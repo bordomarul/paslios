@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Takım Detayı">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Çankaya Tigers</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        fon        <a href="messages.html" class="nav-item">
+          <span style="font-size: 0.8rem; font-weight: bold;">MSG</span>
+          <span>Mesajlar</span>
+        </a>mily: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .nav-right {
+        width: 2.5rem;
+      }
+      
+      .team-info {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      
+      .team-logo {
+        width: 5rem;
+        height: 5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        font-size: 2rem;
+      }
+      
+      .team-name {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .team-founded {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .team-location {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      
+      .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+      
+      .stat-value {
+        color: #047857;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .stat-label {
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+      
+      .section {
+        margin-bottom: 2rem;
+      }
+      
+      .section-title {
+        color: #1f2937;
+        font-size: 1.125rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      
+      .member-item {
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      
+      .member-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .member-item.captain {
+        border: 2px solid #fbbf24;
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+      }
+      
+      .member-avatar {
+        width: 3rem;
+        height: 3rem;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #6b7280;
+        position: relative;
+      }
+      
+      .captain-badge {
+        position: absolute;
+        top: -0.25rem;
+        right: -0.25rem;
+        background: #fbbf24;
+        color: white;
+        border-radius: 50%;
+        width: 1.25rem;
+        height: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.625rem;
+      }
+      
+      .member-info {
+        flex: 1;
+      }
+      
+      .member-name {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      
+      .member-position {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 0.125rem;
+      }
+      
+      .member-rating {
+        color: #047857;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      
+      .member-stats {
+        text-align: right;
+      }
+      
+      .member-matches {
+        color: #047857;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 0.125rem;
+      }
+      
+      .member-matches-label {
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      body {
+        padding-bottom: 80px;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #047857;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #047857;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="profile.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Takım Detayı</h1>
+          </div>
+          <div class="nav-right"></div>
+        </div>
+
+        <!-- Team Info -->
+        <div class="team-info">
+          <div class="team-logo">🐅</div>
+          <div class="team-name">Çankaya Tigers</div>
+          <div class="team-founded">Kurulma: Ağustos 2024</div>
+          <div class="team-location">📍 Çankaya, Ankara</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Team Statistics -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">6</div>
+          <div class="stat-label">Aktif Oyuncu</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">23</div>
+          <div class="stat-label">Toplam Maç</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">4.5</div>
+          <div class="stat-label">Ortalama Puan</div>
+        </div>
+      </div>
+
+      <!-- Team Members -->
+      <div class="section">
+        <h2 class="section-title">Takım Üyeleri</h2>
+        
+        <!-- Captain -->
+        <div class="member-item captain">
+          <div class="member-avatar">
+            AY
+            <div class="captain-badge">👑</div>
+          </div>
+          <div class="member-info">
+            <div class="member-name">Ahmet Yılmaz (Kaptan)</div>
+            <div class="member-position">Orta Saha Oyuncusu</div>
+            <div class="member-rating">⭐ 4.7 puan</div>
+          </div>
+          <div class="member-stats">
+            <div class="member-matches">24</div>
+            <div class="member-matches-label">maç</div>
+          </div>
+        </div>
+
+        <!-- Members -->
+        <div class="member-item">
+          <div class="member-avatar">MK</div>
+          <div class="member-info">
+            <div class="member-name">Mehmet Kaya</div>
+            <div class="member-position">Kaleci</div>
+            <div class="member-rating">⭐ 4.8 puan</div>
+          </div>
+          <div class="member-stats">
+            <div class="member-matches">18</div>
+            <div class="member-matches-label">maç</div>
+          </div>
+        </div>
+
+        <div class="member-item">
+          <div class="member-avatar">ED</div>
+          <div class="member-info">
+            <div class="member-name">Emre Demir</div>
+            <div class="member-position">Forvet</div>
+            <div class="member-rating">⭐ 4.3 puan</div>
+          </div>
+          <div class="member-stats">
+            <div class="member-matches">16</div>
+            <div class="member-matches-label">maç</div>
+          </div>
+        </div>
+
+        <div class="member-item">
+          <div class="member-avatar">CÖ</div>
+          <div class="member-info">
+            <div class="member-name">Can Özkan</div>
+            <div class="member-position">Defans</div>
+            <div class="member-rating">⭐ 4.5 puan</div>
+          </div>
+          <div class="member-stats">
+            <div class="member-matches">15</div>
+            <div class="member-matches-label">maç</div>
+          </div>
+        </div>
+
+        <div class="member-item">
+          <div class="member-avatar">BT</div>
+          <div class="member-info">
+            <div class="member-name">Burak Tunç</div>
+            <div class="member-position">Orta Saha</div>
+            <div class="member-rating">⭐ 4.2 puan</div>
+          </div>
+          <div class="member-stats">
+            <div class="member-matches">12</div>
+            <div class="member-matches-label">maç</div>
+          </div>
+        </div>
+
+        <div class="member-item">
+          <div class="member-avatar">AS</div>
+          <div class="member-info">
+            <div class="member-name">Ali Şen</div>
+            <div class="member-position">Kanat</div>
+            <div class="member-rating">⭐ 4.0 puan</div>
+          </div>
+          <div class="member-stats">
+            <div class="member-matches">8</div>
+            <div class="member-matches-label">maç</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Bildirimler">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Bildirimler</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 80px;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .mark-all-btn {
+        color: white;
+        font-size: 0.875rem;
+        text-decoration: none;
+        opacity: 0.9;
+        font-weight: 500;
+      }
+      
+      .mark-all-btn:hover {
+        opacity: 1;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .notification-item {
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+        position: relative;
+      }
+      
+      .notification-item.unread {
+        border-left: 4px solid #3b82f6;
+      }
+      
+      .notification-item:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+      
+      .notification-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      
+      .notification-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+      }
+      
+      .notification-icon.match {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+      }
+      
+      .notification-icon.friend {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+      }
+      
+      .notification-icon.achievement {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+      }
+      
+      .notification-icon.system {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        color: white;
+      }
+      
+      .notification-content {
+        flex: 1;
+      }
+      
+      .notification-title {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .notification-message {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+      }
+      
+      .notification-time {
+        color: #9ca3af;
+        font-size: 0.75rem;
+      }
+      
+      .notification-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+      
+      .btn-accept {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .btn-accept:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+      
+      .btn-decline {
+        background: #f3f4f6;
+        color: #6b7280;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .btn-decline:hover {
+        background: #e5e7eb;
+      }
+      
+      .section-title {
+        color: #1f2937;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-left: 0.5rem;
+      }
+      
+      .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+      }
+      
+      .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+      
+      .empty-state-text {
+        font-size: 0.875rem;
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      body {
+        padding-bottom: 80px;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #3b82f6;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #3b82f6;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="home.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Bildirimler</h1>
+          </div>
+          <a href="javascript:void(0)" class="mark-all-btn" onclick="markAllAsRead()">Tümünü Okundu İşaretle</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Yeni Bildirimler -->
+      <div class="section-title">Yeni</div>
+      
+      <!-- Maç Daveti -->
+      <div class="notification-item unread">
+        <div class="notification-header">
+          <div class="notification-icon match">⚽</div>
+          <div class="notification-content">
+            <div class="notification-title">Maç Daveti</div>
+            <div class="notification-message">
+              <strong>Mehmet Kaya</strong> seni yarın 19:00'da Elite Football Center'daki maça davet etti.
+            </div>
+            <div class="notification-time">15 dakika önce</div>
+            <div class="notification-actions">
+              <button class="btn-accept">Katıl</button>
+              <button class="btn-decline">Reddet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arkadaşlık İsteği -->
+      <div class="notification-item unread">
+        <div class="notification-header">
+          <div class="notification-icon friend">👥</div>
+          <div class="notification-content">
+            <div class="notification-title">Arkadaşlık İsteği</div>
+            <div class="notification-message">
+              <strong>Ali Sönmez</strong> arkadaş olmak istiyor.
+            </div>
+            <div class="notification-time">1 saat önce</div>
+            <div class="notification-actions">
+              <button class="btn-accept">Kabul Et</button>
+              <button class="btn-decline">Reddet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Başarı Bildirimi -->
+      <div class="notification-item unread">
+        <div class="notification-header">
+          <div class="notification-icon achievement">🏆</div>
+          <div class="notification-content">
+            <div class="notification-title">Yeni Başarı!</div>
+            <div class="notification-message">
+              "Gol Makinesi" rozetini kazandın! 10 maçta gol atmayı başardın.
+            </div>
+            <div class="notification-time">3 saat önce</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Önceki Bildirimler -->
+      <div class="section-title" style="margin-top: 2rem;">Önceki</div>
+
+      <!-- Maç Sonucu -->
+      <a href="rating.html" class="notification-item">
+        <div class="notification-header">
+          <div class="notification-icon match">⚽</div>
+          <div class="notification-content">
+            <div class="notification-title">Maç Sonucu</div>
+            <div class="notification-message">
+              Ankara Spor Halısaha'daki maçınız sona erdi. Takımınız 4-2 galip geldi! Oyuncuları değerlendirin.
+            </div>
+            <div class="notification-time">1 gün önce</div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Saha Rezervasyon Onayı -->
+      <div class="notification-item">
+        <div class="notification-header">
+          <div class="notification-icon system">🏟️</div>
+          <div class="notification-content">
+            <div class="notification-title">Rezervasyon Onayı</div>
+            <div class="notification-message">
+              18 Eylül 20:00 için Champions Halısaha rezervasyonunuz onaylandı.
+            </div>
+            <div class="notification-time">2 gün önce</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yeni Takım Üyesi -->
+      <div class="notification-item">
+        <div class="notification-header">
+          <div class="notification-icon friend">👥</div>
+          <div class="notification-content">
+            <div class="notification-title">Takım Güncellemesi</div>
+            <div class="notification-message">
+              <strong>Emre Tuncay</strong> "Şampiyonlar" takımına katıldı.
+            </div>
+            <div class="notification-time">3 gün önce</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Haftalık Özet -->
+      <div class="notification-item">
+        <div class="notification-header">
+          <div class="notification-icon system">📊</div>
+          <div class="notification-content">
+            <div class="notification-title">Haftalık Özet</div>
+            <div class="notification-message">
+              Bu hafta 3 maç oynadın, 2 gol attın ve 1 asist yaptın. Harika performans!
+            </div>
+            <div class="notification-time">1 hafta önce</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      function markAllAsRead() {
+        const unreadItems = document.querySelectorAll('.notification-item.unread');
+        unreadItems.forEach(item => {
+          item.classList.remove('unread');
+        });
+        
+        // Hide the mark all button
+        const markAllBtn = document.querySelector('.mark-all-btn');
+        markAllBtn.style.display = 'none';
+        
+        // Show success message
+        alert('Tüm bildirimler okundu olarak işaretlendi!');
+      }
+    </script>
+  </body>
+</html>

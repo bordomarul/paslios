@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Liderlik Tablosu">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Liderlik Tablosu</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'S        <a href="messages.html" class="nav-item">
+          <span style="font-size: 0.8rem; font-weight: bold;">MSG</span>
+          <span>Mesajlar</span>
+        </a> UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .nav-right {
+        width: 2.5rem;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .my-ranking {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border: 2px solid #3b82f6;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      
+      .my-ranking-title {
+        color: #1e40af;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .my-rank {
+        color: #1e40af;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+      }
+      
+      .my-rank-label {
+        color: #1e40af;
+        font-size: 0.875rem;
+      }
+      
+      .tabs {
+        display: flex;
+        background: #f3f4f6;
+        border-radius: 12px;
+        padding: 0.25rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        border-radius: 8px;
+        color: #6b7280;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .tab.active {
+        background: white;
+        color: #047857;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      .leaderboard {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      .rank-item {
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s;
+      }
+      
+      .rank-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .rank-item.my-rank-item {
+        border: 2px solid #3b82f6;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      }
+      
+      .rank-number {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      
+      .rank-number.gold {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: white;
+      }
+      
+      .rank-number.silver {
+        background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+        color: #374151;
+      }
+      
+      .rank-number.bronze {
+        background: linear-gradient(135deg, #cd7c2f, #a45a2a);
+        color: white;
+      }
+      
+      .rank-number.regular {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      
+      .player-avatar {
+        width: 3rem;
+        height: 3rem;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #6b7280;
+      }
+      
+      .player-info {
+        flex: 1;
+      }
+      
+      .player-name {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      
+      .player-team {
+        color: #047857;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #ecfdf5;
+        padding: 0.125rem 0.5rem;
+        border-radius: 6px;
+        display: inline-block;
+        margin-bottom: 0.25rem;
+      }
+      
+      .player-position {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .match-count {
+        text-align: right;
+      }
+      
+      .match-number {
+        color: #047857;
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 0.125rem;
+      }
+      
+      .match-label {
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      body {
+        padding-bottom: 80px;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #047857;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #047857;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="profile.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Liderlik Tablosu</h1>
+          </div>
+          <div class="nav-right"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- My Ranking -->
+      <div class="my-ranking">
+        <div class="my-ranking-title">Senin Sıralamaın</div>
+        <div class="my-rank">#12</div>
+        <div class="my-rank-label">24 maç ile 12. sıradasın</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(event, 'weekly')">Bu Hafta</div>
+        <div class="tab" onclick="switchTab(event, 'monthly')">Bu Ay</div>
+        <div class="tab" onclick="switchTab(event, 'alltime')">Tüm Zamanlar</div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="leaderboard" id="weekly">
+        <!-- 1st Place -->
+        <div class="rank-item">
+          <div class="rank-number gold">1</div>
+          <div class="player-avatar">MK</div>
+          <div class="player-info">
+            <div class="player-name">Mehmet Kaya</div>
+            <div class="player-team">Ankara Sharks</div>
+            <div class="player-position">Kaleci</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">8</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+
+        <!-- 2nd Place -->
+        <div class="rank-item">
+          <div class="rank-number silver">2</div>
+          <div class="player-avatar">ED</div>
+          <div class="player-info">
+            <div class="player-name">Emre Demir</div>
+            <div class="player-team">Capital FC</div>
+            <div class="player-position">Forvet</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">7</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+
+        <!-- 3rd Place -->
+        <div class="rank-item">
+          <div class="rank-number bronze">3</div>
+          <div class="player-avatar">CÖ</div>
+          <div class="player-info">
+            <div class="player-name">Can Özkan</div>
+            <div class="player-team">Keçiören United</div>
+            <div class="player-position">Defans</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">6</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+
+        <!-- 4th Place -->
+        <div class="rank-item">
+          <div class="rank-number regular">4</div>
+          <div class="player-avatar">BT</div>
+          <div class="player-info">
+            <div class="player-name">Burak Tunç</div>
+            <div class="player-team">Mamak Warriors</div>
+            <div class="player-position">Orta Saha</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">6</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+
+        <!-- 5th Place -->
+        <div class="rank-item">
+          <div class="rank-number regular">5</div>
+          <div class="player-avatar">AS</div>
+          <div class="player-info">
+            <div class="player-name">Ali Şen</div>
+            <div class="player-team">Çankaya Eagles</div>
+            <div class="player-position">Kanat</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">5</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+
+        <!-- Current User -->
+        <div class="rank-item my-rank-item">
+          <div class="rank-number regular">12</div>
+          <div class="player-avatar">AY</div>
+          <div class="player-info">
+            <div class="player-name">Ahmet Yılmaz (Sen)</div>
+            <div class="player-team">Çankaya Tigers</div>
+            <div class="player-position">Orta Saha Oyuncusu</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">3</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Leaderboard (Hidden) -->
+      <div class="leaderboard" id="monthly" style="display: none;">
+        <div class="rank-item">
+          <div class="rank-number gold">1</div>
+          <div class="player-avatar">ED</div>
+          <div class="player-info">
+            <div class="player-name">Emre Demir</div>
+            <div class="player-team">Capital FC</div>
+            <div class="player-position">Forvet</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">15</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+
+        <div class="rank-item my-rank-item">
+          <div class="rank-number regular">8</div>
+          <div class="player-avatar">AY</div>
+          <div class="player-info">
+            <div class="player-name">Ahmet Yılmaz (Sen)</div>
+            <div class="player-team">Çankaya Tigers</div>
+            <div class="player-position">Orta Saha Oyuncusu</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">9</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All-time Leaderboard (Hidden) -->
+      <div class="leaderboard" id="alltime" style="display: none;">
+        <div class="rank-item">
+          <div class="rank-number gold">1</div>
+          <div class="player-avatar">MK</div>
+          <div class="player-info">
+            <div class="player-name">Mehmet Kaya</div>
+            <div class="player-team">Ankara Sharks</div>
+            <div class="player-position">Kaleci</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">127</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+
+        <div class="rank-item my-rank-item">
+          <div class="rank-number regular">45</div>
+          <div class="player-avatar">AY</div>
+          <div class="player-info">
+            <div class="player-name">Ahmet Yılmaz (Sen)</div>
+            <div class="player-team">Çankaya Tigers</div>
+            <div class="player-position">Orta Saha Oyuncusu</div>
+          </div>
+          <div class="match-count">
+            <div class="match-number">24</div>
+            <div class="match-label">maç</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      function switchTab(event, tabName) {
+        // Hide all leaderboards
+        const leaderboards = document.querySelectorAll('.leaderboard');
+        leaderboards.forEach(board => {
+          board.style.display = 'none';
+        });
+        
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Show selected leaderboard
+        document.getElementById(tabName).style.display = 'flex';
+        
+        // Add active class to clicked tab
+        event.target.classList.add('active');
+        
+        // Update my ranking based on tab
+        const myRank = document.querySelector('.my-rank');
+        const myRankLabel = document.querySelector('.my-rank-label');
+        
+        if (tabName === 'weekly') {
+          myRank.textContent = '#12';
+          myRankLabel.textContent = '3 maç ile 12. sıradasın';
+        } else if (tabName === 'monthly') {
+          myRank.textContent = '#8';
+          myRankLabel.textContent = '9 maç ile 8. sıradasın';
+        } else if (tabName === 'alltime') {
+          myRank.textContent = '#45';
+          myRankLabel.textContent = '24 maç ile 45. sıradasın';
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Mesajlar">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Mesajlar</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 80px;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .header-container {
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .new-message-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .new-message-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .search-box {
+        background: white;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      
+      .search-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        color: #1f2937;
+      }
+      
+      .search-input::placeholder {
+        color: #9ca3af;
+      }
+      
+      .search-icon {
+        color: #9ca3af;
+        font-size: 1rem;
+      }
+      
+      .conversation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .conversation-item {
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+      }
+      
+      .conversation-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .conversation-item.unread {
+        border-left: 4px solid #10b981;
+      }
+      
+      .user-avatar {
+        width: 3rem;
+        height: 3rem;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #6b7280;
+        position: relative;
+      }
+      
+      .online-status {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 0.75rem;
+        height: 0.75rem;
+        background: #10b981;
+        border: 2px solid white;
+        border-radius: 50%;
+      }
+      
+      .conversation-info {
+        flex: 1;
+        min-width: 0;
+      }
+      
+      .conversation-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+      }
+      
+      .user-name {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      
+      .message-time {
+        color: #9ca3af;
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+      
+      .last-message {
+        color: #6b7280;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      
+      .unread-count {
+        background: #10b981;
+        color: white;
+        border-radius: 50%;
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+      }
+      
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6b7280;
+      }
+      
+      .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+      
+      .empty-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+      }
+      
+      .empty-description {
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .start-chat-btn {
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+      }
+      
+      .start-chat-btn:hover {
+        background: #059669;
+        transform: translateY(-1px);
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      body {
+        padding-bottom: 80px;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #10b981;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #10b981;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="home.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Mesajlar</h1>
+          </div>
+          <a href="search.html" class="new-message-btn">
+            <span style="color: white; font-size: 1.125rem;">✏️</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Search Box -->
+      <div class="search-box">
+        <input 
+          type="text" 
+          placeholder="Mesajlarda ara..."
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Conversation List -->
+      <div class="conversation-list">
+        <!-- Active Conversation -->
+        <a href="chat.html?user=mehmet" class="conversation-item unread">
+          <div class="user-avatar">
+            MK
+            <div class="online-status"></div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <div class="user-name">Mehmet Kaya</div>
+              <div class="message-time">2 dk</div>
+            </div>
+            <div class="last-message">Yarın maçta görüşürüz! 🔥</div>
+          </div>
+          <div class="unread-count">2</div>
+        </a>
+
+        <!-- Conversation 2 -->
+        <a href="chat.html?user=emre" class="conversation-item">
+          <div class="user-avatar">ED</div>
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <div class="user-name">Emre Demir</div>
+              <div class="message-time">1 saat</div>
+            </div>
+            <div class="last-message">Antalya maçından fotoğraflar geldi!</div>
+          </div>
+        </a>
+
+        <!-- Team Chat -->
+        <a href="chat.html?team=tigers" class="conversation-item unread">
+          <div class="user-avatar" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">🐅</div>
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <div class="user-name">Çankaya Tigers</div>
+              <div class="message-time">3 saat</div>
+            </div>
+            <div class="last-message">Can: Bu hafta antrenman var mı?</div>
+          </div>
+          <div class="unread-count">5</div>
+        </a>
+
+        <!-- Conversation 3 -->
+        <a href="chat.html?user=can" class="conversation-item">
+          <div class="user-avatar">CÖ</div>
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <div class="user-name">Can Özkan</div>
+              <div class="message-time">1 gün</div>
+            </div>
+            <div class="last-message">Yeni ayakkabılar nasıl?</div>
+          </div>
+        </a>
+
+        <!-- Conversation 4 -->
+        <a href="chat.html?user=burak" class="conversation-item">
+          <div class="user-avatar">
+            BT
+            <div class="online-status"></div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <div class="user-name">Burak Tunç</div>
+              <div class="message-time">2 gün</div>
+            </div>
+            <div class="last-message">Saha rezervasyonu yaptım ✅</div>
+          </div>
+        </a>
+
+        <!-- Conversation 5 -->
+        <a href="chat.html?user=ali" class="conversation-item">
+          <div class="user-avatar">AS</div>
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <div class="user-name">Ali Şen</div>
+              <div class="message-time">1 hafta</div>
+            </div>
+            <div class="last-message">👍</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

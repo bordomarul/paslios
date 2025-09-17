@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Sohbet">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Sohbet</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 0.75rem 1rem;
+        flex-shrink: 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      
+      .user-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #059669;
+        position: relative;
+      }
+      
+      .online-status {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 0.75rem;
+        height: 0.75rem;
+        background: #10b981;
+        border: 2px solid white;
+        border-radius: 50%;
+      }
+      
+      .user-details h1 {
+        color: white;
+        font-size: 1.125rem;
+        font-weight: bold;
+        margin-bottom: 0.125rem;
+      }
+      
+      .user-status {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+      }
+      
+      .chat-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      
+      .action-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .chat-container {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      
+      .messages-area {
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .message {
+        display: flex;
+        max-width: 85%;
+        animation: slideIn 0.3s ease;
+      }
+      
+      .message.sent {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+      }
+      
+      .message.received {
+        align-self: flex-start;
+      }
+      
+      .message-content {
+        background: white;
+        border-radius: 18px;
+        padding: 0.875rem 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        margin: 0 0.5rem;
+      }
+      
+      .message.sent .message-content {
+        background: #10b981;
+        color: white;
+        border-bottom-right-radius: 6px;
+      }
+      
+      .message.received .message-content {
+        background: white;
+        color: #1f2937;
+        border-bottom-left-radius: 6px;
+      }
+      
+      .message-text {
+        font-size: 0.9375rem;
+        line-height: 1.4;
+        margin-bottom: 0.25rem;
+      }
+      
+      .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        text-align: right;
+      }
+      
+      .message.received .message-time {
+        color: #6b7280;
+      }
+      
+      .message.sent .message-time {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .message-avatar {
+        width: 2rem;
+        height: 2rem;
+        background: #e5e7eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #6b7280;
+        align-self: flex-end;
+      }
+      
+      .date-separator {
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        margin: 0.5rem 2rem;
+        align-self: center;
+      }
+      
+      .typing-indicator {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .typing-dots {
+        display: flex;
+        gap: 0.25rem;
+      }
+      
+      .typing-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        background: #10b981;
+        border-radius: 50%;
+        animation: typing 1.5s infinite;
+      }
+      
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      
+      .message-input-container {
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        flex-shrink: 0;
+      }
+      
+      .message-input-box {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.75rem;
+        background: #f9fafb;
+        border-radius: 24px;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .attachment-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: #10b981;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: white;
+        font-size: 1.125rem;
+      }
+      
+      .attachment-btn:hover {
+        background: #059669;
+        transform: scale(1.05);
+      }
+      
+      .text-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 0.9375rem;
+        color: #1f2937;
+        padding: 0.75rem 0.5rem;
+        max-height: 100px;
+        resize: none;
+        font-family: inherit;
+      }
+      
+      .text-input::placeholder {
+        color: #9ca3af;
+      }
+      
+      .send-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: #10b981;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: white;
+        font-size: 1.125rem;
+      }
+      
+      .send-btn:hover:not(:disabled) {
+        background: #059669;
+        transform: scale(1.05);
+      }
+      
+      .send-btn:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+      }
+      
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      @keyframes typing {
+        0%, 60%, 100% {
+          transform: translateY(0);
+        }
+        30% {
+          transform: translateY(-10px);
+        }
+      }
+      
+      .quick-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0 1rem 1rem 1rem;
+        overflow-x: auto;
+      }
+      
+      .quick-action {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .quick-action:hover {
+        background: rgba(16, 185, 129, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <div class="nav-left">
+            <a href="messages.html" class="back-btn">
+              <span style="color: white; font-size: 1.125rem;">←</span>
+            </a>
+            <div class="user-info">
+              <div class="user-avatar">
+                MK
+                <div class="online-status"></div>
+              </div>
+              <div class="user-details">
+                <h1 id="chat-title">Mehmet Kaya</h1>
+                <div class="user-status" id="user-status">Çevrimiçi</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-actions">
+            <a href="profile.html?user=mehmet" class="action-btn">
+              <span style="color: white; font-size: 1rem;">👤</span>
+            </a>
+            <button class="action-btn" onclick="toggleMute()">
+              <span style="color: white; font-size: 1rem;">🔔</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <button class="quick-action" onclick="sendQuickMessage('👋 Selam!')">👋 Selam</button>
+        <button class="quick-action" onclick="sendQuickMessage('Maça gelecek misin?')">⚽ Maça gel</button>
+        <button class="quick-action" onclick="sendQuickMessage('Saha rezervasyonu yapalım')">🏟️ Saha ayarla</button>
+        <button class="quick-action" onclick="sendQuickMessage('👍')">👍</button>
+      </div>
+
+      <!-- Messages Area -->
+      <div class="messages-area" id="messages">
+        <div class="date-separator">Bugün</div>
+        
+        <div class="message received">
+          <div class="message-avatar">MK</div>
+          <div class="message-content">
+            <div class="message-text">Selam! Bu akşam maça gelecek misin?</div>
+            <div class="message-time">14:30</div>
+          </div>
+        </div>
+
+        <div class="message sent">
+          <div class="message-content">
+            <div class="message-text">Evet kesinlikle! Saat kaçta başlıyor?</div>
+            <div class="message-time">14:32</div>
+          </div>
+        </div>
+
+        <div class="message received">
+          <div class="message-avatar">MK</div>
+          <div class="message-content">
+            <div class="message-text">19:00'da başlıyor. Keçiören Sports Center'da oynayacağız</div>
+            <div class="message-time">14:33</div>
+          </div>
+        </div>
+
+        <div class="message sent">
+          <div class="message-content">
+            <div class="message-text">Harika! 18:30'da orada olurum 👍</div>
+            <div class="message-time">14:35</div>
+          </div>
+        </div>
+
+        <div class="message received">
+          <div class="message-avatar">MK</div>
+          <div class="message-content">
+            <div class="message-text">Mükemmel! Bu arada yeni kramponları aldın mı?</div>
+            <div class="message-time">14:40</div>
+          </div>
+        </div>
+
+        <div class="message sent">
+          <div class="message-content">
+            <div class="message-text">Evet aldım! Nike Mercurial aldım, çok güzel 🔥</div>
+            <div class="message-time">14:42</div>
+          </div>
+        </div>
+
+        <div class="message received">
+          <div class="message-avatar">MK</div>
+          <div class="message-content">
+            <div class="message-text">Yarın maçta görüşürüz! 🔥</div>
+            <div class="message-time">15:20</div>
+          </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typing">
+          <div class="message-avatar">MK</div>
+          <span>yazıyor</span>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Input -->
+      <div class="message-input-container">
+        <div class="message-input-box">
+          <button class="attachment-btn" onclick="openAttachments()">
+            📎
+          </button>
+          <textarea 
+            class="text-input" 
+            placeholder="Bir mesaj yazın..."
+            id="messageInput"
+            rows="1"
+            onkeydown="handleKeyDown(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // URL parametrelerini oku
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('user');
+      const teamId = urlParams.get('team');
+
+      // Kullanıcı bilgilerini güncelle
+      function updateChatHeader() {
+        const chatTitle = document.getElementById('chat-title');
+        const userStatus = document.getElementById('user-status');
+        
+        if (teamId) {
+          if (teamId === 'tigers') {
+            chatTitle.textContent = 'Çankaya Tigers';
+            userStatus.textContent = '12 üye, 5 çevrimiçi';
+            document.querySelector('.user-avatar').innerHTML = '🐅';
+            document.querySelector('.user-avatar').style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+          }
+        } else if (userId) {
+          const users = {
+            'mehmet': { name: 'Mehmet Kaya', status: 'Çevrimiçi', avatar: 'MK' },
+            'emre': { name: 'Emre Demir', status: '2 dk önce aktif', avatar: 'ED' },
+            'can': { name: 'Can Özkan', status: '1 saat önce aktif', avatar: 'CÖ' },
+            'burak': { name: 'Burak Tunç', status: 'Çevrimiçi', avatar: 'BT' },
+            'ali': { name: 'Ali Şen', status: '3 gün önce aktif', avatar: 'AS' }
+          };
+          
+          if (users[userId]) {
+            chatTitle.textContent = users[userId].name;
+            userStatus.textContent = users[userId].status;
+            document.querySelector('.user-avatar').textContent = users[userId].avatar;
+          }
+        }
+      }
+
+      // Sayfa yüklendiğinde başlığı güncelle
+      updateChatHeader();
+
+      // Mesaj gönderme
+      function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (message) {
+          addMessage(message, true);
+          input.value = '';
+          updateSendButton();
+          autoResize(input);
+          
+          // Otomatik cevap simülasyonu
+          setTimeout(() => {
+            showTyping();
+            setTimeout(() => {
+              hideTyping();
+              const responses = [
+                'Anlaşıldı! 👍',
+                'Harika fikir!',
+                'Tabii, olur',
+                'Ben de aynı şekilde düşünüyorum',
+                'Hadi bakalım! 🔥'
+              ];
+              const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+              addMessage(randomResponse, false);
+            }, 2000);
+          }, 500);
+        }
+      }
+
+      // Hızlı mesaj gönderme
+      function sendQuickMessage(message) {
+        addMessage(message, true);
+      }
+
+      // Mesaj ekleme
+      function addMessage(text, isSent) {
+        const messagesArea = document.getElementById('messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+        
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                          now.getMinutes().toString().padStart(2, '0');
+        
+        if (isSent) {
+          messageDiv.innerHTML = `
+            <div class="message-content">
+              <div class="message-text">${text}</div>
+              <div class="message-time">${timeString}</div>
+            </div>
+          `;
+        } else {
+          const avatar = teamId ? '🐅' : (document.querySelector('.user-avatar').textContent || 'MK');
+          messageDiv.innerHTML = `
+            <div class="message-avatar">${avatar}</div>
+            <div class="message-content">
+              <div class="message-text">${text}</div>
+              <div class="message-time">${timeString}</div>
+            </div>
+          `;
+        }
+        
+        messagesArea.appendChild(messageDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+      }
+
+      // Yazıyor göstergesi
+      function showTyping() {
+        document.getElementById('typing').style.display = 'flex';
+        const messagesArea = document.getElementById('messages');
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+      }
+
+      function hideTyping() {
+        document.getElementById('typing').style.display = 'none';
+      }
+
+      // Enter tuşu ile mesaj gönderme
+      function handleKeyDown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          sendMessage();
+        }
+      }
+
+      // Otomatik boyutlandırma
+      function autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+        updateSendButton();
+      }
+
+      // Gönder butonu durumunu güncelle
+      function updateSendButton() {
+        const input = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        sendBtn.disabled = !input.value.trim();
+      }
+
+      // Ek dosya ekleme
+      function openAttachments() {
+        alert('Dosya ekleme özelliği yakında gelecek!');
+      }
+
+      // Bildirim sessize alma
+      function toggleMute() {
+        alert('Bildirimler sessize alındı!');
+      }
+
+      // Mesajları en alta kaydır
+      document.addEventListener('DOMContentLoaded', function() {
+        const messagesArea = document.getElementById('messages');
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Takım Oluştur">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Takım Oluştur</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 80px;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .header-container {
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .save-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      
+      .save-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .form-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+      }
+      
+      .section-title {
+        color: #1f2937;
+        font-size: 1.125rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      
+      .form-label {
+        display: block;
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: #1f2937;
+        background: #f9fafb;
+        transition: all 0.2s;
+      }
+      
+      .form-input:focus {
+        outline: none;
+        border-color: #10b981;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+      }
+      
+      .form-textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+      
+      .color-picker {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+      
+      .color-option {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .color-option.selected {
+        border-color: #1f2937;
+        transform: scale(1.1);
+      }
+      
+      .emoji-picker {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+      
+      .emoji-option {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+      }
+      
+      .emoji-option.selected {
+        background: #10b981;
+        border-color: #059669;
+        transform: scale(1.1);
+      }
+      
+      .privacy-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+      
+      .privacy-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .privacy-option.selected {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+      }
+      
+      .privacy-icon {
+        font-size: 1.25rem;
+      }
+      
+      .privacy-text {
+        flex: 1;
+      }
+      
+      .privacy-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+      }
+      
+      .privacy-desc {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+      
+      .create-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 1rem;
+      }
+      
+      .create-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+      
+      .create-btn:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #10b981;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #10b981;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="profile.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Takım Oluştur</h1>
+          </div>
+          <button class="save-btn" onclick="createTeam()">
+            <span style="color: white; font-size: 1rem;">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Team Info -->
+      <div class="form-section">
+        <div class="section-title">Takım Bilgileri</div>
+        
+        <div class="form-group">
+          <label for="teamName" class="form-label">Takım Adı *</label>
+          <input 
+            type="text" 
+            id="teamName" 
+            class="form-input" 
+            placeholder="Örn: Çankaya Tigers"
+            maxlength="30"
+            required
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="teamDescription" class="form-label">Açıklama</label>
+          <textarea 
+            id="teamDescription" 
+            class="form-input form-textarea" 
+            placeholder="Takımınız hakkında kısa açıklama..."
+            maxlength="200"
+          ></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="teamLocation" class="form-label">Oyun Bölgesi</label>
+          <select id="teamLocation" class="form-input">
+            <option value="">Bölge seçin</option>
+            <option value="cankaya">Çankaya</option>
+            <option value="kecioren">Keçiören</option>
+            <option value="mamak">Mamak</option>
+            <option value="yenimahalle">Yenimahalle</option>
+            <option value="sincan">Sincan</option>
+            <option value="pursaklar">Pursaklar</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Team Appearance -->
+      <div class="form-section">
+        <div class="section-title">Takım Görünümü</div>
+        
+        <div class="form-group">
+          <label class="form-label">Takım Simgesi</label>
+          <div class="emoji-picker">
+            <div class="emoji-option selected" data-emoji="🐅">🐅</div>
+            <div class="emoji-option" data-emoji="🦁">🦁</div>
+            <div class="emoji-option" data-emoji="🐺">🐺</div>
+            <div class="emoji-option" data-emoji="🦅">🦅</div>
+            <div class="emoji-option" data-emoji="⚡">⚡</div>
+            <div class="emoji-option" data-emoji="🔥">🔥</div>
+            <div class="emoji-option" data-emoji="💪">💪</div>
+            <div class="emoji-option" data-emoji="🏆">🏆</div>
+            <div class="emoji-option" data-emoji="⭐">⭐</div>
+            <div class="emoji-option" data-emoji="🎯">🎯</div>
+            <div class="emoji-option" data-emoji="🚀">🚀</div>
+            <div class="emoji-option" data-emoji="💎">💎</div>
+            <div class="emoji-option" data-emoji="🌟">🌟</div>
+            <div class="emoji-option" data-emoji="⚽">⚽</div>
+            <div class="emoji-option" data-emoji="🏅">🏅</div>
+            <div class="emoji-option" data-emoji="🔱">🔱</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Takım Rengi</label>
+          <div class="color-picker">
+            <div class="color-option selected" style="background: #10b981;" data-color="#10b981"></div>
+            <div class="color-option" style="background: #3b82f6;" data-color="#3b82f6"></div>
+            <div class="color-option" style="background: #ef4444;" data-color="#ef4444"></div>
+            <div class="color-option" style="background: #f59e0b;" data-color="#f59e0b"></div>
+            <div class="color-option" style="background: #8b5cf6;" data-color="#8b5cf6"></div>
+            <div class="color-option" style="background: #ec4899;" data-color="#ec4899"></div>
+            <div class="color-option" style="background: #06b6d4;" data-color="#06b6d4"></div>
+            <div class="color-option" style="background: #84cc16;" data-color="#84cc16"></div>
+            <div class="color-option" style="background: #f97316;" data-color="#f97316"></div>
+            <div class="color-option" style="background: #6366f1;" data-color="#6366f1"></div>
+            <div class="color-option" style="background: #14b8a6;" data-color="#14b8a6"></div>
+            <div class="color-option" style="background: #1f2937;" data-color="#1f2937"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy Settings -->
+      <div class="form-section">
+        <div class="section-title">Gizlilik Ayarları</div>
+        
+        <div class="privacy-options">
+          <div class="privacy-option selected" data-privacy="public">
+            <div class="privacy-icon">🌍</div>
+            <div class="privacy-text">
+              <div class="privacy-title">Herkese Açık</div>
+              <div class="privacy-desc">Herkes takımınızı bulabilir ve katılım isteyebilir</div>
+            </div>
+          </div>
+          
+          <div class="privacy-option" data-privacy="invite">
+            <div class="privacy-icon">👥</div>
+            <div class="privacy-text">
+              <div class="privacy-title">Sadece Davetiye</div>
+              <div class="privacy-desc">Sadece davet edilen oyuncular katılabilir</div>
+            </div>
+          </div>
+          
+          <div class="privacy-option" data-privacy="request">
+            <div class="privacy-icon">✋</div>
+            <div class="privacy-text">
+              <div class="privacy-title">Onay Gerektiren</div>
+              <div class="privacy-desc">Katılım istekleri kaptan tarafından onaylanır</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create Button -->
+      <button class="create-btn" onclick="createTeam()">
+        🏆 Takımı Oluştur
+      </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      let selectedEmoji = '🐅';
+      let selectedColor = '#10b981';
+      let selectedPrivacy = 'public';
+
+      // Emoji seçimi
+      document.querySelectorAll('.emoji-option').forEach(option => {
+        option.addEventListener('click', function() {
+          document.querySelectorAll('.emoji-option').forEach(o => o.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedEmoji = this.dataset.emoji;
+        });
+      });
+
+      // Renk seçimi
+      document.querySelectorAll('.color-option').forEach(option => {
+        option.addEventListener('click', function() {
+          document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedColor = this.dataset.color;
+        });
+      });
+
+      // Gizlilik seçimi
+      document.querySelectorAll('.privacy-option').forEach(option => {
+        option.addEventListener('click', function() {
+          document.querySelectorAll('.privacy-option').forEach(o => o.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedPrivacy = this.dataset.privacy;
+        });
+      });
+
+      // Takım oluşturma
+      function createTeam() {
+        const teamName = document.getElementById('teamName').value.trim();
+        const teamDescription = document.getElementById('teamDescription').value.trim();
+        const teamLocation = document.getElementById('teamLocation').value;
+
+        if (!teamName) {
+          alert('Lütfen takım adını girin!');
+          return;
+        }
+
+        if (teamName.length < 3) {
+          alert('Takım adı en az 3 karakter olmalıdır!');
+          return;
+        }
+
+        // Takım oluşturma simülasyonu
+        const teamData = {
+          name: teamName,
+          description: teamDescription,
+          location: teamLocation,
+          emoji: selectedEmoji,
+          color: selectedColor,
+          privacy: selectedPrivacy,
+          captain: 'Ahmet Yılmaz', // Mevcut kullanıcı
+          members: 1,
+          createdAt: new Date().toISOString()
+        };
+
+        // Başarı mesajı
+        alert(`🎉 "${teamName}" takımı başarıyla oluşturuldu!\n\nTakım simgesi: ${selectedEmoji}\nGizlilik: ${getPrivacyText(selectedPrivacy)}\n\nProfil sayfanızdan takımınızı yönetebilirsiniz.`);
+        
+        // Profil sayfasına yönlendir
+        window.location.href = 'profile.html';
+      }
+
+      function getPrivacyText(privacy) {
+        switch(privacy) {
+          case 'public': return 'Herkese Açık';
+          case 'invite': return 'Sadece Davetiye';
+          case 'request': return 'Onay Gerektiren';
+          default: return 'Herkese Açık';
+        }
+      }
+
+      // Form validasyonu
+      document.getElementById('teamName').addEventListener('input', function() {
+        const createBtn = document.querySelector('.create-btn');
+        if (this.value.trim().length >= 3) {
+          createBtn.disabled = false;
+        } else {
+          createBtn.disabled = true;
+        }
+      });
+
+      // Sayfa yüklendiğinde butonu devre dışı bırak
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.create-btn').disabled = true;
+      });
+    </script>
+  </body>
+</html>

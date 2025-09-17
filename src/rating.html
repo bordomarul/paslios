@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Oyuncu Değerlendirmesi">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Oyuncu Değerlendirmesi</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .nav-right {
+        width: 2.5rem;
+      }
+      
+      .match-info {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 1rem;
+        text-align: center;
+        color: white;
+      }
+      
+      .match-title {
+        font-size: 1.125rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .match-details {
+        opacity: 0.9;
+        font-size: 0.875rem;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .instruction {
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      
+      .instruction-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .instruction-title {
+        color: #1e40af;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .instruction-text {
+        color: #1e3a8a;
+        font-size: 0.875rem;
+      }
+      
+      .players-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .player-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+      }
+      
+      .player-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      
+      .player-avatar {
+        width: 3rem;
+        height: 3rem;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #6b7280;
+      }
+      
+      .player-info h3 {
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+      }
+      
+      .player-position {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .rating-categories {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .rating-category {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .category-label {
+        color: #374151;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .rating-buttons {
+        display: flex;
+        gap: 0.5rem;
+      }
+      
+      .rating-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        background: white;
+        color: #6b7280;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .rating-btn:hover {
+        border-color: #d1d5db;
+        background: #f9fafb;
+      }
+      
+      .rating-btn.selected {
+        border-color: #3b82f6;
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      
+      .rating-btn.poor {
+        border-color: #ef4444;
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      
+      .rating-btn.average {
+        border-color: #f59e0b;
+        background: #fef3c7;
+        color: #d97706;
+      }
+      
+      .rating-btn.good {
+        border-color: #10b981;
+        background: #d1fae5;
+        color: #059669;
+      }
+      
+      .submit-btn {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-weight: bold;
+        font-size: 1rem;
+        width: 100%;
+        margin-top: 2rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .submit-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+      }
+      
+      .submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .completion-message {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+      }
+      
+      .completion-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+      
+      .completion-title {
+        color: #1f2937;
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .completion-text {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+      }
+      
+      .return-btn {
+        background: #f3f4f6;
+        color: #374151;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+      }
+      
+      .return-btn:hover {
+        background: #e5e7eb;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="notifications.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Oyuncu Değerlendirmesi</h1>
+          </div>
+          <div class="nav-right"></div>
+        </div>
+
+        <!-- Match Info -->
+        <div class="match-info">
+          <div class="match-title">Ankara Spor Halısaha</div>
+          <div class="match-details">28 Ocak 2025 • 20:00 • Takım Maçı</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Instruction -->
+      <div class="instruction">
+        <div class="instruction-icon">⭐</div>
+        <div class="instruction-title">Oyuncuları Değerlendir</div>
+        <div class="instruction-text">
+          Maçta birlikte oynadığın oyuncuları aşağıdaki kategorilerde değerlendir. Bu değerlendirmeler oyuncuların profillerinde görünecek.
+        </div>
+      </div>
+
+      <!-- Players List -->
+      <div class="players-list" id="playersList">
+        <!-- Player 1 -->
+        <div class="player-card" data-player="mehmet">
+          <div class="player-header">
+            <div class="player-avatar">MK</div>
+            <div class="player-info">
+              <h3>Mehmet Kaya</h3>
+              <div class="player-position">Kaleci</div>
+            </div>
+          </div>
+          
+          <div class="rating-categories">
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🤝</span>
+                <span>Takım Oyuncusu</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="teamwork" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="teamwork" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="teamwork" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>⚽</span>
+                <span>Yetenekli</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="skill" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="skill" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="skill" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🙏</span>
+                <span>Saygılı</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="respect" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="respect" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="respect" data-value="good">İyi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player 2 -->
+        <div class="player-card" data-player="emre">
+          <div class="player-header">
+            <div class="player-avatar">ED</div>
+            <div class="player-info">
+              <h3>Emre Demir</h3>
+              <div class="player-position">Forvet</div>
+            </div>
+          </div>
+          
+          <div class="rating-categories">
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🤝</span>
+                <span>Takım Oyuncusu</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="teamwork" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="teamwork" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="teamwork" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>⚽</span>
+                <span>Yetenekli</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="skill" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="skill" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="skill" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🙏</span>
+                <span>Saygılı</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="respect" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="respect" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="respect" data-value="good">İyi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player 3 -->
+        <div class="player-card" data-player="can">
+          <div class="player-header">
+            <div class="player-avatar">CÖ</div>
+            <div class="player-info">
+              <h3>Can Özkan</h3>
+              <div class="player-position">Defans</div>
+            </div>
+          </div>
+          
+          <div class="rating-categories">
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🤝</span>
+                <span>Takım Oyuncusu</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="teamwork" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="teamwork" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="teamwork" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>⚽</span>
+                <span>Yetenekli</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="skill" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="skill" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="skill" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🙏</span>
+                <span>Saygılı</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="respect" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="respect" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="respect" data-value="good">İyi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player 4 -->
+        <div class="player-card" data-player="burak">
+          <div class="player-header">
+            <div class="player-avatar">BT</div>
+            <div class="player-info">
+              <h3>Burak Tunç</h3>
+              <div class="player-position">Orta Saha</div>
+            </div>
+          </div>
+          
+          <div class="rating-categories">
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🤝</span>
+                <span>Takım Oyuncusu</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="teamwork" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="teamwork" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="teamwork" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>⚽</span>
+                <span>Yetenekli</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="skill" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="skill" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="skill" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🙏</span>
+                <span>Saygılı</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="respect" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="respect" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="respect" data-value="good">İyi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button class="submit-btn" id="submitBtn" onclick="submitRatings()">
+        Değerlendirmeleri Gönder
+      </button>
+
+      <!-- Completion Message (Hidden initially) -->
+      <div class="completion-message" id="completionMessage" style="display: none;">
+        <div class="completion-icon">✅</div>
+        <div class="completion-title">Değerlendirmeler Gönderildi!</div>
+        <div class="completion-text">
+          Oyuncuları değerlendirdiğin için teşekkürler. Bu değerlendirmeler diğer oyuncuların profil puanlarına yansıyacak.
+        </div>
+        <a href="home.html" class="return-btn">Ana Sayfaya Dön</a>
+      </div>
+    </div>
+
+    <script>
+      const ratings = {};
+      
+      // Initialize ratings object
+      const players = ['mehmet', 'emre', 'can', 'burak'];
+      const categories = ['teamwork', 'skill', 'respect'];
+      
+      players.forEach(player => {
+        ratings[player] = {};
+        categories.forEach(category => {
+          ratings[player][category] = null;
+        });
+      });
+      
+      // Handle rating button clicks
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('rating-btn')) {
+          const playerCard = e.target.closest('.player-card');
+          const player = playerCard.dataset.player;
+          const category = e.target.dataset.category;
+          const value = e.target.dataset.value;
+          
+          // Remove selected class from all buttons in this category
+          const categoryButtons = playerCard.querySelectorAll(`[data-category="${category}"]`);
+          categoryButtons.forEach(btn => {
+            btn.classList.remove('selected', 'poor', 'average', 'good');
+          });
+          
+          // Add selected class and color class to clicked button
+          e.target.classList.add('selected', value);
+          
+          // Store the rating
+          ratings[player][category] = value;
+          
+          // Check if all ratings are complete
+          updateSubmitButton();
+        }
+      });
+      
+      function updateSubmitButton() {
+        const submitBtn = document.getElementById('submitBtn');
+        let allRatingsComplete = true;
+        
+        players.forEach(player => {
+          categories.forEach(category => {
+            if (ratings[player][category] === null) {
+              allRatingsComplete = false;
+            }
+          });
+        });
+        
+        submitBtn.disabled = !allRatingsComplete;
+      }
+      
+      function submitRatings() {
+        // Hide the form and show completion message
+        document.getElementById('playersList').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('completionMessage').style.display = 'block';
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+        
+        console.log('Ratings submitted:', ratings);
+      }
+    </script>
+  </body>
+</html>

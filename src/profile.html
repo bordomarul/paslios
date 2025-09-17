@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Profil">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Profil</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 80px;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .settings-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .settings-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .profile-info {
+        text-align: center;
+      }
+      
+      .profile-avatar {
+        width: 5rem;
+        height: 5rem;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+      
+      .profile-name {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .profile-title {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .profile-team {
+        color: #fbbf24;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        background: rgba(251, 191, 36, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
+      }
+      
+      .profile-team:hover {
+        background: rgba(251, 191, 36, 0.3);
+        transform: translateY(-1px);
+      }
+      
+      .profile-actions {
+        margin: 0.5rem 0;
+      }
+      
+      .create-team-btn {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.375rem 0.75rem;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.2s;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .create-team-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+      }
+      
+      .profile-location {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      
+      .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+      
+      .stat-value {
+        color: #047857;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .stat-label {
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+      
+      .section {
+        margin-bottom: 2rem;
+      }
+      
+      .section-title {
+        color: #1f2937;
+        font-size: 1.125rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      
+      .menu-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+      }
+      
+      .menu-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+      
+      .menu-item-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      
+      .menu-icon {
+        width: 2rem;
+        height: 2rem;
+        background: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+      }
+      
+      .menu-text {
+        color: #1f2937;
+        font-weight: 500;
+      }
+      
+      .menu-arrow {
+        color: #9ca3af;
+        font-size: 1rem;
+      }
+      
+      .activity-item {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+      }
+      
+      .activity-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .activity-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+      }
+      
+      .activity-type {
+        color: #047857;
+        font-size: 0.875rem;
+        font-weight: 600;
+        background: #ecfdf5;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        display: inline-block;
+      }
+      
+      .activity-date {
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+      
+      .activity-title {
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 1.125rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+      }
+      
+      .activity-description {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      body {
+        padding-bottom: 80px;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #3b82f6;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #3b82f6;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="home.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Profil</h1>
+          </div>
+          <a href="settings.html" class="settings-btn">
+            <span style="color: white; font-size: 1.125rem;">⚙️</span>
+          </a>
+        </div>
+
+        <!-- Profile Info -->
+        <div class="profile-info">
+          <div class="profile-avatar">
+            <span style="color: #3b82f6; font-weight: bold; font-size: 1.5rem;">AY</span>
+          </div>
+          <div class="profile-name">Ahmet Yılmaz</div>
+          <a href="team.html" class="profile-team">Çankaya Tigers</a>
+          <div class="profile-actions">
+            <a href="create-team.html" class="create-team-btn">+ Yeni Takım Oluştur</a>
+          </div>
+          <div class="profile-title">Orta Saha Oyuncusu</div>
+          <div class="profile-location">📍 Ankara, Türkiye</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Statistics -->
+      <div class="stats-grid">
+        <a href="leaderboard.html" class="stat-card" style="text-decoration: none; color: inherit;">
+          <div class="stat-value">24</div>
+          <div class="stat-label">Oynadığı Maç</div>
+        </a>
+        <div class="stat-card">
+          <div class="stat-value">4.6/5.0</div>
+          <div class="stat-label">Takım Oyuncusu</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">4.8/5.0</div>
+          <div class="stat-label">Saygılı Oyuncu</div>
+        </div>
+      </div>
+
+
+
+
+      <div class="section">
+        <h2 class="section-title">Gönderilerim</h2>
+        
+        <div class="activity-item">
+          <div class="activity-header">
+            <span class="activity-type">GÖNDERI</span>
+            <span class="activity-date">3 saat önce</span>
+          </div>
+          <div class="activity-title">Bugün harika bir maç yaptık! 🔥</div>
+          <div class="activity-description">Spor Ankara Halısaha'da takım arkadaşlarımla muhteşem bir galibiyet aldık. 3-2'lik skorla bitirdik ve ben 2 gol attım! 💪 #futsal #goalify</div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-header">
+            <span class="activity-type">GÖNDERI</span>
+            <span class="activity-date">1 gün önce</span>
+          </div>
+          <div class="activity-title">Yeni ayakkabılarım geldi! ⚽</div>
+          <div class="activity-description">Nike Mercurial ayakkabılarım sonunda geldi. Yarın sahada test edeceğim. Kimse durduramaz beni! 😄</div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-header">
+            <span class="activity-type">GÖNDERI</span>
+            <span class="activity-date">3 gün önce</span>
+          </div>
+          <div class="activity-title">Antrenman zamanı! 💪</div>
+          <div class="activity-description">Bugün 2 saatlik antrenman yaptık. Kondisyon ve top kontrolü üzerinde çalıştık. Gelecek hafta büyük final var!</div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-header">
+            <span class="activity-type">GÖNDERI</span>
+            <span class="activity-date">1 hafta önce</span>
+          </div>
+          <div class="activity-title">Hat-trick! 🎯</div>
+          <div class="activity-description">Dün akşam yapığım hat-trick ile takımımızı 4-1'lik galibiyete taşıdım. Bu sezon en iyi performansımdı. Teşekkürler arkadaşlar! 🙏</div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="section">
+        <h2 class="section-title">Son Aktiviteler</h2>
+        
+        <div class="activity-item">
+          <div class="activity-header">
+            <span class="activity-type">MAÇ</span>
+            <span class="activity-date">2 gün önce</span>
+          </div>
+          <div class="activity-title">Spor Ankara Halısaha</div>
+          <div class="activity-description">Takımın ile 3-2 galip geldi. 1 gol, 2 asist yaptın.</div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-header">
+            <span class="activity-type">BAŞARI</span>
+            <span class="activity-date">1 hafta önce</span>
+          </div>
+          <div class="activity-title">Hat-trick Kralı</div>
+          <div class="activity-description">Bir maçta 3 gol atarak yeni rozet kazandın!</div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-header">
+            <span class="activity-type">ARKADAŞ</span>
+            <span class="activity-date">2 hafta önce</span>
+          </div>
+          <div class="activity-title">Mehmet Kaya</div>
+          <div class="activity-description">Yeni arkadaş eklendi ve seni bir maça davet etti.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Ayarlar">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Ayarlar</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 80px;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      .nav-right {
+        width: 2.5rem;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .section {
+        margin-bottom: 2rem;
+      }
+      
+      .section-title {
+        color: #1f2937;
+        font-size: 1.125rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      
+      .menu-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+      }
+      
+      .menu-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+      
+      .menu-item-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      
+      .menu-icon {
+        width: 2rem;
+        height: 2rem;
+        background: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+      }
+      
+      .menu-text {
+        color: #1f2937;
+        font-weight: 500;
+      }
+      
+      .menu-description {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-top: 0.125rem;
+      }
+      
+      .menu-arrow {
+        color: #9ca3af;
+        font-size: 1rem;
+      }
+      
+      .toggle-switch {
+        width: 3rem;
+        height: 1.5rem;
+        background: #e5e7eb;
+        border-radius: 12px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .toggle-switch.active {
+        background: #3b82f6;
+      }
+      
+      .toggle-knob {
+        width: 1.25rem;
+        height: 1.25rem;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 0.125rem;
+        left: 0.125rem;
+        transition: all 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      
+      .toggle-switch.active .toggle-knob {
+        left: 1.625rem;
+      }
+      
+      .danger-item {
+        color: #dc2626;
+      }
+      
+      .danger-item .menu-icon {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      
+      .version-info {
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-top: 2rem;
+        padding: 1rem;
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      body {
+        padding-bottom: 80px;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #3b82f6;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #3b82f6;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="profile.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Ayarlar</h1>
+          </div>
+          <div class="nav-right"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Hesap Section -->
+      <div class="section">
+        <h2 class="section-title">Hesap</h2>
+        
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">✏️</div>
+            <div>
+              <div class="menu-text">Profili Düzenle</div>
+              <div class="menu-description">Ad, fotoğraf ve bilgilerinizi düzenleyin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🔒</div>
+            <div>
+              <div class="menu-text">Şifre Değiştir</div>
+              <div class="menu-description">Hesap güvenliğinizi güncelleyin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">📧</div>
+            <div>
+              <div class="menu-text">Email Değiştir</div>
+              <div class="menu-description">Giriş email adresinizi güncelleyin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="search.html" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">👥</div>
+            <div>
+              <div class="menu-text">Arkadaşlarım</div>
+              <div class="menu-description">Arkadaş listesini yönetin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Bildirimler Section -->
+      <div class="section">
+        <h2 class="section-title">Bildirimler</h2>
+        
+        <div class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🔔</div>
+            <div>
+              <div class="menu-text">Push Bildirimleri</div>
+              <div class="menu-description">Anlık bildirimler alın</div>
+            </div>
+          </div>
+          <div class="toggle-switch active" onclick="toggleSwitch(this)">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">⚽</div>
+            <div>
+              <div class="menu-text">Maç Davetleri</div>
+              <div class="menu-description">Maç davet bildirimlerini alın</div>
+            </div>
+          </div>
+          <div class="toggle-switch active" onclick="toggleSwitch(this)">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">📊</div>
+            <div>
+              <div class="menu-text">Haftalık Özet</div>
+              <div class="menu-description">Performans özetlerinizi alın</div>
+            </div>
+          </div>
+          <div class="toggle-switch" onclick="toggleSwitch(this)">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">📱</div>
+            <div>
+              <div class="menu-text">SMS Bildirimleri</div>
+              <div class="menu-description">Önemli güncellemeler için SMS</div>
+            </div>
+          </div>
+          <div class="toggle-switch" onclick="toggleSwitch(this)">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gizlilik Section -->
+      <div class="section">
+        <h2 class="section-title">Gizlilik</h2>
+        
+        <div class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🔒</div>
+            <div>
+              <div class="menu-text">Profil Gizliliği</div>
+              <div class="menu-description">Profilinizi herkese açık yapın</div>
+            </div>
+          </div>
+          <div class="toggle-switch active" onclick="toggleSwitch(this)">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">📍</div>
+            <div>
+              <div class="menu-text">Konum Paylaşımı</div>
+              <div class="menu-description">Konumunuzu arkadaşlarla paylaşın</div>
+            </div>
+          </div>
+          <div class="toggle-switch active" onclick="toggleSwitch(this)">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🛡️</div>
+            <div>
+              <div class="menu-text">Engellenen Kullanıcılar</div>
+              <div class="menu-description">Engelleme listesini yönetin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Uygulama Section -->
+      <div class="section">
+        <h2 class="section-title">Uygulama</h2>
+        
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🌙</div>
+            <div>
+              <div class="menu-text">Tema</div>
+              <div class="menu-description">Açık/Koyu mod seçin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🌍</div>
+            <div>
+              <div class="menu-text">Dil</div>
+              <div class="menu-description">Türkçe</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">💾</div>
+            <div>
+              <div class="menu-text">Önbellek Temizle</div>
+              <div class="menu-description">Uygulama verilerini temizleyin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Destek Section -->
+      <div class="section">
+        <h2 class="section-title">Destek</h2>
+        
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">❓</div>
+            <div>
+              <div class="menu-text">Yardım Merkezi</div>
+              <div class="menu-description">SSS ve rehberler</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">📞</div>
+            <div>
+              <div class="menu-text">İletişim</div>
+              <div class="menu-description">Bizimle iletişime geçin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🐛</div>
+            <div>
+              <div class="menu-text">Hata Bildir</div>
+              <div class="menu-description">Karşılaştığınız sorunları bildirin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">⭐</div>
+            <div>
+              <div class="menu-text">Uygulamayı Değerlendir</div>
+              <div class="menu-description">App Store'da puan verin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Tehlikeli İşlemler -->
+      <div class="section">
+        <a href="index.html" class="menu-item danger-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🚪</div>
+            <div>
+              <div class="menu-text">Çıkış Yap</div>
+              <div class="menu-description">Hesabınızdan çıkış yapın</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+
+        <a href="#" class="menu-item danger-item">
+          <div class="menu-item-left">
+            <div class="menu-icon">🗑️</div>
+            <div>
+              <div class="menu-text">Hesabı Sil</div>
+              <div class="menu-description">Hesabınızı kalıcı olarak silin</div>
+            </div>
+          </div>
+          <span class="menu-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Version Info -->
+      <div class="version-info">
+        <p>Goalify v1.0.0</p>
+        <p>© 2025 Goalify. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      function toggleSwitch(element) {
+        element.classList.toggle('active');
+      }
+    </script>
+  </body>
+</html>

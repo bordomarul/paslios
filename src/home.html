@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Ana Sayfa">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Ana Sayfa</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        padding-bottom: 80px;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .header-container {
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+      
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      
+      .logo {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      
+      .user-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #059669;
+      }
+      
+      .nav-right {
+        display: flex;
+        gap: 0.5rem;
+      }
+      
+      .nav-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .welcome-text {
+        color: white;
+        margin-bottom: 1.5rem;
+      }
+      
+      .welcome-title {
+        font-size: 1.75rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      .welcome-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+      }
+      
+      .quick-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      
+      .action-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        padding: 1rem;
+        text-decoration: none;
+        color: #1f2937;
+        transition: all 0.2s;
+        backdrop-filter: blur(10px);
+        text-align: center;
+      }
+      
+      .action-btn:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .action-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+      
+      .action-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      
+      .action-desc {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .section {
+        margin-bottom: 2rem;
+      }
+      
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      
+      .section-title {
+        color: #1f2937;
+        font-size: 1.125rem;
+        font-weight: bold;
+      }
+      
+      .section-link {
+        color: #10b981;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .section-link:hover {
+        color: #059669;
+      }
+      
+      .match-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+      }
+      
+      .match-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .match-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+      
+      .match-time {
+        background: #10b981;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+      }
+      
+      .match-status {
+        color: #6b7280;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: #f3f4f6;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+      }
+      
+      .match-title {
+        color: #1f2937;
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .match-location {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .match-players {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .post-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+      }
+      
+      .post-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      
+      .post-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: #e5e7eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+      
+      .post-info {
+        flex: 1;
+      }
+      
+      .post-author {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+      
+      .post-time {
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+      
+      .post-content {
+        color: #1f2937;
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+      }
+      
+      .post-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f3f4f6;
+      }
+      
+      .post-likes, .post-comments, .post-shares {
+        color: #6b7280;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .post-likes:hover, .post-comments:hover, .post-shares:hover {
+        color: #3b82f6;
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #10b981;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #10b981;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <div class="nav-left">
+            <div class="logo">⚽ Goalify</div>
+            <div class="user-avatar">AY</div>
+          </div>
+          <div class="nav-right">
+            <a href="search.html" class="nav-btn">
+              <span style="color: white; font-size: 1rem;">🔍</span>
+            </a>
+            <a href="notifications.html" class="nav-btn">
+              <span style="color: white; font-size: 1rem;">🔔</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-text">
+          <div class="welcome-title">Selam Ahmet! 👋</div>
+          <div class="welcome-subtitle">Bugün hangi maça katılacaksın?</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <a href="matches.html" class="action-btn">
+            <span class="action-icon">⚽</span>
+            <div class="action-title">Maç Bul</div>
+            <div class="action-desc">Yakındaki maçları keşfet</div>
+          </a>
+          <a href="booking.html" class="action-btn">
+            <span class="action-icon">🏟️</span>
+            <div class="action-title">Saha Reserve Et</div>
+            <div class="action-desc">Saha bul ve rezerve et</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Upcoming Matches -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Yaklaşan Maçlar</div>
+          <a href="matches.html" class="section-link">Tümünü Gör</a>
+        </div>
+
+        <div class="match-card">
+          <div class="match-header">
+            <div class="match-time">Bugün 19:00</div>
+            <div class="match-status">2 Kişi Eksik</div>
+          </div>
+          <div class="match-title">Ankara Spor Halısaha</div>
+          <div class="match-location">📍 Çankaya, Ankara</div>
+          <div class="match-players">8/10 Oyuncu</div>
+        </div>
+
+        <div class="match-card">
+          <div class="match-header">
+            <div class="match-time">Yarın 20:30</div>
+            <div class="match-status">Tam Dolu</div>
+          </div>
+          <div class="match-title">Çimenli Futbol Sahası</div>
+          <div class="match-location">📍 Keçiören, Ankara</div>
+          <div class="match-players">10/10 Oyuncu</div>
+        </div>
+      </div>
+
+      <!-- Social Feed -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Son Aktiviteler</div>
+          <a href="profile.html" class="section-link">Profili Gör</a>
+        </div>
+
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar">MK</div>
+            <div class="post-info">
+              <div class="post-author">Mehmet Kaya</div>
+              <div class="post-time">2 saat önce</div>
+            </div>
+          </div>
+          <div class="post-content">
+            Bugünkü maçta harika bir performans sergiledik! Takım arkadaşlarım çok iyiydi. Bu tempo devam ederse şampiyonluk bizim! 🏆⚽
+          </div>
+          <div class="post-actions">
+            <span class="post-likes">❤️ 24</span>
+            <span class="post-comments">💬 8</span>
+            <span class="post-shares">🔗 3</span>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar">ED</div>
+            <div class="post-info">
+              <div class="post-author">Emre Demir</div>
+              <div class="post-time">4 saat önce</div>
+            </div>
+          </div>
+          <div class="post-content">
+            Yeni ayakkabılarım geldi! Nike Mercurial Vapor 15. Yarın sahada test edeceğim. Kim durmak ister? 😏⚽
+          </div>
+          <div class="post-actions">
+            <span class="post-likes">❤️ 18</span>
+            <span class="post-comments">💬 12</span>
+            <span class="post-shares">🔗 2</span>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar">CÖ</div>
+            <div class="post-info">
+              <div class="post-author">Can Özkan</div>
+              <div class="post-time">1 gün önce</div>
+            </div>
+          </div>
+          <div class="post-content">
+            Geçen hafta 5 gol attım! Bu sezonki en iyi performansımdı. Antrenmanlar gerçekten işe yarıyor 💪🔥
+          </div>
+          <div class="post-actions">
+            <span class="post-likes">❤️ 32</span>
+            <span class="post-comments">💬 6</span>
+            <span class="post-shares">🔗 5</span>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar">BT</div>
+            <div class="post-info">
+              <div class="post-author">Burak Tunç</div>
+              <div class="post-time">2 gün önce</div>
+            </div>
+          </div>
+          <div class="post-content">
+            Yeni saha keşfettim! Çimenli ve çok güzel. Bu hafta sonu orada maç yapacağız. Kimse gelecek? 🌱⚽
+          </div>
+          <div class="post-actions">
+            <span class="post-likes">❤️ 21</span>
+            <span class="post-comments">💬 15</span>
+            <span class="post-shares">🔗 4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item active">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

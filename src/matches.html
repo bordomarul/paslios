@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Maçlar">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Maçlar</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f9fafb;
+        min-height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 80px;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        padding: 3rem 1rem 2rem 1rem;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+      
+      .header-container {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-center {
+        text-align: center;
+      }
+      
+      .nav-center h1 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+      
+      .nav-center p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+      }
+      
+      .nav-right {
+        width: 2.5rem;
+      }
+      
+      .filters {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+      
+      .filter-btn {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      
+      .filter-btn.active,
+      .filter-btn:hover {
+        background: white;
+        color: #3b82f6;
+      }
+      
+      .main-content {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      
+      .match-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+      }
+      
+      .match-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+      
+      .match-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      
+      .match-time {
+        color: #10b981;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+      
+      .match-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      
+      .status-available {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      
+      .status-full {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      
+      .status-few-left {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      
+      .match-venue {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .match-location {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      
+      .match-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: 12px;
+      }
+      
+      .detail-item {
+        text-align: center;
+      }
+      
+      .detail-label {
+        color: #6b7280;
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .detail-value {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+      
+      .match-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .match-players {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .btn-join {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      
+      .btn-join:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+      
+      .btn-join.disabled {
+        background: #6b7280;
+        cursor: not-allowed;
+      }
+      
+      .btn-join.disabled:hover {
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .floating-btn {
+        position: fixed;
+        bottom: 5rem;
+        right: 1rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .floating-btn:hover {
+        transform: scale(1.1);
+      }
+      
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+        padding: 1rem;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+      
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .nav-item.active {
+        color: #3b82f6;
+      }
+      
+      .nav-item:not(.active) {
+        color: #6b7280;
+      }
+      
+      .nav-item:hover {
+        color: #3b82f6;
+      }
+      
+      .nav-item span:first-child {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-item span:last-child {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-container">
+        <!-- Navigation -->
+        <div class="nav">
+          <a href="home.html" class="back-btn">
+            <span style="color: white; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="nav-center">
+            <h1>Maçlar</h1>
+            <p>Yakındaki maçları keşfet</p>
+          </div>
+          <div class="nav-right"></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <button class="filter-btn active">Tümü</button>
+          <button class="filter-btn">Bugün</button>
+          <button class="filter-btn">Yarın</button>
+          <button class="filter-btn">Bu Hafta</button>
+          <button class="filter-btn">Müsait</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Match Card 1 -->
+      <div class="match-card">
+        <div class="match-header">
+          <span class="match-time">Bugün 19:00</span>
+          <span class="match-status status-available">2 Kişi Eksik</span>
+        </div>
+        <div class="match-venue">Spor A Halısaha</div>
+        <div class="match-location">
+          <span>📍</span>
+          <span>Çankaya, Ankara (2.1 km)</span>
+        </div>
+        <div class="match-details">
+          <div class="detail-item">
+            <div class="detail-label">Süre</div>
+            <div class="detail-value">90 dk</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Ücret</div>
+            <div class="detail-value">₺25</div>
+          </div>
+        </div>
+        <div class="match-footer">
+          <span class="match-players">8/10 Oyuncu</span>
+          <button class="btn-join">Katıl</button>
+        </div>
+      </div>
+
+      <!-- Match Card 2 -->
+      <div class="match-card">
+        <div class="match-header">
+          <span class="match-time">Bugün 20:30</span>
+          <span class="match-status status-few-left">1 Kişi Eksik</span>
+        </div>
+        <div class="match-venue">Champions Halısaha</div>
+        <div class="match-location">
+          <span>📍</span>
+          <span>Keçiören, Ankara (3.8 km)</span>
+        </div>
+        <div class="match-details">
+          <div class="detail-item">
+            <div class="detail-label">Süre</div>
+            <div class="detail-value">60 dk</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Ücret</div>
+            <div class="detail-value">₺30</div>
+          </div>
+        </div>
+        <div class="match-footer">
+          <span class="match-players">9/10 Oyuncu</span>
+          <button class="btn-join">Katıl</button>
+        </div>
+      </div>
+
+      <!-- Match Card 3 -->
+      <div class="match-card">
+        <div class="match-header">
+          <span class="match-time">Yarın 18:00</span>
+          <span class="match-status status-full">Tam Dolu</span>
+        </div>
+        <div class="match-venue">Elite Football Center</div>
+        <div class="match-location">
+          <span>📍</span>
+          <span>Mamak, Ankara (1.5 km)</span>
+        </div>
+        <div class="match-details">
+          <div class="detail-item">
+            <div class="detail-label">Süre</div>
+            <div class="detail-value">90 dk</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Ücret</div>
+            <div class="detail-value">₺35</div>
+          </div>
+        </div>
+        <div class="match-footer">
+          <span class="match-players">10/10 Oyuncu</span>
+          <button class="btn-join disabled">Dolu</button>
+        </div>
+      </div>
+
+      <!-- Match Card 4 -->
+      <div class="match-card">
+        <div class="match-header">
+          <span class="match-time">Yarın 20:00</span>
+          <span class="match-status status-available">4 Kişi Eksik</span>
+        </div>
+        <div class="match-venue">Futbol Park</div>
+        <div class="match-location">
+          <span>📍</span>
+          <span>Sincan, Ankara (4.2 km)</span>
+        </div>
+        <div class="match-details">
+          <div class="detail-item">
+            <div class="detail-label">Süre</div>
+            <div class="detail-value">90 dk</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Ücret</div>
+            <div class="detail-value">₺20</div>
+          </div>
+        </div>
+        <div class="match-footer">
+          <span class="match-players">6/10 Oyuncu</span>
+          <button class="btn-join">Katıl</button>
+        </div>
+      </div>
+
+      <!-- Match Card 5 -->
+      <div class="match-card">
+        <div class="match-header">
+          <span class="match-time">Cuma 19:30</span>
+          <span class="match-status status-available">3 Kişi Eksik</span>
+        </div>
+        <div class="match-venue">Goal Arena</div>
+        <div class="match-location">
+          <span>📍</span>
+          <span>Etimesgut, Ankara (6.1 km)</span>
+        </div>
+        <div class="match-details">
+          <div class="detail-item">
+            <div class="detail-label">Süre</div>
+            <div class="detail-value">90 dk</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Ücret</div>
+            <div class="detail-value">₺28</div>
+          </div>
+        </div>
+        <div class="match-footer">
+          <span class="match-players">7/10 Oyuncu</span>
+          <button class="btn-join">Katıl</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <a href="booking.html" class="floating-btn">
+      <span style="color: white; font-size: 1.5rem;">+</span>
+    </a>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <a href="home.html" class="nav-item">
+          <span>🏠</span>
+          <span>Ana Sayfa</span>
+        </a>
+        <a href="matches.html" class="nav-item active">
+          <span>⚽</span>
+          <span>Maçlar</span>
+        </a>
+        <a href="messages.html" class="nav-item">
+          <span>💌</span>
+          <span>Mesajlar</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+          <span>👤</span>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

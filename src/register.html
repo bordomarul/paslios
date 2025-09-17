@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Goalify - Hesap oluştur">
+    <link href="output.css" rel="stylesheet">
+    <title>Goalify - Kayıt Ol</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      
+      .container {
+        width: 100%;
+        max-width: 400px;
+      }
+      
+      .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        padding: 2rem;
+      }
+      
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+      }
+      
+      .back-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: #f3f4f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .back-btn:hover {
+        background: #e5e7eb;
+      }
+      
+      .logo {
+        width: 3rem;
+        height: 3rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      
+      .logo span {
+        font-size: 1.5rem;
+        color: white;
+      }
+      
+      .spacer {
+        width: 2.5rem;
+      }
+      
+      h1 {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #1f2937;
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+      
+      .subtitle {
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      
+      .input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        color: #1f2937;
+        transition: all 0.2s;
+      }
+      
+      .input:focus {
+        outline: none;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      }
+      
+      .input::placeholder {
+        color: #9ca3af;
+      }
+      
+      .select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        color: #1f2937;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      
+      .select:focus {
+        outline: none;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: flex-start;
+        font-size: 0.875rem;
+        margin-bottom: 1.25rem;
+        gap: 0.75rem;
+      }
+      
+      .checkbox {
+        width: 1rem;
+        height: 1rem;
+        margin-top: 0.125rem;
+      }
+      
+      .checkbox-label {
+        color: #6b7280;
+        line-height: 1.4;
+      }
+      
+      .checkbox-link {
+        color: #3b82f6;
+        text-decoration: none;
+      }
+      
+      .checkbox-link:hover {
+        color: #2563eb;
+      }
+      
+      .btn-primary {
+        width: 100%;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+        border-radius: 16px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin-top: 0.5rem;
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      }
+      
+      .login-section {
+        margin-top: 1.5rem;
+        text-align: center;
+      }
+      
+      .login-text {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .login-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      
+      .login-link:hover {
+        color: #2563eb;
+      }
+      
+      .demo-section {
+        margin-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1.5rem;
+      }
+      
+      .demo-text {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 0.75rem;
+      }
+      
+      .demo-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      
+      .demo-link {
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .demo-link.blue {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+      
+      .demo-link.green {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      
+      .demo-link.purple {
+        background: #f3e8ff;
+        color: #9333ea;
+      }
+      
+      .demo-link.orange {
+        background: #fed7aa;
+        color: #ea580c;
+      }
+      
+      .demo-link:hover {
+        opacity: 0.8;
+      }
+      
+      .footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: white;
+        font-size: 0.875rem;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Kayıt Kartı -->
+      <div class="card">
+        <!-- Geri Butonu ve Logo -->
+        <div class="header">
+          <a href="index.html" class="back-btn">
+            <span style="color: #6b7280; font-size: 1.125rem;">←</span>
+          </a>
+          <div class="logo">
+            <span>⚽</span>
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <!-- Başlık -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <h1>Hesap Oluştur</h1>
+          <p class="subtitle">Goalify ailesine katılın!</p>
+        </div>
+
+        <!-- Kayıt Formu -->
+        <form onsubmit="event.preventDefault(); window.location.href='home.html';">
+          <div class="form-group">
+            <input 
+              type="text" 
+              placeholder="Ad Soyad"
+              class="input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <input 
+              type="email" 
+              placeholder="Email"
+              class="input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <input 
+              type="tel" 
+              placeholder="Telefon (0555 123 45 67)"
+              class="input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Şifre"
+              class="input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Şifre Tekrar"
+              class="input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <select class="select" required>
+              <option value="">Pozisyonunuz</option>
+              <option value="kaleci">Kaleci</option>
+              <option value="defans">Defans</option>
+              <option value="orta-saha">Orta Saha</option>
+              <option value="forvet">Forvet</option>
+              <option value="her-pozisyon">Her Pozisyon</option>
+            </select>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" class="checkbox" required>
+            <span class="checkbox-label">
+              <a href="terms-of-service.html" class="checkbox-link">Kullanım Koşulları</a>'nı ve 
+              <a href="privacy-policy.html" class="checkbox-link">Gizlilik Politikası</a>'nı kabul ediyorum
+            </span>
+          </div>
+
+          <button type="submit" class="btn-primary">
+            Hesap Oluştur
+          </button>
+        </form>
+
+        <!-- Giriş Yap -->
+        <div class="login-section">
+          <p class="login-text">
+            Zaten hesabınız var mı? 
+            <a href="index.html" class="login-link">Giriş yapın</a>
+          </p>
+        </div>
+
+        <!-- Demo Linkler -->
+        <div class="demo-section">
+          <p class="demo-text">Demo için sayfaları görüntüle:</p>
+          <div class="demo-links">
+            <a href="home.html" class="demo-link blue">Ana Sayfa</a>
+            <a href="matches.html" class="demo-link green">Maçlar</a>
+            <a href="profile.html" class="demo-link purple">Profil</a>
+            <a href="search.html" class="demo-link orange">Arama</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alt Bilgi -->
+      <div class="footer">
+        <p>© 2025 Goalify. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+  </body>
+</html>
