@@ -88,6 +88,17 @@
         border: 1px solid #f3f4f6;
       }
       
+      .map-container-interactive {
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        position: relative;
+        cursor: pointer;
+      }
+      
       .map-placeholder {
         background: linear-gradient(135deg, #e5e7eb, #d1d5db);
         border-radius: 12px;
@@ -98,6 +109,48 @@
         justify-content: center;
         color: #6b7280;
         position: relative;
+      }
+      
+      .map-pins {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        border-radius: 12px;
+        z-index: 10;
+      }
+      
+      .map-pin {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 20;
+      }
+      
+      .map-pin:hover {
+        transform: scale(1.1);
+      }
+      
+      .pin-icon {
+        font-size: 24px;
+        color: #ef4444;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      }
+      
+      .pin-label {
+        background: white;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #374151;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-top: 2px;
       }
       
       .map-icon {
@@ -412,6 +465,209 @@
         box-shadow: none;
       }
       
+      /* Venue Detail Popup */
+      .venue-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      
+      .venue-popup {
+        background: white;
+        border-radius: 20px;
+        max-width: 350px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        animation: slideUp 0.3s ease;
+      }
+      
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .popup-header {
+        position: relative;
+        height: 150px;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+      
+      .popup-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .venue-icon {
+        font-size: 48px;
+      }
+      
+      .popup-content {
+        padding: 20px;
+      }
+      
+      .venue-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+      }
+      
+      .venue-address {
+        color: #6b7280;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      
+      .rating-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 12px;
+      }
+      
+      .star-rating {
+        display: flex;
+        gap: 2px;
+      }
+      
+      .star {
+        color: #fbbf24;
+        font-size: 18px;
+      }
+      
+      .star.empty {
+        color: #e5e7eb;
+      }
+      
+      .rating-text {
+        font-weight: 600;
+        color: #1f2937;
+      }
+      
+      .rating-count {
+        color: #6b7280;
+        font-size: 14px;
+      }
+      
+      .venue-features {
+        margin-bottom: 20px;
+      }
+      
+      .features-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 12px;
+      }
+      
+      .features-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .feature-tag {
+        padding: 6px 12px;
+        background: #dcfce7;
+        color: #166534;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      
+      .price-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        background: #f0fdf4;
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+      
+      .price-label {
+        color: #374151;
+        font-weight: 500;
+      }
+      
+      .price-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: #22c55e;
+      }
+      
+      .popup-actions {
+        display: flex;
+        gap: 12px;
+      }
+      
+      .action-btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+      }
+      
+      .btn-secondary:hover {
+        background: #e5e7eb;
+      }
+      
+      .btn-primary {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+      }
+      
       .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -464,6 +720,151 @@
         font-size: 0.75rem;
         font-weight: 500;
       }
+
+      /* Toast Notification Styles */
+      .toast {
+        position: fixed;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1f2937;
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        opacity: 0;
+        transition: all 0.3s ease;
+        max-width: 320px;
+        text-align: center;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px);
+      }
+
+      .toast.success {
+        background: #10b981;
+      }
+
+      .toast.error {
+        background: #ef4444;
+      }
+
+      .toast.info {
+        background: #3b82f6;
+      }
+
+      .toast.warning {
+        background: #f59e0b;
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .booking-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 350px;
+        width: 90%;
+        margin: 1rem;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .modal-overlay.show .booking-modal {
+        transform: scale(1);
+      }
+
+      .modal-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .booking-summary {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .summary-item:last-child {
+        margin-bottom: 0;
+        font-weight: bold;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+
+      .modal-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 100px;
+      }
+
+      .modal-btn.primary {
+        background: #10b981;
+        color: white;
+      }
+
+      .modal-btn.primary:hover {
+        background: #059669;
+      }
+
+      .modal-btn.secondary {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .modal-btn.secondary:hover {
+        background: #e5e7eb;
+      }
     </style>
   </head>
   <body>
@@ -488,9 +889,27 @@
       <!-- Map Section -->
       <div class="map-container">
         <div class="section-title">Yakındaki Sahalar</div>
-        <div class="map-placeholder" onclick="initMap()">
-          <div class="map-icon">🗺️</div>
-          <div class="map-text">Haritayı açmak için tıklayın</div>
+        <div class="map-container-interactive" onclick="initMap()">
+          <div class="map-placeholder">
+            <div class="map-icon">🗺️</div>
+            <div class="map-text">Haritayı açmak için tıklayın</div>
+          </div>
+          
+          <!-- Interactive Map Pins -->
+          <div class="map-pins" id="mapPins" style="display: none;">
+            <div class="map-pin" style="top: 30%; left: 25%;" onclick="showVenueDetails('venue1', event)">
+              <span class="pin-icon">📍</span>
+              <span class="pin-label">Spor A</span>
+            </div>
+            <div class="map-pin" style="top: 60%; left: 70%;" onclick="showVenueDetails('venue2', event)">
+              <span class="pin-icon">📍</span>
+              <span class="pin-label">Champions</span>
+            </div>
+            <div class="map-pin" style="top: 80%; left: 40%;" onclick="showVenueDetails('venue3', event)">
+              <span class="pin-icon">📍</span>
+              <span class="pin-label">Elite FC</span>
+            </div>
+          </div>
         </div>
         <div class="location-info">
           <div class="current-location">
@@ -683,10 +1102,6 @@
           <span>Mesajlar</span>
         </a>
         <a href="profile.html" class="nav-item">
-          <span>�</span>
-          <span>Profil</span>
-        </a>
-        <a href="profile.html" class="nav-item">
           <span>👤</span>
           <span>Profil</span>
         </a>
@@ -699,8 +1114,101 @@
       let selectedPrice = 0;
       let playerCount = 10;
 
+      // Toast Notification System
+      function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add('show');
+        }, 100);
+
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            if (document.body.contains(toast)) {
+              document.body.removeChild(toast);
+            }
+          }, 300);
+        }, 4000);
+      }
+
+      // Booking Confirmation Modal
+      function showBookingModal(venueData) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="booking-modal">
+            <div class="modal-title">🎯 Rezervasyon Onayı</div>
+            <div class="booking-summary">
+              <div class="summary-item">
+                <span>Saha:</span>
+                <span>${venueData.venue}</span>
+              </div>
+              <div class="summary-item">
+                <span>Tarih:</span>
+                <span>${venueData.date}</span>
+              </div>
+              <div class="summary-item">
+                <span>Saat:</span>
+                <span>${venueData.time}</span>
+              </div>
+              <div class="summary-item">
+                <span>Oyuncu:</span>
+                <span>${venueData.players} kişi</span>
+              </div>
+              <div class="summary-item">
+                <span>Toplam Ücret:</span>
+                <span>₺${venueData.price}</span>
+              </div>
+            </div>
+            <div class="modal-buttons">
+              <button class="modal-btn secondary" onclick="closeBookingModal()">İptal</button>
+              <button class="modal-btn primary" onclick="confirmBooking()">Onayla & Öde</button>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        setTimeout(() => overlay.classList.add('show'), 100);
+        window.currentBookingModal = overlay;
+      }
+
+      function closeBookingModal() {
+        if (window.currentBookingModal) {
+          window.currentBookingModal.classList.remove('show');
+          setTimeout(() => {
+            if (document.body.contains(window.currentBookingModal)) {
+              document.body.removeChild(window.currentBookingModal);
+            }
+            window.currentBookingModal = null;
+          }, 300);
+        }
+      }
+
+      function confirmBooking() {
+        closeBookingModal();
+        showToast('🎉 Rezervasyon başarılı! Ödeme işlemi tamamlandı.', 'success');
+        
+        // Reset form after successful booking
+        setTimeout(() => {
+          selectedVenue = null;
+          selectedSlot = null;
+          document.querySelectorAll('.venue-card').forEach(card => {
+            card.classList.remove('selected');
+          });
+          document.querySelectorAll('.slot-btn').forEach(btn => {
+            btn.classList.remove('selected');
+          });
+          updateBookingButton();
+          showToast('📱 Rezervasyon onayı bildirimlerinize gönderildi.', 'info');
+        }, 2000);
+      }
+
       function initMap() {
-        alert('Harita entegrasyonu için Google Maps API gerekli. Demo için tıklanabilir harita simülasyonu.');
+        showToast('🗺️ Demo modunda çalışıyorsunuz. Google Maps entegrasyonu yakında!', 'warning');
       }
 
       function changePlayerCount(change) {
@@ -709,6 +1217,20 @@
           playerCount = newCount;
           document.getElementById('player-count').textContent = playerCount;
           updateSummary();
+          
+          // Show info toast
+          if (change > 0) {
+            showToast(`👥 Oyuncu sayısı ${playerCount} olarak güncellendi`, 'info');
+          } else {
+            showToast(`👥 Oyuncu sayısı ${playerCount} olarak güncellendi`, 'info');
+          }
+        } else {
+          // Show warning for invalid counts
+          if (newCount < 2) {
+            showToast('⚠️ Minimum 2 oyuncu gereklidir!', 'warning');
+          } else {
+            showToast('⚠️ Maksimum 22 oyuncu olabilir!', 'warning');
+          }
         }
         
         // Update button states
@@ -731,12 +1253,20 @@
         element.classList.add('selected');
         selectedVenue = venueName;
         selectedPrice = price;
-        selectedSlot = null;
+        selectedSlot = null; // Reset slot selection
         
-        updateSummary();
+        // Show success toast
+        showToast(`⚽ ${venueName} seçildi! Şimdi saat seçimi yapabilirsiniz.`, 'success');
+        
+        updateBookingButton();
       }
 
       function selectSlot(element, time) {
+        if (!selectedVenue) {
+          showToast('⚠️ Önce bir saha seçmelisiniz!', 'warning');
+          return;
+        }
+        
         // Remove previous slot selection
         document.querySelectorAll('.slot-btn').forEach(btn => {
           btn.classList.remove('selected');
@@ -745,6 +1275,9 @@
         // Select slot
         element.classList.add('selected');
         selectedSlot = time;
+        
+        // Show success toast
+        showToast(`🕐 ${time} saati seçildi! Rezervasyon yapmaya hazırsınız.`, 'success');
         
         updateSummary();
       }
@@ -771,26 +1304,209 @@
         }
       }
 
+      function updateBookingButton() {
+        const bookBtn = document.getElementById('book-btn');
+        if (selectedVenue && selectedSlot) {
+          bookBtn.disabled = false;
+          bookBtn.textContent = `Rezervasyon Yap - ₺${selectedPrice}`;
+        } else {
+          bookBtn.disabled = true;
+          bookBtn.textContent = 'Saha ve Saat Seçin';
+        }
+      }
+
       function makeBooking() {
         if (selectedVenue && selectedSlot) {
-          alert(`Rezervasyon başarılı!\n\nSaha: ${selectedVenue}\nTarih: ${document.getElementById('selected-date').textContent}\nSaat: ${selectedSlot}\nOyuncu: ${playerCount} kişi\nÜcret: ₺${selectedPrice}\n\nRezervasyon onayı bildirimlerinize gönderildi.`);
+          const bookingData = {
+            venue: selectedVenue,
+            date: document.getElementById('selected-date').textContent,
+            time: selectedSlot,
+            players: playerCount,
+            price: selectedPrice
+          };
           
-          // Reset form
-          selectedVenue = null;
-          selectedSlot = null;
-          document.querySelectorAll('.venue-card').forEach(card => {
-            card.classList.remove('selected');
-          });
-          document.querySelectorAll('.slot-btn').forEach(btn => {
-            btn.classList.remove('selected');
-          });
-          updateSummary();
+          showBookingModal(bookingData);
+        } else {
+          showToast('⚠️ Lütfen saha ve saat seçimi yapınız!', 'warning');
         }
       }
 
       // Initialize button states
       document.getElementById('decrease-btn').disabled = playerCount <= 2;
       document.getElementById('increase-btn').disabled = playerCount >= 22;
+      
+      // Venue details data
+      const venueData = {
+        venue1: {
+          name: 'Spor A Halısaha',
+          address: 'Çankaya Mahallesi, No: 42, Ankara',
+          rating: 4.8,
+          reviewCount: 156,
+          price: 150,
+          features: ['Duş', 'Soyunma Odası', 'Otopark', 'Kafe', 'WiFi'],
+          description: 'Modern tesislerle donatılmış kaliteli halısaha.'
+        },
+        venue2: {
+          name: 'Champions Halısaha',
+          address: 'Balgat Caddesi, No: 78, Ankara',
+          rating: 4.6,
+          reviewCount: 89,
+          price: 180,
+          features: ['Duş', 'Soyunma Odası', 'Otopark', 'Tribün'],
+          description: 'Profesyonel standartlarda futsal sahası.'
+        },
+        venue3: {
+          name: 'Elite Football Center',
+          address: 'Kızılay Meydanı, No: 15, Ankara',
+          rating: 4.9,
+          reviewCount: 234,
+          price: 200,
+          features: ['Duş', 'Soyunma Odası', 'Otopark', 'Kafe', 'Klima', 'Ses Sistemi'],
+          description: 'Premium kalitede spor kompleksi.'
+        }
+      };
+      
+      function initMap() {
+        // Map açma simülasyonu
+        const mapPins = document.getElementById('mapPins');
+        const mapPlaceholder = document.querySelector('.map-placeholder');
+        
+        mapPlaceholder.style.display = 'none';
+        mapPins.style.display = 'block';
+      }
+      
+      function showVenueDetails(venueId, event) {
+        event.stopPropagation();
+        const venue = venueData[venueId];
+        
+        // Popup HTML'ini oluştur
+        const popup = document.getElementById('venuePopup') || createVenuePopup();
+        
+        // Venue bilgilerini doldur
+        popup.querySelector('.venue-name').textContent = venue.name;
+        popup.querySelector('.venue-address').innerHTML = `📍 ${venue.address}`;
+        popup.querySelector('.rating-text').textContent = venue.rating;
+        popup.querySelector('.rating-count').textContent = `(${venue.reviewCount} değerlendirme)`;
+        popup.querySelector('.price-value').textContent = `₺${venue.price}/saat`;
+        
+        // Yıldızları oluştur
+        const starRating = popup.querySelector('.star-rating');
+        starRating.innerHTML = '';
+        for(let i = 1; i <= 5; i++) {
+          const star = document.createElement('span');
+          star.className = i <= Math.floor(venue.rating) ? 'star' : 'star empty';
+          star.textContent = '★';
+          starRating.appendChild(star);
+        }
+        
+        // Özellikleri oluştur
+        const featuresList = popup.querySelector('.features-list');
+        featuresList.innerHTML = '';
+        venue.features.forEach(feature => {
+          const tag = document.createElement('span');
+          tag.className = 'feature-tag';
+          tag.textContent = feature;
+          featuresList.appendChild(tag);
+        });
+        
+        // Popup'ı göster
+        document.getElementById('venuePopupOverlay').style.display = 'flex';
+      }
+      
+      function createVenuePopup() {
+        const overlay = document.createElement('div');
+        overlay.id = 'venuePopupOverlay';
+        overlay.className = 'venue-popup-overlay';
+        overlay.onclick = closeVenuePopup;
+        
+        overlay.innerHTML = `
+          <div class="venue-popup" onclick="event.stopPropagation()">
+            <div class="popup-header">
+              <button class="popup-close" onclick="closeVenuePopup()">✕</button>
+              <div class="venue-icon">⚽</div>
+            </div>
+            <div class="popup-content">
+              <h3 class="venue-name"></h3>
+              <div class="venue-address"></div>
+              
+              <div class="rating-section">
+                <div class="star-rating"></div>
+                <span class="rating-text"></span>
+                <span class="rating-count"></span>
+              </div>
+              
+              <div class="venue-features">
+                <div class="features-title">Özellikler</div>
+                <div class="features-list"></div>
+              </div>
+              
+              <div class="price-section">
+                <span class="price-label">Saatlik Ücret</span>
+                <span class="price-value"></span>
+              </div>
+              
+              <div class="popup-actions">
+                <button class="action-btn btn-secondary" onclick="closeVenuePopup()">Kapat</button>
+                <button class="action-btn btn-primary" onclick="selectVenueFromPopup()">Rezervasyon Yap</button>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        return overlay.querySelector('.venue-popup');
+      }
+      
+      function closeVenuePopup() {
+        const overlay = document.getElementById('venuePopupOverlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+        }
+      }
+      
+      function selectVenueFromPopup() {
+        closeVenuePopup();
+        // Sayfa aşağı kaydır ve venue seçimini vurgula
+        document.querySelector('.venue-list').scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      // ESC tuşu ile popup kapatma
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeVenuePopup();
+          closeBookingModal();
+        }
+      });
+
+      // Date input change handler
+      document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('booking-date');
+        if (dateInput) {
+          dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            const formattedDate = selectedDate.toLocaleDateString('tr-TR', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            });
+            
+            if (selectedDate < today.setHours(0,0,0,0)) {
+              showToast('⚠️ Geçmiş tarih seçilemez!', 'warning');
+              this.value = new Date().toISOString().split('T')[0];
+            } else {
+              showToast(`📅 ${formattedDate} tarihi seçildi`, 'info');
+              updateSummary();
+            }
+          });
+        }
+
+        // Initialize button states
+        document.getElementById('decrease-btn').disabled = playerCount <= 2;
+        document.getElementById('increase-btn').disabled = playerCount >= 22;
+        updateBookingButton();
+      });
     </script>
   </body>
 </html>

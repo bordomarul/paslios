@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yardım Merkezi - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .search-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .category-section {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            color: #111827;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .faq-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-item:hover {
+            background: #f9fafb;
+        }
+
+        .faq-question {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .question-text {
+            color: #111827;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .question-icon {
+            color: #6b7280;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .question-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+        }
+
+        .answer-content {
+            padding: 0 20px 16px 20px;
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .quick-actions {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .quick-actions-title {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #374151;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .action-text {
+            font-size: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Yardım Merkezi</h1>
+                <button class="search-btn" onclick="focusSearch()">🔍</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Sorularınızı arayın..." id="searchInput" oninput="searchFAQ()">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <div class="quick-actions-title">Hızlı İşlemler</div>
+            <div class="action-buttons">
+                <a href="contact.html" class="action-btn">
+                    <div class="action-icon">💬</div>
+                    <div class="action-text">Canlı Destek</div>
+                </a>
+                <a href="report-bug.html" class="action-btn">
+                    <div class="action-icon">🐛</div>
+                    <div class="action-text">Hata Bildir</div>
+                </a>
+                <a href="#" class="action-btn" onclick="requestFeature()">
+                    <div class="action-icon">💡</div>
+                    <div class="action-text">Özellik İste</div>
+                </a>
+                <a href="#" class="action-btn" onclick="downloadData()">
+                    <div class="action-icon">📊</div>
+                    <div class="action-text">Veri İndir</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <div class="category-title">📱 Uygulama Kullanımı</div>
+            <div class="faq-list">
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Nasıl hesap oluşturabilirim?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Ana sayfada "Kayıt Ol" butonuna tıklayın. Email, şifre ve kişisel bilgilerinizi girin. Email doğrulaması yapıldıktan sonra hesabınız aktif olacaktır.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Şifremi unuttum, ne yapmalıyım?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Giriş sayfasında "Şifremi Unuttum" linkine tıklayın. Email adresinizi girin, size şifre sıfırlama linki gönderilecektir.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Profil fotoğrafımı nasıl değiştirebilirim?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Profil sayfanıza gidin, Ayarlar > Profili Düzenle'ye tıklayın. Fotoğraf alanına tıklayarak yeni fotoğraf yükleyebilirsiniz.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <div class="category-title">⚽ Maç ve Rezervasyon</div>
+            <div class="faq-list">
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Nasıl halısaha rezervasyonu yapabilirim?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Rezervasyon sayfasında haritadan halısahayı seçin, tarih ve saat seçin, ödeme bilgilerinizi girin ve rezervasyonunuzu tamamlayın.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Maç davetimi nasıl iptal edebilirim?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Maçlar sayfasında ilgili maça tıklayın, "Maç Ayarları" > "Maçı İptal Et" seçeneğini kullanın. 2 saat öncesine kadar iptal edebilirsiniz.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Takım nasıl kurabilirim?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Maçlar sayfasında "Takım Kur" butonuna tıklayın. Takım adı, logo ve oyuncu davetleri göndererek takımınızı oluşturun.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <div class="category-title">🔒 Güvenlik ve Gizlilik</div>
+            <div class="faq-list">
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Hesabımı nasıl güvende tutabilirim?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Güçlü şifre kullanın, düzenli olarak değiştirin. Hesap bilgilerinizi kimseyle paylaşmayın ve şüpheli aktiviteleri bildirin.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <div class="question-text">Birini nasıl engelleyebilirim?</div>
+                        <div class="question-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            Kullanıcının profiline gidin, sağ üstteki menüden "Engelle" seçeneğini tıklayın. Engellenen kullanıcıları Ayarlar'dan yönetebilirsiniz.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function focusSearch() {
+            document.getElementById('searchInput').focus();
+        }
+
+        function toggleFAQ(element) {
+            element.classList.toggle('active');
+        }
+
+        function searchFAQ() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const questionText = item.querySelector('.question-text').textContent.toLowerCase();
+                const answerText = item.querySelector('.answer-content').textContent.toLowerCase();
+                
+                if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    if (searchTerm && searchTerm.length > 2) {
+                        item.classList.add('active');
+                    }
+                } else {
+                    item.style.display = searchTerm ? 'none' : 'block';
+                    if (!searchTerm) {
+                        item.classList.remove('active');
+                    }
+                }
+            });
+
+            // Show/hide category sections
+            document.querySelectorAll('.category-section').forEach(section => {
+                const visibleItems = section.querySelectorAll('.faq-item:not([style*="none"])');
+                section.style.display = visibleItems.length > 0 ? 'block' : 'none';
+            });
+        }
+
+        function requestFeature() {
+            const feature = prompt('Hangi özelliği istiyorsunuz?\n\nFikirlerinizi bizimle paylaşın:');
+            if (feature && feature.trim()) {
+                alert(`Özellik isteğiniz alındı! 💡\n\n"${feature}"\n\nGeliştirme ekibimiz değerlendirecek. Teşekkürler!`);
+            }
+        }
+
+        function downloadData() {
+            if (confirm('Kişisel verilerinizi indirmek istiyor musunuz?\n\nBu işlem birkaç dakika sürebilir.')) {
+                alert('Veri dışa aktarma işlemi başlatıldı! 📊\n\nHazır olduğunda email ile bilgilendirileceksiniz.');
+            }
+        }
+    </script>
+</body>
+</html>

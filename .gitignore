@@ -1,5 +1,32 @@
 node_modules/
 *.log
 .env
+.env.local
+.env.production
 .DS_Store
 Thumbs.db
+
+# Database files
+*.db
+*.sqlite
+
+# Build outputs
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+
+# User uploads
+uploads/
+images/user-uploads/
+
+# Config files with sensitive data
+config/database.js
+config/secrets.js
+
+# OS files
+ehthumbs.db
+*.swp
+*.swo

@@ -349,6 +349,26 @@
         color: #6b7280;
       }
       
+      .floating-btn {
+        position: fixed;
+        bottom: 5rem;
+        right: 1rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .floating-btn:hover {
+        transform: scale(1.1);
+      }
+      
       .nav-item:hover {
         color: #10b981;
       }
@@ -361,6 +381,161 @@
       .nav-item span:last-child {
         font-size: 0.75rem;
         font-weight: 500;
+      }
+      
+      /* Toast Notifications */
+      .toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #10b981;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+        transition: all 0.3s ease;
+        max-width: 350px;
+        text-align: center;
+      }
+      
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      
+      .toast.success {
+        background: #10b981;
+      }
+      
+      .toast.error {
+        background: #ef4444;
+      }
+      
+      .toast.info {
+        background: #3b82f6;
+      }
+      
+      /* Comment Modal */
+      .comment-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      
+      .comment-modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 350px;
+        margin: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: scale(0.9);
+        transition: transform 0.2s ease;
+      }
+      
+      .comment-modal.show .comment-modal-content {
+        transform: scale(1);
+      }
+      
+      .comment-modal-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      
+      .comment-modal-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        margin-right: 0.75rem;
+      }
+      
+      .comment-modal-info h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+      }
+      
+      .comment-modal-info p {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0;
+      }
+      
+      .comment-textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        resize: vertical;
+        font-family: inherit;
+        margin-bottom: 1rem;
+      }
+      
+      .comment-textarea:focus {
+        outline: none;
+        border-color: #10b981;
+      }
+      
+      .comment-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+      }
+      
+      .comment-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+      }
+      
+      .comment-btn-cancel {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      
+      .comment-btn-cancel:hover {
+        background: #e5e7eb;
+      }
+      
+      .comment-btn-submit {
+        background: #10b981;
+        color: white;
+      }
+      
+      .comment-btn-submit:hover {
+        background: #059669;
+        transform: translateY(-1px);
+      }
+      
+      .comment-btn-submit:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+        transform: none;
       }
     </style>
   </head>
@@ -517,6 +692,11 @@
       </div>
     </div>
 
+    <!-- Floating Action Button -->
+    <a href="create-post.html" class="floating-btn">
+      <span style="color: white; font-size: 1.5rem;">+</span>
+    </a>
+
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
       <div class="nav-items">
@@ -538,5 +718,190 @@
         </a>
       </div>
     </div>
+
+    <script>
+      // Toast function
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        document.getElementById('toastContainer').appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      function likePost(element) {
+        const currentLikes = element.textContent.match(/\d+/)[0];
+        const newLikes = parseInt(currentLikes) + 1;
+        element.textContent = `❤️ ${newLikes}`;
+        element.style.color = '#ef4444';
+        
+        // Add animation
+        element.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+          element.style.transform = 'scale(1)';
+        }, 200);
+        
+        showToast('Gönderi beğenildi! ❤️', 'success');
+      }
+
+      // Comment modal functions
+      let currentCommentElement = null;
+      
+      function openCommentModal(element) {
+        currentCommentElement = element;
+        const author = element.closest('.post-card').querySelector('.post-author').textContent;
+        
+        // Set author info in modal
+        document.getElementById('commentAuthorName').textContent = author;
+        document.getElementById('commentAuthorAvatar').textContent = author.charAt(0).toUpperCase();
+        document.getElementById('commentText').value = '';
+        
+        // Show modal
+        const modal = document.getElementById('commentModal');
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        
+        // Focus textarea
+        setTimeout(() => document.getElementById('commentText').focus(), 100);
+      }
+      
+      function closeCommentModal() {
+        const modal = document.getElementById('commentModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 200);
+        currentCommentElement = null;
+      }
+      
+      function submitComment() {
+        const commentText = document.getElementById('commentText').value.trim();
+        if (!commentText) {
+          showToast('Lütfen bir yorum yazın', 'error');
+          return;
+        }
+        
+        if (currentCommentElement) {
+          const currentComments = currentCommentElement.textContent.match(/\d+/)[0];
+          const newComments = parseInt(currentComments) + 1;
+          currentCommentElement.textContent = `💬 ${newComments}`;
+          
+          showToast(`Yorumunuz eklendi: "${commentText}"`, 'success');
+          closeCommentModal();
+        }
+      }
+
+      function commentPost(element) {
+        openCommentModal(element);
+      }
+
+      function sharePost(element) {
+        const author = element.closest('.post-card').querySelector('.post-author').textContent;
+        const content = element.closest('.post-card').querySelector('.post-content').textContent;
+        
+        if (navigator.share) {
+          navigator.share({
+            title: `${author} - Goalify`,
+            text: content,
+            url: window.location.href
+          });
+        } else {
+          // Fallback for browsers without native sharing
+          const shareText = `${author}: ${content}\n\nGoalify uygulamasından paylaşıldı`;
+          navigator.clipboard.writeText(shareText).then(() => {
+            showToast('Gönderi panoya kopyalandı! 📋', 'info');
+          });
+        }
+        
+        const currentShares = element.textContent.match(/\d+/)[0];
+        const newShares = parseInt(currentShares) + 1;
+        element.textContent = `🔗 ${newShares}`;
+      }
+
+      // Add click events to all post action buttons
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.post-likes').forEach(el => {
+          el.addEventListener('click', () => likePost(el));
+        });
+        
+        document.querySelectorAll('.post-comments').forEach(el => {
+          el.addEventListener('click', () => commentPost(el));
+        });
+        
+        document.querySelectorAll('.post-shares').forEach(el => {
+          el.addEventListener('click', () => sharePost(el));
+        });
+
+        // Make user avatars clickable
+        document.querySelectorAll('.user-avatar').forEach(el => {
+          el.addEventListener('click', () => {
+            window.location.href = 'profile.html';
+          });
+          el.style.cursor = 'pointer';
+        });
+
+        // Make post authors clickable
+        document.querySelectorAll('.post-author').forEach(el => {
+          el.addEventListener('click', () => {
+            window.location.href = 'user-profile.html';
+          });
+          el.style.cursor = 'pointer';
+          el.style.textDecoration = 'underline';
+        });
+
+        // Comment modal events
+        document.getElementById('commentModal').addEventListener('click', function(e) {
+          if (e.target === this) {
+            closeCommentModal();
+          }
+        });
+
+        // Enable/disable submit button based on textarea content
+        document.getElementById('commentText').addEventListener('input', function() {
+          const submitBtn = document.getElementById('submitComment');
+          submitBtn.disabled = !this.value.trim();
+        });
+
+        // Submit comment on Ctrl+Enter
+        document.getElementById('commentText').addEventListener('keydown', function(e) {
+          if (e.ctrlKey && e.key === 'Enter') {
+            submitComment();
+          }
+        });
+      });
+    </script>
+
+    <!-- Comment Modal -->
+    <div id="commentModal" class="comment-modal">
+      <div class="comment-modal-content">
+        <div class="comment-modal-header">
+          <div class="comment-modal-avatar" id="commentAuthorAvatar"></div>
+          <div class="comment-modal-info">
+            <h3 id="commentAuthorName">Kullanıcı Adı</h3>
+            <p>Gönderisine yorum yap</p>
+          </div>
+        </div>
+        <textarea 
+          id="commentText" 
+          class="comment-textarea" 
+          placeholder="Yorumunuzu yazın..."
+          maxlength="500"
+        ></textarea>
+        <div class="comment-actions">
+          <button class="comment-btn comment-btn-cancel" onclick="closeCommentModal()">İptal</button>
+          <button class="comment-btn comment-btn-submit" id="submitComment" onclick="submitComment()">Yorum Yap</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
   </body>
 </html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dil Ayarları - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .apply-btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .apply-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .current-language {
+            background: #f0fdf4;
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .current-language h3 {
+            color: #065f46;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .current-language p {
+            color: #059669;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .language-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .language-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .language-option:hover {
+            background: #f9fafb;
+        }
+
+        .language-option.active {
+            background: #f0fdf4;
+            border-color: #10b981;
+        }
+
+        .language-flag {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .language-info {
+            flex: 1;
+        }
+
+        .language-name {
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .language-native {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .language-status {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .status-complete {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-beta {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-coming {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .radio-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            position: relative;
+            margin-left: 8px;
+        }
+
+        .language-option.active .radio-check {
+            border-color: #10b981;
+        }
+
+        .language-option.active .radio-check::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .auto-translate {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .toggle-option:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-title {
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .toggle-description {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #10b981;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .download-section {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .download-section h4 {
+            color: #92400e;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .download-section p {
+            color: #b45309;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .download-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #d97706;
+        }
+
+        .region-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .region-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .region-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .region-option:hover {
+            background: #f9fafb;
+        }
+
+        .region-option.active {
+            background: #f0fdf4;
+            border-color: #10b981;
+            color: #059669;
+        }
+
+        .region-flag {
+            margin-right: 6px;
+            font-size: 14px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Dil Ayarları</h1>
+                <button class="apply-btn" onclick="applyLanguage()">Uygula</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="current-language">
+            <h3>🌍 Mevcut Dil</h3>
+            <p>🇹🇷 Türkçe</p>
+        </div>
+
+        <div class="language-section">
+            <div class="section-title">🗣️ Dil Seçimi</div>
+            <div class="language-list">
+                <div class="language-option active" onclick="selectLanguage(this, 'tr')">
+                    <div class="language-flag">🇹🇷</div>
+                    <div class="language-info">
+                        <div class="language-name">Türkçe</div>
+                        <div class="language-native">Turkish</div>
+                    </div>
+                    <div class="language-status status-complete">Tam</div>
+                    <div class="radio-check"></div>
+                </div>
+
+                <div class="language-option" onclick="selectLanguage(this, 'en')">
+                    <div class="language-flag">🇺🇸</div>
+                    <div class="language-info">
+                        <div class="language-name">İngilizce</div>
+                        <div class="language-native">English</div>
+                    </div>
+                    <div class="language-status status-complete">Tam</div>
+                    <div class="radio-check"></div>
+                </div>
+
+                <div class="language-option" onclick="selectLanguage(this, 'de')">
+                    <div class="language-flag">🇩🇪</div>
+                    <div class="language-info">
+                        <div class="language-name">Almanca</div>
+                        <div class="language-native">Deutsch</div>
+                    </div>
+                    <div class="language-status status-complete">Tam</div>
+                    <div class="radio-check"></div>
+                </div>
+
+                <div class="language-option" onclick="selectLanguage(this, 'fr')">
+                    <div class="language-flag">🇫🇷</div>
+                    <div class="language-info">
+                        <div class="language-name">Fransızca</div>
+                        <div class="language-native">Français</div>
+                    </div>
+                    <div class="language-status status-beta">Beta</div>
+                    <div class="radio-check"></div>
+                </div>
+
+                <div class="language-option" onclick="selectLanguage(this, 'es')">
+                    <div class="language-flag">🇪🇸</div>
+                    <div class="language-info">
+                        <div class="language-name">İspanyolca</div>
+                        <div class="language-native">Español</div>
+                    </div>
+                    <div class="language-status status-beta">Beta</div>
+                    <div class="radio-check"></div>
+                </div>
+
+                <div class="language-option" onclick="selectLanguage(this, 'it')">
+                    <div class="language-flag">🇮🇹</div>
+                    <div class="language-info">
+                        <div class="language-name">İtalyanca</div>
+                        <div class="language-native">Italiano</div>
+                    </div>
+                    <div class="language-status status-beta">Beta</div>
+                    <div class="radio-check"></div>
+                </div>
+
+                <div class="language-option" onclick="selectLanguage(this, 'ar')">
+                    <div class="language-flag">🇸🇦</div>
+                    <div class="language-info">
+                        <div class="language-name">Arapça</div>
+                        <div class="language-native">العربية</div>
+                    </div>
+                    <div class="language-status status-coming">Yakında</div>
+                    <div class="radio-check"></div>
+                </div>
+
+                <div class="language-option" onclick="selectLanguage(this, 'ru')">
+                    <div class="language-flag">🇷🇺</div>
+                    <div class="language-info">
+                        <div class="language-name">Rusça</div>
+                        <div class="language-native">Русский</div>
+                    </div>
+                    <div class="language-status status-coming">Yakında</div>
+                    <div class="radio-check"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <h4>📦 Dil Paketleri</h4>
+            <p>Seçilen diller için ek dil paketleri indirilebilir (Çevrimdışı kullanım için)</p>
+            <button class="download-btn" onclick="downloadLanguagePacks()">Dil Paketlerini İndir</button>
+        </div>
+
+        <div class="region-section">
+            <div class="section-title">🌍 Bölge Ayarları</div>
+            <p style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">
+                Tarih, saat ve para birimi formatlarını belirler
+            </p>
+            
+            <div class="region-list">
+                <div class="region-option active" onclick="selectRegion(this, 'tr-TR')">
+                    <span class="region-flag">🇹🇷</span>
+                    <span>Türkiye</span>
+                </div>
+                <div class="region-option" onclick="selectRegion(this, 'en-US')">
+                    <span class="region-flag">🇺🇸</span>
+                    <span>Amerika</span>
+                </div>
+                <div class="region-option" onclick="selectRegion(this, 'en-GB')">
+                    <span class="region-flag">🇬🇧</span>
+                    <span>İngiltere</span>
+                </div>
+                <div class="region-option" onclick="selectRegion(this, 'de-DE')">
+                    <span class="region-flag">🇩🇪</span>
+                    <span>Almanya</span>
+                </div>
+                <div class="region-option" onclick="selectRegion(this, 'fr-FR')">
+                    <span class="region-flag">🇫🇷</span>
+                    <span>Fransa</span>
+                </div>
+                <div class="region-option" onclick="selectRegion(this, 'es-ES')">
+                    <span class="region-flag">🇪🇸</span>
+                    <span>İspanya</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="auto-translate">
+            <div class="section-title">🤖 Otomatik Çeviri</div>
+            
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Mesajları Çevir</div>
+                    <div class="toggle-description">Diğer kullanıcıların mesajlarını otomatik çevir</div>
+                </div>
+                <div class="toggle-switch active" onclick="toggleOption(this)"></div>
+            </div>
+
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Profil Açıklamalarını Çevir</div>
+                    <div class="toggle-description">Kullanıcı bio'larını ve açıklamaları çevir</div>
+                </div>
+                <div class="toggle-switch" onclick="toggleOption(this)"></div>
+            </div>
+
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Saha İsimlerini Çevir</div>
+                    <div class="toggle-description">Saha ve tesis isimlerini çevir</div>
+                </div>
+                <div class="toggle-switch active" onclick="toggleOption(this)"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let selectedLanguage = 'tr';
+        let selectedRegion = 'tr-TR';
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectLanguage(element, langCode) {
+            // Check if language is available
+            const statusElement = element.querySelector('.language-status');
+            if (statusElement.classList.contains('status-coming')) {
+                alert('Bu dil henüz mevcut değil. Yakında eklenecek! 🚧');
+                return;
+            }
+
+            selectedLanguage = langCode;
+            
+            // Update UI
+            document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('active'));
+            element.classList.add('active');
+
+            // Show beta warning
+            if (statusElement.classList.contains('status-beta')) {
+                alert('⚠️ Bu dil beta sürümde!\n\nBazı çeviriler eksik veya hatalı olabilir. Geri bildirimlerinizi bekliyoruz.');
+            }
+        }
+
+        function selectRegion(element, regionCode) {
+            selectedRegion = regionCode;
+            
+            document.querySelectorAll('.region-option').forEach(opt => opt.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function toggleOption(toggle) {
+            toggle.classList.toggle('active');
+            
+            // Add haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function downloadLanguagePacks() {
+            const downloadProgress = [
+                'Dil paketleri indiriliyor... 📦',
+                'İndirme başladı: 0%',
+                'İndiriliyor: 25%',
+                'İndiriliyor: 50%',
+                'İndiriliyor: 75%',
+                'İndiriliyor: 100%',
+                'Dil paketleri başarıyla indirildi! ✅'
+            ];
+
+            let step = 0;
+            const interval = setInterval(() => {
+                alert(downloadProgress[step]);
+                step++;
+                if (step >= downloadProgress.length) {
+                    clearInterval(interval);
+                    alert('Artık çevrimdışı modda da uygulamayı kullanabilirsiniz! 🌐');
+                }
+            }, 800);
+        }
+
+        function applyLanguage() {
+            const languageNames = {
+                'tr': 'Türkçe',
+                'en': 'English',
+                'de': 'Deutsch',
+                'fr': 'Français',
+                'es': 'Español',
+                'it': 'Italiano'
+            };
+
+            const regionNames = {
+                'tr-TR': 'Türkiye',
+                'en-US': 'Amerika',
+                'en-GB': 'İngiltere',
+                'de-DE': 'Almanya',
+                'fr-FR': 'Fransa',
+                'es-ES': 'İspanya'
+            };
+
+            // Save settings
+            const languageSettings = {
+                language: selectedLanguage,
+                region: selectedRegion,
+                autoTranslateMessages: document.querySelectorAll('.toggle-switch')[0].classList.contains('active'),
+                autoTranslateProfiles: document.querySelectorAll('.toggle-switch')[1].classList.contains('active'),
+                autoTranslateVenues: document.querySelectorAll('.toggle-switch')[2].classList.contains('active')
+            };
+
+            localStorage.setItem('goalifyLanguageSettings', JSON.stringify(languageSettings));
+
+            alert(`Dil ayarları uygulandı! 🌍\n\nDil: ${languageNames[selectedLanguage]}\nBölge: ${regionNames[selectedRegion]}\n\nUygulama yeniden başlatılıyor...`);
+            
+            // Simulate app restart
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function loadSavedSettings() {
+            const saved = localStorage.getItem('goalifyLanguageSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                
+                selectedLanguage = settings.language || 'tr';
+                selectedRegion = settings.region || 'tr-TR';
+                
+                // Apply language selection
+                document.querySelectorAll('.language-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                const languageElement = document.querySelector(`[onclick*="${selectedLanguage}"]`);
+                if (languageElement) {
+                    languageElement.classList.add('active');
+                }
+                
+                // Apply region selection
+                document.querySelectorAll('.region-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                const regionElement = document.querySelector(`[onclick*="${selectedRegion}"]`);
+                if (regionElement) {
+                    regionElement.classList.add('active');
+                }
+                
+                // Apply toggle settings
+                const toggles = document.querySelectorAll('.toggle-switch');
+                if (settings.autoTranslateMessages !== undefined) {
+                    toggles[0].classList.toggle('active', settings.autoTranslateMessages);
+                }
+                if (settings.autoTranslateProfiles !== undefined) {
+                    toggles[1].classList.toggle('active', settings.autoTranslateProfiles);
+                }
+                if (settings.autoTranslateVenues !== undefined) {
+                    toggles[2].classList.toggle('active', settings.autoTranslateVenues);
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedSettings();
+        });
+    </script>
+</body>
+</html>

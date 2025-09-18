@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Gönderi - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .post-btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .post-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .post-btn:disabled {
+            background: rgba(255,255,255,0.5);
+            color: rgba(5,150,105,0.5);
+            cursor: not-allowed;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+        }
+
+        /* Media Upload */
+        .media-upload-section {
+            margin-bottom: 20px;
+        }
+
+        .upload-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .upload-option {
+            flex: 1;
+            border: 2px dashed #e5e7eb;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-option:hover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .upload-option.photo {
+            border-color: #3b82f6;
+        }
+
+        .upload-option.photo:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .upload-option.video {
+            border-color: #ef4444;
+        }
+
+        .upload-option.video:hover {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .media-preview {
+            display: none;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .media-preview img, .media-preview video {
+            width: 100%;
+            border-radius: 16px;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .remove-media {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Text Area */
+        .text-area {
+            margin-bottom: 20px;
+        }
+
+        .text-area textarea {
+            width: 100%;
+            min-height: 120px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .text-area textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .text-area textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        .char-counter.warning {
+            color: #f59e0b;
+        }
+
+        .char-counter.error {
+            color: #ef4444;
+        }
+
+        /* Person Tagging */
+        .person-tagging {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .tag-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tag-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .tag-hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        /* Location */
+        .location-section {
+            margin-bottom: 20px;
+        }
+
+        .location-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .location-input:hover {
+            border-color: #10b981;
+        }
+
+        .location-icon {
+            color: #ef4444;
+            font-size: 20px;
+        }
+
+        .location-text {
+            flex: 1;
+            color: #374151;
+        }
+
+        .location-text.placeholder {
+            color: #9ca3af;
+        }
+
+        /* Tags */
+        .tags-section {
+            margin-bottom: 20px;
+        }
+
+        .tags-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tags-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Privacy */
+        .privacy-section {
+            margin-bottom: 30px;
+        }
+
+        .privacy-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .privacy-option {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-option.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .privacy-option:hover:not(.active) {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            transition: all 0.3s ease;
+            max-width: 350px;
+            text-align: center;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success {
+            background: #10b981;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+        }
+        
+        .toast.info {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Yeni Gönderi</h1>
+                <button class="post-btn" id="postBtn" onclick="createPost()" disabled>Paylaş</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Media Upload -->
+        <div class="media-upload-section">
+            <div class="upload-options">
+                <div class="upload-option photo" onclick="document.getElementById('photoInput').click()">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Fotoğraf</div>
+                    <input type="file" id="photoInput" accept="image/*" onchange="previewMedia(event, 'photo')" style="display: none;">
+                </div>
+                <div class="upload-option video" onclick="document.getElementById('videoInput').click()">
+                    <div class="upload-icon">🎬</div>
+                    <div class="upload-text">Video</div>
+                    <input type="file" id="videoInput" accept="video/*" onchange="previewMedia(event, 'video')" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <div class="media-preview" id="mediaPreview">
+            <img id="previewImg" src="" alt="Preview" style="display: none;">
+            <video id="previewVideo" controls style="display: none; width: 100%; border-radius: 16px; max-height: 300px;">
+                <source id="videoSource" src="" type="video/mp4">
+            </video>
+            <button class="remove-media" onclick="removeMedia()">×</button>
+        </div>
+
+        <!-- Text Area -->
+        <div class="text-area">
+            <textarea 
+                id="postText" 
+                placeholder="Neler oluyor? Maçından, antrenmanından veya saha deneyiminden bahset..."
+                maxlength="500"
+                oninput="updateCharCounter(); validateForm()"
+            ></textarea>
+            <div class="char-counter" id="charCounter">0/500</div>
+        </div>
+
+        <!-- Person Tagging -->
+        <div class="person-tagging">
+            <div class="section-title">Kişi Etiketle</div>
+            <input 
+                type="text" 
+                class="tag-input" 
+                id="personTags"
+                placeholder="Arkadaşlarını etiketle... (@username)"
+                oninput="validateForm()"
+            >
+            <div class="tag-hint">@ kullanarak arkadaşlarını etiketleyebilirsin</div>
+        </div>
+
+        <!-- Location -->
+        <div class="location-section">
+            <div class="section-title">Konum</div>
+            <div class="location-input" onclick="selectLocation()">
+                <span class="location-icon">📍</span>
+                <span class="location-text placeholder" id="locationText">Konum ekle</span>
+            </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags-section">
+            <div class="section-title">Etiketler</div>
+            <input 
+                type="text" 
+                class="tags-input" 
+                id="tagsInput"
+                placeholder="#futsal #gol #antrenman"
+                oninput="validateForm()"
+            >
+            <div class="tag-hint">Virgülle ayırarak birden fazla etiket ekleyebilirsiniz</div>
+        </div>
+
+        <!-- Privacy -->
+        <div class="privacy-section">
+            <div class="section-title">Gizlilik</div>
+            <div class="privacy-options">
+                <div class="privacy-option active" onclick="selectPrivacy('public')">
+                    🌍 Herkese Açık
+                </div>
+                <div class="privacy-option" onclick="selectPrivacy('followers')">
+                    👥 Takipçilerime
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let selectedLocation = null;
+        let selectedPrivacy = 'public';
+        
+        // Toast function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Hide and remove toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        function goBack() {
+            window.history.back();
+        }
+        
+        function previewMedia(event, type) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (type === 'photo') {
+                        document.getElementById('previewImg').src = e.target.result;
+                        document.getElementById('previewImg').style.display = 'block';
+                        document.getElementById('previewVideo').style.display = 'none';
+                    } else {
+                        document.getElementById('videoSource').src = e.target.result;
+                        document.getElementById('previewVideo').style.display = 'block';
+                        document.getElementById('previewImg').style.display = 'none';
+                        document.getElementById('previewVideo').load();
+                    }
+                    
+                    document.querySelector('.media-upload-section').style.display = 'none';
+                    document.getElementById('mediaPreview').style.display = 'block';
+                    validateForm();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeMedia() {
+            document.getElementById('photoInput').value = '';
+            document.getElementById('videoInput').value = '';
+            document.querySelector('.media-upload-section').style.display = 'block';
+            document.getElementById('mediaPreview').style.display = 'none';
+            document.getElementById('previewImg').style.display = 'none';
+            document.getElementById('previewVideo').style.display = 'none';
+            validateForm();
+        }
+        
+        function selectLocation() {
+            const locations = [
+                'Futbol Plus Halısaha - Bahçelievler',
+                'Arena Spor Kompleksi - Beşiktaş',
+                'Goal Futsal Center - Kadıköy',
+                'Champions League Sahası - Şişli',
+                'Victory Sports Club - Üsküdar'
+            ];
+            
+            const location = locations[Math.floor(Math.random() * locations.length)];
+            selectedLocation = location;
+            
+            const locationText = document.getElementById('locationText');
+            locationText.textContent = location;
+            locationText.classList.remove('placeholder');
+            
+            validateForm();
+        }
+        
+        function selectPrivacy(type) {
+            selectedPrivacy = type;
+            document.querySelectorAll('.privacy-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        function updateCharCounter() {
+            const text = document.getElementById('postText').value;
+            const counter = document.getElementById('charCounter');
+            const length = text.length;
+            
+            counter.textContent = `${length}/500`;
+            
+            if (length > 450) {
+                counter.classList.add('warning');
+                counter.classList.remove('error');
+            } else if (length >= 500) {
+                counter.classList.add('error');
+                counter.classList.remove('warning');
+            } else {
+                counter.classList.remove('warning', 'error');
+            }
+        }
+        
+        function validateForm() {
+            const text = document.getElementById('postText').value.trim();
+            const hasMedia = document.getElementById('mediaPreview').style.display === 'block';
+            const postBtn = document.getElementById('postBtn');
+            
+            if (text.length > 0 || hasMedia) {
+                postBtn.disabled = false;
+            } else {
+                postBtn.disabled = true;
+            }
+        }
+        
+        function createPost() {
+            const text = document.getElementById('postText').value.trim();
+            const personTags = document.getElementById('personTags').value.trim();
+            const tags = document.getElementById('tagsInput').value.trim();
+            const hasMedia = document.getElementById('mediaPreview').style.display === 'block';
+            const postBtn = document.getElementById('postBtn');
+            
+            if (text.length === 0 && !hasMedia) {
+                showToast('Lütfen bir metin yazın veya medya ekleyin.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            postBtn.disabled = true;
+            postBtn.textContent = 'Paylaşılıyor...';
+            
+            const postData = {
+                text: text,
+                personTags: personTags,
+                location: selectedLocation,
+                tags: tags,
+                privacy: selectedPrivacy,
+                hasMedia: hasMedia,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Simulate upload delay
+            setTimeout(() => {
+                showToast('Gönderiniz başarıyla paylaşıldı! 🎉', 'success');
+                
+                // Wait for toast to show, then redirect
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 1500);
+            }, 800);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            validateForm();
+        });
+    </script>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+</body>
+</html>

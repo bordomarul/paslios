@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takipçiler - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .search-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+            color: #6b7280;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .tab.active {
+            background: #10b981;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #f0fdf4;
+            color: #10b981;
+        }
+
+        /* Search */
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        /* User List */
+        .user-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: all 0.2s ease;
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-item:hover {
+            background: #f9fafb;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+
+        .user-username {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .user-stats {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .follow-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .follow-btn:hover {
+            background: #059669;
+        }
+
+        .follow-btn.following {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .follow-btn.following:hover {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        /* Stats */
+        .stats-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Takipçiler</h1>
+                <button class="search-btn" onclick="toggleSearch()">🔍</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Stats -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="followersCount">1,234</div>
+                    <div class="stat-label">Takipçi</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="followingCount">567</div>
+                    <div class="stat-label">Takip Edilen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('followers')">Takipçiler</button>
+            <button class="tab" onclick="switchTab('following')">Takip Edilenler</button>
+        </div>
+
+        <!-- Search -->
+        <div class="search-section" id="searchSection" style="display: none;">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Kullanıcı ara..." id="searchInput" oninput="filterUsers()">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <!-- Followers List -->
+        <div class="user-list" id="followersList">
+            <div class="user-item">
+                <div class="user-avatar" onclick="openUserProfile('ahmetyilmaz')">AY</div>
+                <div class="user-info" onclick="openUserProfile('ahmetyilmaz')" style="cursor: pointer;">
+                    <div class="user-name">Ahmet Yılmaz</div>
+                    <div class="user-username">@ahmetyilmaz</div>
+                    <div class="user-stats">156 takipçi • 89 gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+
+            <div class="user-item">
+                <div class="user-avatar" onclick="openUserProfile('fatmaturan')">FT</div>
+                <div class="user-info" onclick="openUserProfile('fatmaturan')" style="cursor: pointer;">
+                    <div class="user-name">Fatma Turan</div>
+                    <div class="user-username">@fatmaturan</div>
+                    <div class="user-stats">234 takipçi • 145 gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+
+            <div class="user-item">
+                <div class="user-avatar">MK</div>
+                <div class="user-info">
+                    <div class="user-name">Mehmet Korkmaz</div>
+                    <div class="user-username">@mehmetk</div>
+                    <div class="user-stats">89 takipçi • 67 gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+
+            <div class="user-item">
+                <div class="user-avatar">EG</div>
+                <div class="user-info">
+                    <div class="user-name">Elif Güneş</div>
+                    <div class="user-username">@elifgunes</div>
+                    <div class="user-stats">312 takipçi • 198 gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+
+            <div class="user-item">
+                <div class="user-avatar">CY</div>
+                <div class="user-info">
+                    <div class="user-name">Can Yıldız</div>
+                    <div class="user-username">@canyildiz</div>
+                    <div class="user-stats">445 takipçi • 276 gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+        </div>
+
+        <!-- Following List (Hidden by default) -->
+        <div class="user-list" id="followingList" style="display: none;">
+            <div class="user-item">
+                <div class="user-avatar">MS</div>
+                <div class="user-info">
+                    <div class="user-name">Messi Skills</div>
+                    <div class="user-username">@messiskills</div>
+                    <div class="user-stats">1.2M takipçi • 2.4K gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+
+            <div class="user-item">
+                <div class="user-avatar">FB</div>
+                <div class="user-info">
+                    <div class="user-name">Futbol Blog</div>
+                    <div class="user-username">@futbolblog</div>
+                    <div class="user-stats">850K takipçi • 1.8K gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+
+            <div class="user-item">
+                <div class="user-avatar">GS</div>
+                <div class="user-info">
+                    <div class="user-name">Goal Shots</div>
+                    <div class="user-username">@goalshots</div>
+                    <div class="user-stats">456K takipçi • 987 gönderi</div>
+                </div>
+                <button class="follow-btn following" onclick="toggleFollow(this)">Takip Ediliyor</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'followers';
+        let searchVisible = false;
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update page title
+            document.querySelector('.page-title').textContent = tab === 'followers' ? 'Takipçiler' : 'Takip Edilenler';
+            
+            // Show/hide lists
+            if (tab === 'followers') {
+                document.getElementById('followersList').style.display = 'block';
+                document.getElementById('followingList').style.display = 'none';
+            } else {
+                document.getElementById('followersList').style.display = 'none';
+                document.getElementById('followingList').style.display = 'block';
+            }
+        }
+
+        function toggleSearch() {
+            searchVisible = !searchVisible;
+            const searchSection = document.getElementById('searchSection');
+            
+            if (searchVisible) {
+                searchSection.style.display = 'block';
+                document.getElementById('searchInput').focus();
+            } else {
+                searchSection.style.display = 'none';
+                document.getElementById('searchInput').value = '';
+                filterUsers(); // Reset filter
+            }
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeList = currentTab === 'followers' ? 'followersList' : 'followingList';
+            const userItems = document.querySelectorAll(`#${activeList} .user-item`);
+            
+            userItems.forEach(item => {
+                const name = item.querySelector('.user-name').textContent.toLowerCase();
+                const username = item.querySelector('.user-username').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || username.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleFollow(button) {
+            if (button.classList.contains('following')) {
+                button.classList.remove('following');
+                button.textContent = 'Takip Et';
+                button.style.background = '#10b981';
+                button.style.color = 'white';
+            } else {
+                button.classList.add('following');
+                button.textContent = 'Takip Ediliyor';
+                button.style.background = '#f3f4f6';
+                button.style.color = '#6b7280';
+            }
+        }
+
+        function openUserProfile(username) {
+            window.location.href = `user-profile.html?user=${username}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            switchTab('followers');
+        });
+    </script>
+</body>
+</html>

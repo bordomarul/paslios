@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İletişim - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .send-btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .send-btn:disabled {
+            background: rgba(255,255,255,0.5);
+            color: rgba(5,150,105,0.5);
+            cursor: not-allowed;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .contact-methods {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .methods-title {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .method-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .method-item:last-child {
+            border-bottom: none;
+        }
+
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 12px;
+        }
+
+        .email-icon { background: #dbeafe; color: #1d4ed8; }
+        .phone-icon { background: #dcfce7; color: #16a34a; }
+        .chat-icon { background: #fef3c7; color: #d97706; }
+        .social-icon { background: #f3e8ff; color: #7c3aed; }
+
+        .method-info {
+            flex: 1;
+        }
+
+        .method-name {
+            color: #111827;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .method-detail {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .method-action {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-title {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .priority-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .priority-option {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .priority-option.low {
+            color: #16a34a;
+        }
+
+        .priority-option.medium {
+            color: #d97706;
+        }
+
+        .priority-option.high {
+            color: #dc2626;
+        }
+
+        .priority-option.active {
+            border-color: currentColor;
+            background: currentColor;
+            color: white;
+        }
+
+        .response-info {
+            background: #f0fdf4;
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .response-info h3 {
+            color: #065f46;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .response-info p {
+            color: #065f46;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">İletişim</h1>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="contact-methods">
+            <div class="methods-title">💬 İletişim Yolları</div>
+            
+            <div class="method-item">
+                <div class="method-icon email-icon">📧</div>
+                <div class="method-info">
+                    <div class="method-name">Email</div>
+                    <div class="method-detail">24 saat içinde yanıt</div>
+                </div>
+                <a href="mailto:support@goalify.com" class="method-action">Gönder</a>
+            </div>
+
+            <div class="method-item">
+                <div class="method-icon chat-icon">💬</div>
+                <div class="method-info">
+                    <div class="method-name">Canlı Destek</div>
+                    <div class="method-detail">09:00 - 22:00 arası</div>
+                </div>
+                <a href="#" class="method-action" onclick="startLiveChat()">Başlat</a>
+            </div>
+
+            <div class="method-item">
+                <div class="method-icon phone-icon">📞</div>
+                <div class="method-info">
+                    <div class="method-name">Telefon</div>
+                    <div class="method-detail">0850 123 45 67</div>
+                </div>
+                <a href="tel:08501234567" class="method-action">Ara</a>
+            </div>
+
+            <div class="method-item">
+                <div class="method-icon social-icon">📱</div>
+                <div class="method-info">
+                    <div class="method-name">Sosyal Medya</div>
+                    <div class="method-detail">@goalifyapp</div>
+                </div>
+                <a href="#" class="method-action" onclick="openSocial()">Takip Et</a>
+            </div>
+        </div>
+
+        <div class="response-info">
+            <h3>⏰ Yanıt Süreleri</h3>
+            <p>
+                • Acil durumlar: 2 saat içinde<br>
+                • Normal sorular: 24 saat içinde<br>
+                • Özellik istekleri: 3-5 iş günü
+            </p>
+        </div>
+
+        <div class="form-section">
+            <div class="form-title">📝 Mesaj Gönder</div>
+            
+            <div class="form-group">
+                <label class="form-label">Konu</label>
+                <select class="form-select" id="subject" onchange="validateForm()">
+                    <option value="">Konu seçin</option>
+                    <option value="bug">🐛 Hata Bildirimi</option>
+                    <option value="feature">💡 Özellik İsteği</option>
+                    <option value="account">👤 Hesap Sorunu</option>
+                    <option value="payment">💳 Ödeme Sorunu</option>
+                    <option value="other">❓ Diğer</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Adresiniz</label>
+                <input type="email" class="form-input" id="email" placeholder="email@example.com" value="enes.guler@example.com" oninput="validateForm()">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Öncelik</label>
+                <div class="priority-options">
+                    <div class="priority-option low" onclick="selectPriority('low')">Düşük</div>
+                    <div class="priority-option medium active" onclick="selectPriority('medium')">Orta</div>
+                    <div class="priority-option high" onclick="selectPriority('high')">Yüksek</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mesajınız</label>
+                <textarea class="form-textarea" id="message" placeholder="Sorununuzu veya önerinizi detaylı bir şekilde açıklayın..." maxlength="1000" oninput="updateCharCounter(); validateForm()"></textarea>
+                <div class="char-counter" id="charCounter">0/1000</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let selectedPriority = 'medium';
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectPriority(priority) {
+            selectedPriority = priority;
+            document.querySelectorAll('.priority-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector(`.priority-option.${priority}`).classList.add('active');
+        }
+
+        function updateCharCounter() {
+            const message = document.getElementById('message').value;
+            const counter = document.getElementById('charCounter');
+            counter.textContent = `${message.length}/1000`;
+            
+            if (message.length > 900) {
+                counter.style.color = '#ef4444';
+            } else if (message.length > 750) {
+                counter.style.color = '#f59e0b';
+            } else {
+                counter.style.color = '#6b7280';
+            }
+        }
+
+        function validateForm() {
+            const subject = document.getElementById('subject').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            const sendBtn = document.getElementById('sendBtn');
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            const isValid = subject && emailRegex.test(email) && message.trim().length >= 10;
+            sendBtn.disabled = !isValid;
+        }
+
+        function sendMessage() {
+            const formData = {
+                subject: document.getElementById('subject').value,
+                email: document.getElementById('email').value,
+                priority: selectedPriority,
+                message: document.getElementById('message').value.trim()
+            };
+
+            // Get subject text for display
+            const subjectSelect = document.getElementById('subject');
+            const subjectText = subjectSelect.options[subjectSelect.selectedIndex].text;
+
+            alert(`Mesajınız başarıyla gönderildi! 📧\n\nKonu: ${subjectText}\nÖncelik: ${selectedPriority === 'low' ? 'Düşük' : selectedPriority === 'medium' ? 'Orta' : 'Yüksek'}\n\n${selectedPriority === 'high' ? '2 saat' : '24 saat'} içinde size dönüş yapacağız.`);
+            
+            window.history.back();
+        }
+
+        function startLiveChat() {
+            alert('Canlı destek sistemi açılıyor... 💬\n\nSizi canlı destek temsilcimize yönlendiriyoruz.\n\nÇalışma saatleri: 09:00 - 22:00');
+        }
+
+        function openSocial() {
+            if (confirm('Sosyal medya hesaplarımızı ziyaret etmek istiyor musunuz?\n\n• Twitter: @goalifyapp\n• Instagram: @goalifyapp\n• LinkedIn: Goalify')) {
+                alert('Sosyal medya hesaplarımızı takip etmeyi unutmayın! 📱');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            validateForm();
+        });
+    </script>
+</body>
+</html>

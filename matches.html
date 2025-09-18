@@ -313,6 +313,125 @@
         font-size: 0.75rem;
         font-weight: 500;
       }
+      
+      /* Toast Notifications */
+      .toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #10b981;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+        transition: all 0.3s ease;
+        max-width: 350px;
+        text-align: center;
+      }
+      
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      
+      .toast.success {
+        background: #10b981;
+      }
+      
+      .toast.error {
+        background: #ef4444;
+      }
+      
+      .toast.info {
+        background: #3b82f6;
+      }
+      
+      /* Modal Styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      
+      .modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 350px;
+        margin: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: scale(0.9);
+        transition: transform 0.2s ease;
+      }
+      
+      .modal.show .modal-content {
+        transform: scale(1);
+      }
+      
+      .modal-header {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      
+      .modal-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+      
+      .modal-message {
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        white-space: pre-line;
+      }
+      
+      .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+      
+      .modal-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+      }
+      
+      .modal-btn-primary {
+        background: #10b981;
+        color: white;
+      }
+      
+      .modal-btn-primary:hover {
+        background: #059669;
+        transform: translateY(-1px);
+      }
+      
+      .modal-btn-secondary {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      
+      .modal-btn-secondary:hover {
+        background: #e5e7eb;
+      }
     </style>
   </head>
   <body>
@@ -506,5 +625,213 @@
         </a>
       </div>
     </div>
+
+    <script>
+      let currentFilter = 'Tümü';
+
+      // Toast functions
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        document.getElementById('toastContainer').appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+      
+      // Modal functions
+      function showModal(title, message, onConfirm) {
+        const modal = document.getElementById('confirmationModal');
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').textContent = message;
+        
+        const confirmBtn = document.getElementById('confirmBtn');
+        confirmBtn.onclick = () => {
+          onConfirm();
+          closeModal();
+        };
+        
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+      }
+      
+      function closeModal() {
+        const modal = document.getElementById('confirmationModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 200);
+      }
+
+      function filterMatches(filter, element) {
+        currentFilter = filter;
+        
+        // Update active filter button
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+        
+        // Show/hide matches based on filter
+        const matchCards = document.querySelectorAll('.match-card');
+        
+        matchCards.forEach(card => {
+          const timeText = card.querySelector('.match-time').textContent;
+          let shouldShow = true;
+          
+          switch(filter) {
+            case 'Bugün':
+              shouldShow = timeText.includes('Bugün');
+              break;
+            case 'Yarın':
+              shouldShow = timeText.includes('Yarın');
+              break;
+            case 'Bu Hafta':
+              shouldShow = timeText.includes('Bugün') || timeText.includes('Yarın') || 
+                          timeText.includes('Pazartesi') || timeText.includes('Salı') || 
+                          timeText.includes('Çarşamba') || timeText.includes('Perşembe') || 
+                          timeText.includes('Cuma');
+              break;
+            case 'Müsait':
+              const joinBtn = card.querySelector('.btn-join');
+              shouldShow = !joinBtn.classList.contains('disabled');
+              break;
+            default:
+              shouldShow = true;
+          }
+          
+          if (shouldShow) {
+            card.style.display = 'block';
+            card.style.animation = 'fadeIn 0.3s ease-in-out';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        // Show filter result message
+        setTimeout(() => {
+          const visibleMatches = document.querySelectorAll('.match-card[style*="display: block"]').length;
+          if (visibleMatches === 0) {
+            showToast(`${filter} kategorisinde henüz maç bulunmuyor. 😔`, 'info');
+          }
+        }, 300);
+      }
+
+      function joinMatch(element, matchName, time) {
+        if (element.classList.contains('disabled')) {
+          showToast('Bu maç dolu! 😞\n\nBaşka maçlara bakabilir veya yeni bir maç oluşturabilirsiniz.', 'error');
+          return;
+        }
+        
+        const message = `Maça katılmak istediğinizden emin misiniz?\n\n🏟️ ${matchName}\n⏰ ${time}\n\nKatılım onaylandıktan sonra diğer oyuncularla iletişime geçebileceksiniz.`;
+        
+        showModal('Maça Katıl', message, () => {
+          // Update button state
+          element.textContent = 'Katıldın ✓';
+          element.style.backgroundColor = '#10b981';
+          element.disabled = true;
+          
+          // Update player count
+          const playersElement = element.closest('.match-card').querySelector('.match-players');
+          const currentPlayers = parseInt(playersElement.textContent.match(/\d+/)[0]);
+          const maxPlayers = parseInt(playersElement.textContent.match(/\/(\d+)/)[1]);
+          
+          if (currentPlayers < maxPlayers) {
+            const newCount = currentPlayers + 1;
+            playersElement.textContent = `${newCount}/${maxPlayers} Oyuncu`;
+            
+            // Check if match is now full
+            if (newCount === maxPlayers) {
+              const statusElement = element.closest('.match-card').querySelector('.match-status');
+              statusElement.textContent = 'Tam Dolu';
+              statusElement.style.backgroundColor = '#ef4444';
+            } else {
+              const statusElement = element.closest('.match-card').querySelector('.match-status');
+              const remaining = maxPlayers - newCount;
+              statusElement.textContent = `${remaining} Kişi Eksik`;
+            }
+          }
+          
+          showToast(`Tebrikler! Maça başarıyla katıldınız! 🎉\n\nMaç saatinden önce size bildirim gönderilecek.\nDiğer oyuncularla mesajlaşmak için maç detayına girebilirsiniz.`, 'success');
+        });
+      }
+
+      function viewMatchDetails(matchCard) {
+        const matchName = matchCard.querySelector('.match-title').textContent;
+        const time = matchCard.querySelector('.match-time').textContent;
+        const location = matchCard.querySelector('.match-location').textContent;
+        const players = matchCard.querySelector('.match-players').textContent;
+        
+        const details = `📋 MAÇ DETAYLARI\n\n🏟️ ${matchName}\n⏰ ${time}\n${location}\n👥 ${players}\n\nDetayları görmek için Tamam'a basın.`;
+        
+        showModal('Maç Detayları', details, () => {
+          // Redirect to match details page (to be created)
+          showToast('Maç detay sayfası yakında eklenecek! 🚧', 'info');
+        });
+      }
+
+      // Add event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add click events to filter buttons
+        document.querySelectorAll('.filter-btn').forEach((btn, index) => {
+          const filters = ['Tümü', 'Bugün', 'Yarın', 'Bu Hafta', 'Müsait'];
+          btn.addEventListener('click', () => filterMatches(filters[index], btn));
+        });
+        
+        // Add click events to join buttons
+        document.querySelectorAll('.btn-join').forEach(btn => {
+          if (!btn.classList.contains('disabled')) {
+            btn.addEventListener('click', () => {
+              const matchCard = btn.closest('.match-card');
+              const matchName = matchCard.querySelector('.match-title').textContent;
+              const time = matchCard.querySelector('.match-time').textContent;
+              joinMatch(btn, matchName, time);
+            });
+          }
+        });
+        
+        // Add click events to match cards for details
+        document.querySelectorAll('.match-card').forEach(card => {
+          card.addEventListener('click', (e) => {
+            // Don't trigger if clicking on join button
+            if (!e.target.classList.contains('btn-join')) {
+              viewMatchDetails(card);
+            }
+          });
+          card.style.cursor = 'pointer';
+        });
+        
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `;
+        document.head.appendChild(style);
+      });
+    </script>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" id="modalTitle">Emin misiniz?</div>
+        </div>
+        <div class="modal-message" id="modalMessage">Bu işlemi onaylamak istediğinizden emin misiniz?</div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">İptal</button>
+          <button class="modal-btn modal-btn-primary" id="confirmBtn">Onayla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
   </body>
 </html>

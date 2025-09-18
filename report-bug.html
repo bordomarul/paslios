@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hata Bildirimi - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .submit-btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .submit-btn:disabled {
+            background: rgba(255,255,255,0.5);
+            color: rgba(5,150,105,0.5);
+            cursor: not-allowed;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .bug-info {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .bug-info h3 {
+            color: #b91c1c;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .bug-info p {
+            color: #7f1d1d;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-title {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .severity-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .severity-option {
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .severity-option.critical {
+            color: #dc2626;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .severity-option.major {
+            color: #ea580c;
+            border-color: #fed7aa;
+            background: #fff7ed;
+        }
+
+        .severity-option.minor {
+            color: #ca8a04;
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .severity-option.cosmetic {
+            color: #059669;
+            border-color: #a7f3d0;
+            background: #ecfdf5;
+        }
+
+        .severity-option.active {
+            border-width: 2px;
+            transform: scale(1.02);
+        }
+
+        .device-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .device-info h4 {
+            color: #475569;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .device-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+
+        .device-label {
+            color: #64748b;
+        }
+
+        .device-value {
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .file-upload:hover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .file-upload.dragover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .upload-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .file-list {
+            margin-top: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .file-name {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .file-remove {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .steps-info {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .steps-title {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .step-number {
+            background: #10b981;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Hata Bildirimi</h1>
+                <button class="submit-btn" id="submitBtn" onclick="submitBugReport()" disabled>Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="bug-info">
+            <h3>🐛 Hata Bildirimi Rehberi</h3>
+            <p>
+                Hatayı daha iyi anlayabilmemiz için lütfen mümkün olduğunca detaylı bilgi verin. Ekran görüntüleri ve adım adım açıklamalar sorunu daha hızlı çözmemize yardımcı olur.
+            </p>
+        </div>
+
+        <div class="form-section">
+            <div class="form-title">🔍 Hata Detayları</div>
+            
+            <div class="form-group">
+                <label class="form-label">Hata Türü</label>
+                <select class="form-select" id="bugType" onchange="validateForm()">
+                    <option value="">Hata türünü seçin</option>
+                    <option value="crash">💥 Uygulama Çökmesi</option>
+                    <option value="ui">🎨 Arayüz Sorunu</option>
+                    <option value="performance">⚡ Performans Sorunu</option>
+                    <option value="data">📊 Veri Kaybolması</option>
+                    <option value="login">🔐 Giriş Sorunu</option>
+                    <option value="booking">📅 Rezervasyon Sorunu</option>
+                    <option value="payment">💳 Ödeme Sorunu</option>
+                    <option value="notification">🔔 Bildirim Sorunu</option>
+                    <option value="other">❓ Diğer</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Önem Derecesi</label>
+                <div class="severity-options">
+                    <div class="severity-option critical" onclick="selectSeverity('critical')">
+                        🚨 Kritik<br>
+                        <small>Uygulama kullanılamaz</small>
+                    </div>
+                    <div class="severity-option major" onclick="selectSeverity('major')">
+                        🔥 Önemli<br>
+                        <small>Ana özellik çalışmıyor</small>
+                    </div>
+                    <div class="severity-option minor active" onclick="selectSeverity('minor')">
+                        🟡 Küçük<br>
+                        <small>Geçici çözüm var</small>
+                    </div>
+                    <div class="severity-option cosmetic" onclick="selectSeverity('cosmetic')">
+                        🎨 Görsel<br>
+                        <small>Sadece tasarım sorunu</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hata Başlığı</label>
+                <input type="text" class="form-input" id="bugTitle" placeholder="Hatayı kısaca özetleyin" maxlength="100" oninput="validateForm()">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hata Açıklaması</label>
+                <textarea class="form-textarea" id="bugDescription" placeholder="• Ne yapmaya çalışıyordunuz?&#10;• Ne oldu?&#10;• Ne olmasını bekliyordunuz?&#10;• Hatayı tekrar oluşturabilir misiniz?" maxlength="2000" oninput="updateCharCounter('bugDescription', 'descCounter'); validateForm()"></textarea>
+                <div class="char-counter" id="descCounter">0/2000</div>
+            </div>
+        </div>
+
+        <div class="steps-info">
+            <div class="steps-title">📝 Hatayı Tekrarlama Adımları</div>
+            
+            <div class="form-group">
+                <textarea class="form-textarea" id="reproSteps" placeholder="Hatayı tekrar oluşturmak için gereken adımları yazın:&#10;&#10;1. Ana sayfaya git&#10;2. Maç rezervasyonu butonuna tıkla&#10;3. Tarih seç&#10;4. Hata oluşur..." maxlength="1500" oninput="updateCharCounter('reproSteps', 'stepsCounter')"></textarea>
+                <div class="char-counter" id="stepsCounter">0/1500</div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-title">📱 Cihaz Bilgileri</div>
+            
+            <div class="device-info">
+                <h4>🔧 Otomatik Algılanan Bilgiler</h4>
+                <div class="device-detail">
+                    <span class="device-label">Tarayıcı:</span>
+                    <span class="device-value" id="browserInfo">Chrome 119.0</span>
+                </div>
+                <div class="device-detail">
+                    <span class="device-label">İşletim Sistemi:</span>
+                    <span class="device-value" id="osInfo">Windows 11</span>
+                </div>
+                <div class="device-detail">
+                    <span class="device-label">Ekran Çözünürlüğü:</span>
+                    <span class="device-value" id="screenInfo">1920x1080</span>
+                </div>
+                <div class="device-detail">
+                    <span class="device-label">Tarih/Saat:</span>
+                    <span class="device-value" id="dateInfo">-</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Ekran Görüntüleri / Videolar (İsteğe bağlı)</label>
+                <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Dosya yüklemek için tıklayın veya sürükleyin</div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">
+                        PNG, JPG, GIF, MP4 (Maks. 10MB)
+                    </div>
+                </div>
+                <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display: none;" onchange="handleFileSelect()">
+                <div class="file-list" id="fileList"></div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-title">📧 İletişim Bilgileri</div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Adresiniz</label>
+                <input type="email" class="form-input" id="contactEmail" placeholder="email@example.com" value="enes.guler@example.com" oninput="validateForm()">
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="followUp" checked>
+                    <span style="font-size: 14px; color: #374151;">Gelişmeler hakkında bilgilendirilmek istiyorum</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let selectedSeverity = 'minor';
+        let uploadedFiles = [];
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectSeverity(severity) {
+            selectedSeverity = severity;
+            document.querySelectorAll('.severity-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector(`.severity-option.${severity}`).classList.add('active');
+        }
+
+        function updateCharCounter(textareaId, counterId) {
+            const textarea = document.getElementById(textareaId);
+            const counter = document.getElementById(counterId);
+            const maxLength = textarea.getAttribute('maxlength');
+            
+            counter.textContent = `${textarea.value.length}/${maxLength}`;
+            
+            const percentage = (textarea.value.length / maxLength) * 100;
+            if (percentage > 90) {
+                counter.style.color = '#ef4444';
+            } else if (percentage > 75) {
+                counter.style.color = '#f59e0b';
+            } else {
+                counter.style.color = '#6b7280';
+            }
+        }
+
+        function validateForm() {
+            const bugType = document.getElementById('bugType').value;
+            const bugTitle = document.getElementById('bugTitle').value.trim();
+            const bugDescription = document.getElementById('bugDescription').value.trim();
+            const contactEmail = document.getElementById('contactEmail').value.trim();
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            const isValid = bugType && 
+                           bugTitle.length >= 5 && 
+                           bugDescription.length >= 20 && 
+                           emailRegex.test(contactEmail);
+            
+            document.getElementById('submitBtn').disabled = !isValid;
+        }
+
+        function handleFileSelect() {
+            const files = Array.from(document.getElementById('fileInput').files);
+            const fileList = document.getElementById('fileList');
+            
+            files.forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`${file.name} dosyası 10MB'dan büyük. Lütfen daha küçük bir dosya seçin.`);
+                    return;
+                }
+                
+                if (uploadedFiles.find(f => f.name === file.name)) {
+                    return; // Already uploaded
+                }
+                
+                uploadedFiles.push(file);
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span class="file-name">${file.name} (${formatFileSize(file.size)})</span>
+                    <span class="file-remove" onclick="removeFile('${file.name}')">✕</span>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            const fileList = document.getElementById('fileList');
+            const fileItems = fileList.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                if (item.querySelector('.file-name').textContent.includes(fileName)) {
+                    item.remove();
+                }
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function detectDeviceInfo() {
+            // Browser info
+            const userAgent = navigator.userAgent;
+            let browserInfo = 'Bilinmiyor';
+            if (userAgent.includes('Chrome')) browserInfo = 'Chrome ' + userAgent.match(/Chrome\/(\d+)/)?.[1];
+            else if (userAgent.includes('Firefox')) browserInfo = 'Firefox ' + userAgent.match(/Firefox\/(\d+)/)?.[1];
+            else if (userAgent.includes('Safari')) browserInfo = 'Safari ' + userAgent.match(/Version\/(\d+)/)?.[1];
+            else if (userAgent.includes('Edge')) browserInfo = 'Edge ' + userAgent.match(/Edge\/(\d+)/)?.[1];
+            
+            // OS info
+            let osInfo = 'Bilinmiyor';
+            if (userAgent.includes('Windows NT 10.0')) osInfo = 'Windows 10/11';
+            else if (userAgent.includes('Windows NT 6.3')) osInfo = 'Windows 8.1';
+            else if (userAgent.includes('Windows NT 6.1')) osInfo = 'Windows 7';
+            else if (userAgent.includes('Mac OS X')) osInfo = 'macOS';
+            else if (userAgent.includes('Linux')) osInfo = 'Linux';
+            else if (userAgent.includes('Android')) osInfo = 'Android';
+            else if (userAgent.includes('iOS')) osInfo = 'iOS';
+            
+            // Screen info
+            const screenInfo = `${screen.width}x${screen.height}`;
+            
+            // Date info
+            const now = new Date();
+            const dateInfo = now.toLocaleString('tr-TR');
+            
+            document.getElementById('browserInfo').textContent = browserInfo;
+            document.getElementById('osInfo').textContent = osInfo;
+            document.getElementById('screenInfo').textContent = screenInfo;
+            document.getElementById('dateInfo').textContent = dateInfo;
+        }
+
+        function submitBugReport() {
+            const bugData = {
+                type: document.getElementById('bugType').value,
+                severity: selectedSeverity,
+                title: document.getElementById('bugTitle').value.trim(),
+                description: document.getElementById('bugDescription').value.trim(),
+                reproSteps: document.getElementById('reproSteps').value.trim(),
+                email: document.getElementById('contactEmail').value.trim(),
+                followUp: document.getElementById('followUp').checked,
+                deviceInfo: {
+                    browser: document.getElementById('browserInfo').textContent,
+                    os: document.getElementById('osInfo').textContent,
+                    screen: document.getElementById('screenInfo').textContent,
+                    date: document.getElementById('dateInfo').textContent
+                },
+                files: uploadedFiles.map(f => f.name)
+            };
+
+            const bugId = 'BUG-' + Date.now().toString().slice(-6);
+            
+            alert(`Hata raporu başarıyla gönderildi! 🐛\n\nRapor ID: ${bugId}\nÖnem: ${selectedSeverity === 'critical' ? 'Kritik' : selectedSeverity === 'major' ? 'Önemli' : selectedSeverity === 'minor' ? 'Küçük' : 'Görsel'}\n\n${selectedSeverity === 'critical' ? '2 saat' : selectedSeverity === 'major' ? '24 saat' : '2-3 iş günü'} içinde size dönüş yapacağız.`);
+            
+            window.history.back();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            detectDeviceInfo();
+            validateForm();
+        });
+
+        // File drag and drop
+        const fileUpload = document.querySelector('.file-upload');
+        
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.classList.add('dragover');
+        });
+        
+        fileUpload.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            fileUpload.classList.remove('dragover');
+        });
+        
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.classList.remove('dragover');
+            
+            const files = Array.from(e.dataTransfer.files);
+            const fileInput = document.getElementById('fileInput');
+            
+            // Create a new FileList with the dropped files
+            const dt = new DataTransfer();
+            files.forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+            
+            handleFileSelect();
+        });
+    </script>
+</body>
+</html>

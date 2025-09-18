@@ -322,6 +322,177 @@
         font-size: 0.75rem;
         font-weight: 500;
       }
+      
+      /* Toast Notifications */
+      .toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #10b981;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+        transition: all 0.3s ease;
+        max-width: 350px;
+        text-align: center;
+      }
+      
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      
+      .toast.success {
+        background: #10b981;
+      }
+      
+      .toast.error {
+        background: #ef4444;
+      }
+      
+      .toast.info {
+        background: #3b82f6;
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 350px;
+        width: 90%;
+        margin: 1rem;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+      }
+
+      .modal-overlay.show .modal {
+        transform: scale(1);
+      }
+
+      .modal-title {
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .modal-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .modal-input:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+
+      .modal-btn {
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 80px;
+      }
+
+      .modal-btn.primary {
+        background: #10b981;
+        color: white;
+      }
+
+      .modal-btn.primary:hover {
+        background: #059669;
+      }
+
+      .modal-btn.secondary {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .modal-btn.secondary:hover {
+        background: #e5e7eb;
+      }
+
+      .suggestion-list {
+        max-height: 150px;
+        overflow-y: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+
+      .suggestion-item {
+        padding: 0.75rem;
+        border-bottom: 1px solid #f3f4f6;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .suggestion-item:hover {
+        background: #f9fafb;
+      }
+
+      .suggestion-item:last-child {
+        border-bottom: none;
+      }
+
+      .suggestion-avatar {
+        width: 2rem;
+        height: 2rem;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
     </style>
   </head>
   <body>
@@ -460,5 +631,510 @@
         </a>
       </div>
     </div>
+
+    <script>
+      let conversations = [];
+
+      // Toast function
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        document.getElementById('toastContainer').appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      function initializeConversations() {
+        const conversationItems = document.querySelectorAll('.conversation-item');
+        conversationItems.forEach(item => {
+          const userName = item.querySelector('.user-name').textContent;
+          const lastMessage = item.querySelector('.last-message').textContent;
+          const messageTime = item.querySelector('.message-time').textContent;
+          const isUnread = item.classList.contains('unread');
+          
+          conversations.push({
+            element: item,
+            userName: userName.toLowerCase(),
+            lastMessage: lastMessage.toLowerCase(),
+            messageTime,
+            isUnread
+          });
+        });
+      }
+
+      function searchConversations(query) {
+        const searchTerm = query.toLowerCase().trim();
+        let visibleCount = 0;
+
+        conversations.forEach(conv => {
+          const shouldShow = searchTerm === '' || 
+                            conv.userName.includes(searchTerm) || 
+                            conv.lastMessage.includes(searchTerm);
+          
+          if (shouldShow) {
+            conv.element.style.display = 'flex';
+            conv.element.style.animation = 'fadeIn 0.3s ease-in-out';
+            visibleCount++;
+          } else {
+            conv.element.style.display = 'none';
+          }
+        });
+
+        // Show search result message
+        if (searchTerm !== '' && visibleCount === 0) {
+          showNoResultsMessage();
+        } else {
+          hideNoResultsMessage();
+        }
+      }
+
+      function showNoResultsMessage() {
+        let noResultsDiv = document.querySelector('.no-results');
+        if (!noResultsDiv) {
+          noResultsDiv = document.createElement('div');
+          noResultsDiv.className = 'no-results';
+          noResultsDiv.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">Sonuç bulunamadı</div>
+              <div style="font-size: 0.875rem;">Farklı anahtar kelimeler deneyin</div>
+            </div>
+          `;
+          document.querySelector('.conversation-list').appendChild(noResultsDiv);
+        }
+        noResultsDiv.style.display = 'block';
+      }
+
+      function hideNoResultsMessage() {
+        const noResultsDiv = document.querySelector('.no-results');
+        if (noResultsDiv) {
+          noResultsDiv.style.display = 'none';
+        }
+      }
+
+      function openNewMessage() {
+        showNewMessageModal();
+      }
+
+      // Modern Modal System
+      function createModal(title, content) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal">
+            <div class="modal-title">${title}</div>
+            ${content}
+          </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        setTimeout(() => overlay.classList.add('show'), 100);
+        
+        return overlay;
+      }
+
+      function closeModal(overlay) {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          if (overlay.parentNode) {
+            document.body.removeChild(overlay);
+          }
+        }, 300);
+      }
+
+      function showNewMessageModal() {
+        const suggestedUsers = [
+          { name: 'Mert Koçak', avatar: 'MK', status: 'online' },
+          { name: 'Enes Durmuş', avatar: 'ED', status: 'offline' },
+          { name: 'Fatih Kaya', avatar: 'FK', status: 'online' },
+          { name: 'Oğuz Şahin', avatar: 'OŞ', status: 'offline' }
+        ];
+
+        const suggestionHTML = suggestedUsers.map(user => `
+          <div class="suggestion-item" onclick="selectUserFromSuggestion('${user.name}', '${user.avatar}')">
+            <div class="suggestion-avatar" style="${user.status === 'online' ? 'border: 2px solid #10b981;' : ''}">${user.avatar}</div>
+            <div>
+              <div style="font-weight: 500; color: #1f2937;">${user.name}</div>
+              <div style="font-size: 0.75rem; color: ${user.status === 'online' ? '#10b981' : '#6b7280'};">
+                ${user.status === 'online' ? '🟢 Çevrimiçi' : '⚫ Çevrimdışı'}
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        const modalContent = `
+          <input 
+            type="text" 
+            class="modal-input" 
+            id="newMessageInput"
+            placeholder="Kullanıcı adı veya isim girin..."
+            autocomplete="off"
+          />
+          <div style="margin-bottom: 1rem;">
+            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Önerilen kişiler:</div>
+            <div class="suggestion-list">
+              ${suggestionHTML}
+            </div>
+          </div>
+          <div class="modal-buttons">
+            <button class="modal-btn secondary" onclick="closeCurrentModal()">İptal</button>
+            <button class="modal-btn primary" onclick="startNewChat()">Mesaj Gönder</button>
+          </div>
+        `;
+
+        const modal = createModal('Yeni Mesaj', modalContent);
+        window.currentModal = modal;
+
+        // Auto-focus input
+        setTimeout(() => {
+          const input = document.getElementById('newMessageInput');
+          if (input) {
+            input.focus();
+            
+            // Add Enter key support
+            input.addEventListener('keypress', (e) => {
+              if (e.key === 'Enter' && input.value.trim()) {
+                startNewChat();
+              }
+            });
+
+            // Live search suggestions
+            input.addEventListener('input', (e) => {
+              filterSuggestions(e.target.value);
+            });
+          }
+        }, 150);
+      }
+
+      function selectUserFromSuggestion(userName, avatar) {
+        const input = document.getElementById('newMessageInput');
+        if (input) {
+          input.value = userName;
+        }
+        startNewChat();
+      }
+
+      function filterSuggestions(query) {
+        const suggestions = document.querySelectorAll('.suggestion-item');
+        const searchTerm = query.toLowerCase();
+
+        suggestions.forEach(item => {
+          const userName = item.textContent.toLowerCase();
+          if (searchTerm === '' || userName.includes(searchTerm)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      }
+
+      function startNewChat() {
+        const input = document.getElementById('newMessageInput');
+        const contact = input ? input.value.trim() : '';
+        
+        if (contact) {
+          closeCurrentModal();
+          showToast(`${contact} ile yeni sohbet başlatılıyor... 💬`, 'success');
+          
+          setTimeout(() => {
+            window.location.href = `chat.html?user=${encodeURIComponent(contact)}`;
+          }, 1500);
+        } else {
+          showToast('⚠️ Lütfen bir kullanıcı adı girin!', 'error');
+        }
+      }
+
+      function closeCurrentModal() {
+        if (window.currentModal) {
+          closeModal(window.currentModal);
+          window.currentModal = null;
+        }
+      }
+
+      function markAsRead(conversationElement) {
+        const unreadCount = conversationElement.querySelector('.unread-count');
+        if (unreadCount) {
+          unreadCount.style.display = 'none';
+        }
+        conversationElement.classList.remove('unread');
+      }
+
+      function longPressAction(conversationElement, userName) {
+        showConversationOptionsModal(conversationElement, userName);
+      }
+
+      function showConversationOptionsModal(conversationElement, userName) {
+        const options = [
+          { 
+            text: 'Okundu olarak işaretle', 
+            icon: '✓', 
+            action: () => markAsRead(conversationElement)
+          },
+          { 
+            text: 'Sohbeti sil', 
+            icon: '🗑️', 
+            action: () => deleteConversation(conversationElement, userName),
+            danger: true
+          },
+          { 
+            text: 'Kullanıcıyı engelle', 
+            icon: '🚫', 
+            action: () => blockUser(conversationElement, userName),
+            danger: true
+          },
+          { 
+            text: 'Profili görüntüle', 
+            icon: '👤', 
+            action: () => viewProfile(userName)
+          }
+        ];
+
+        const optionsHTML = options.map(option => `
+          <div class="suggestion-item" onclick="handleConversationAction('${option.text}', '${userName}')" 
+               style="${option.danger ? 'color: #ef4444;' : ''}">
+            <div style="width: 2rem; text-align: center; font-size: 1.25rem;">${option.icon}</div>
+            <div style="font-weight: 500;">${option.text}</div>
+          </div>
+        `).join('');
+
+        const modalContent = `
+          <div style="margin-bottom: 1rem;">
+            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">
+              ${userName} sohbeti için seçenekler:
+            </div>
+            <div class="suggestion-list">
+              ${optionsHTML}
+            </div>
+          </div>
+          <div class="modal-buttons">
+            <button class="modal-btn secondary" onclick="closeCurrentModal()">İptal</button>
+          </div>
+        `;
+
+        const modal = createModal('Sohbet Seçenekleri', modalContent);
+        window.currentModal = modal;
+        window.currentConversationElement = conversationElement;
+      }
+
+      function handleConversationAction(actionText, userName) {
+        const element = window.currentConversationElement;
+        
+        switch(actionText) {
+          case 'Okundu olarak işaretle':
+            markAsRead(element);
+            showToast('Sohbet okundu olarak işaretlendi ✓', 'success');
+            break;
+          case 'Sohbeti sil':
+            deleteConversation(element, userName);
+            break;
+          case 'Kullanıcıyı engelle':
+            blockUser(element, userName);
+            break;
+          case 'Profili görüntüle':
+            viewProfile(userName);
+            break;
+        }
+        
+        closeCurrentModal();
+      }
+
+      function deleteConversation(element, userName) {
+        closeCurrentModal();
+        
+        const confirmModal = createModal(
+          'Sohbeti Sil',
+          `
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">🗑️</div>
+              <div style="color: #6b7280; font-size: 0.875rem;">
+                ${userName} ile olan sohbeti silmek istediğinizden emin misiniz?
+                <br><br>
+                <strong style="color: #ef4444;">Bu işlem geri alınamaz!</strong>
+              </div>
+            </div>
+            <div class="modal-buttons">
+              <button class="modal-btn secondary" onclick="closeCurrentModal()">İptal</button>
+              <button class="modal-btn primary" style="background: #ef4444;" onclick="confirmDeleteConversation()">Sil</button>
+            </div>
+          `
+        );
+        
+        window.currentModal = confirmModal;
+        window.elementToDelete = element;
+        window.userToDelete = userName;
+      }
+
+      function confirmDeleteConversation() {
+        const element = window.elementToDelete;
+        const userName = window.userToDelete;
+        
+        element.style.animation = 'fadeOut 0.3s ease-in-out';
+        setTimeout(() => element.remove(), 300);
+        showToast(`${userName} sohbeti silindi 🗑️`, 'info');
+        
+        closeCurrentModal();
+      }
+
+      function blockUser(element, userName) {
+        closeCurrentModal();
+        
+        const confirmModal = createModal(
+          'Kullanıcıyı Engelle',
+          `
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚫</div>
+              <div style="color: #6b7280; font-size: 0.875rem;">
+                ${userName} kullanıcısını engellemek istediğinizden emin misiniz?
+                <br><br>
+                Engellenen kullanıcı:
+                <br>• Size mesaj gönderemez
+                <br>• Gönderilerinizi göremez
+                <br>• Sizi arayamaz
+              </div>
+            </div>
+            <div class="modal-buttons">
+              <button class="modal-btn secondary" onclick="closeCurrentModal()">İptal</button>
+              <button class="modal-btn primary" style="background: #ef4444;" onclick="confirmBlockUser()">Engelle</button>
+            </div>
+          `
+        );
+        
+        window.currentModal = confirmModal;
+        window.elementToBlock = element;
+        window.userToBlock = userName;
+      }
+
+      function confirmBlockUser() {
+        const element = window.elementToBlock;
+        const userName = window.userToBlock;
+        
+        showToast(`${userName} engellendi 🚫`, 'error');
+        element.style.opacity = '0.5';
+        element.style.pointerEvents = 'none';
+        
+        closeCurrentModal();
+      }
+
+      function viewProfile(userName) {
+        showToast(`${userName} profiline yönlendiriliyor... 👤`, 'info');
+        setTimeout(() => {
+          window.location.href = `user-profile.html?user=${encodeURIComponent(userName)}`;
+        }, 1500);
+      }
+
+      // Add event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        initializeConversations();
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', (e) => {
+          searchConversations(e.target.value);
+        });
+
+        // Clear search on focus
+        searchInput.addEventListener('focus', () => {
+          if (searchInput.value === '') {
+            searchConversations('');
+          }
+        });
+
+        // New message button
+        const newMessageBtn = document.querySelector('.new-message-btn');
+        newMessageBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openNewMessage();
+        });
+
+        // Long press for conversation options
+        let pressTimer;
+        document.querySelectorAll('.conversation-item').forEach(item => {
+          // Mouse events
+          item.addEventListener('mousedown', () => {
+            pressTimer = setTimeout(() => {
+              const userName = item.querySelector('.user-name').textContent;
+              longPressAction(item, userName);
+            }, 1000);
+          });
+
+          item.addEventListener('mouseup', () => {
+            clearTimeout(pressTimer);
+          });
+
+          item.addEventListener('mouseleave', () => {
+            clearTimeout(pressTimer);
+          });
+
+          // Touch events for mobile
+          item.addEventListener('touchstart', () => {
+            pressTimer = setTimeout(() => {
+              const userName = item.querySelector('.user-name').textContent;
+              longPressAction(item, userName);
+            }, 1000);
+          });
+
+          item.addEventListener('touchend', () => {
+            clearTimeout(pressTimer);
+          });
+
+          // Click event to open chat
+          item.addEventListener('click', (e) => {
+            if (e.detail === 1) { // Single click
+              setTimeout(() => {
+                if (!e.defaultPrevented) {
+                  markAsRead(item);
+                  // Navigate to chat page
+                  const userName = item.querySelector('.user-name').textContent;
+                  showToast(`${userName} ile sohbet açılıyor... 💬`, 'success');
+                }
+              }, 200);
+            }
+          });
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+          }
+          .conversation-item:active {
+            transform: scale(0.98);
+          }
+        `;
+        document.head.appendChild(style);
+
+        // ESC key modal close
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && window.currentModal) {
+            closeCurrentModal();
+          }
+        });
+
+        // Click outside modal to close
+        document.addEventListener('click', function(e) {
+          if (window.currentModal && e.target.classList.contains('modal-overlay')) {
+            closeCurrentModal();
+          }
+        });
+      });
+    </script>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
   </body>
 </html>

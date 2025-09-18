@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engellenen Kullanıcılar - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .search-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .info-section {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-section h3 {
+            color: #92400e;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .info-section p {
+            color: #92400e;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .blocked-users-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .blocked-user {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: all 0.2s ease;
+        }
+
+        .blocked-user:last-child {
+            border-bottom: none;
+        }
+
+        .blocked-user:hover {
+            background: #f9fafb;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+
+        .user-username {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .blocked-date {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .unblock-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .unblock-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Engellenenler</h1>
+                <button class="search-btn" onclick="toggleSearch()">🔍</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="info-section">
+            <h3>🛡️ Engellenmiş Kullanıcılar</h3>
+            <p>Engellediğiniz kullanıcılar size mesaj gönderemez, gönderilerinizi göremez ve sizi takip edemez.</p>
+        </div>
+
+        <div class="search-section" id="searchSection" style="display: none;">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Engellenen kullanıcı ara..." id="searchInput" oninput="filterUsers()">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <div class="blocked-users-list" id="blockedUsersList">
+            <div class="blocked-user">
+                <div class="user-avatar">SP</div>
+                <div class="user-info">
+                    <div class="user-name">Spam User</div>
+                    <div class="user-username">@spamuser123</div>
+                    <div class="blocked-date">15 Eylül 2025 tarihinde engellendi</div>
+                </div>
+                <button class="unblock-btn" onclick="unblockUser(this, 'Spam User')">Engeli Kaldır</button>
+            </div>
+
+            <div class="blocked-user">
+                <div class="user-avatar">TR</div>
+                <div class="user-info">
+                    <div class="user-name">Troll Account</div>
+                    <div class="user-username">@trollaccount</div>
+                    <div class="blocked-date">10 Eylül 2025 tarihinde engellendi</div>
+                </div>
+                <button class="unblock-btn" onclick="unblockUser(this, 'Troll Account')">Engeli Kaldır</button>
+            </div>
+
+            <div class="blocked-user">
+                <div class="user-avatar">FK</div>
+                <div class="user-info">
+                    <div class="user-name">Fake Account</div>
+                    <div class="user-username">@fakeaccount99</div>
+                    <div class="blocked-date">5 Eylül 2025 tarihinde engellendi</div>
+                </div>
+                <button class="unblock-btn" onclick="unblockUser(this, 'Fake Account')">Engeli Kaldır</button>
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">✅</div>
+            <div class="empty-title">Hiç Engellenen Kullanıcı Yok</div>
+            <div class="empty-description">
+                Şu anda hiç kullanıcı engellemiyorsunuz.<br>
+                Bu harika bir şey! 😊
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let searchVisible = false;
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function toggleSearch() {
+            searchVisible = !searchVisible;
+            const searchSection = document.getElementById('searchSection');
+            
+            if (searchVisible) {
+                searchSection.style.display = 'block';
+                document.getElementById('searchInput').focus();
+            } else {
+                searchSection.style.display = 'none';
+                document.getElementById('searchInput').value = '';
+                filterUsers(); // Reset filter
+            }
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const userItems = document.querySelectorAll('.blocked-user');
+            
+            userItems.forEach(item => {
+                const name = item.querySelector('.user-name').textContent.toLowerCase();
+                const username = item.querySelector('.user-username').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || username.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function unblockUser(button, userName) {
+            if (confirm(`${userName} kullanıcısının engelini kaldırmak istediğinize emin misiniz?\n\nBu kullanıcı:\n• Size mesaj gönderebilecek\n• Gönderilerinizi görebilecek\n• Sizi takip edebilecek`)) {
+                
+                // Remove user from list
+                const userItem = button.closest('.blocked-user');
+                userItem.style.animation = 'fadeOut 0.3s ease';
+                
+                setTimeout(() => {
+                    userItem.remove();
+                    
+                    // Check if list is empty
+                    const remainingUsers = document.querySelectorAll('.blocked-user');
+                    if (remainingUsers.length === 0) {
+                        document.getElementById('blockedUsersList').style.display = 'none';
+                        document.getElementById('emptyState').style.display = 'block';
+                    }
+                }, 300);
+
+                alert(`${userName} kullanıcısının engeli kaldırıldı. ✅`);
+            }
+        }
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(-100%); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

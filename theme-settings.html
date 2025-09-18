@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema Ayarları - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .save-btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .theme-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .theme-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .theme-option {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .theme-option.active {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .light-preview {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            border: 1px solid #e5e7eb;
+        }
+
+        .dark-preview {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+
+        .auto-preview {
+            background: linear-gradient(45deg, 
+                #ffffff 0%, #ffffff 45%, 
+                #1f2937 55%, #1f2937 100%);
+        }
+
+        .green-preview {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .theme-preview::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .theme-name {
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .color-option {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .color-option.active {
+            border-color: #374151;
+            transform: scale(1.1);
+        }
+
+        .color-option::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .color-option.active::after {
+            opacity: 1;
+        }
+
+        .green-theme { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .blue-theme { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .purple-theme { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .orange-theme { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+        .red-theme { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .pink-theme { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+        .indigo-theme { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+        .teal-theme { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); }
+
+        .font-size-section {
+            margin-bottom: 20px;
+        }
+
+        .font-size-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+            margin: 16px 0;
+        }
+
+        .font-size-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+        }
+
+        .font-size-preview {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .font-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .toggle-option:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-title {
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .toggle-description {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #10b981;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .reset-section {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .reset-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #dc2626;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Tema Ayarları</h1>
+                <button class="save-btn" onclick="saveTheme()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="theme-section">
+            <div class="section-title">🌙 Tema Modu</div>
+            <div class="theme-options">
+                <div class="theme-option active" onclick="selectTheme('light')">
+                    <div class="theme-preview light-preview"></div>
+                    <div class="theme-name">Açık Tema</div>
+                </div>
+                <div class="theme-option" onclick="selectTheme('dark')">
+                    <div class="theme-preview dark-preview"></div>
+                    <div class="theme-name">Koyu Tema</div>
+                </div>
+                <div class="theme-option" onclick="selectTheme('auto')">
+                    <div class="theme-preview auto-preview"></div>
+                    <div class="theme-name">Otomatik</div>
+                </div>
+                <div class="theme-option" onclick="selectTheme('green')">
+                    <div class="theme-preview green-preview"></div>
+                    <div class="theme-name">Goalify Green</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <div class="section-title">🎨 Ana Renk</div>
+            <div class="color-options">
+                <div class="color-option green-theme active" onclick="selectColor('green')"></div>
+                <div class="color-option blue-theme" onclick="selectColor('blue')"></div>
+                <div class="color-option purple-theme" onclick="selectColor('purple')"></div>
+                <div class="color-option orange-theme" onclick="selectColor('orange')"></div>
+                <div class="color-option red-theme" onclick="selectColor('red')"></div>
+                <div class="color-option pink-theme" onclick="selectColor('pink')"></div>
+                <div class="color-option indigo-theme" onclick="selectColor('indigo')"></div>
+                <div class="color-option teal-theme" onclick="selectColor('teal')"></div>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <div class="section-title">📝 Yazı Boyutu</div>
+            <div class="font-size-section">
+                <input type="range" class="font-size-slider" id="fontSizeSlider" min="12" max="20" value="16" oninput="updateFontSize()">
+                <div class="font-labels">
+                    <span>Küçük</span>
+                    <span>Normal</span>
+                    <span>Büyük</span>
+                </div>
+                <div class="font-size-preview" id="fontPreview">
+                    <div style="font-weight: 600; margin-bottom: 8px;">Başlık Metni</div>
+                    <div>Bu bir örnek metin. Yazı boyutunu test etmek için kullanılır. Goalify uygulamasında bu boyutta metin görüntülenecek.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <div class="section-title">⚙️ Görünüm Ayarları</div>
+            
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Animasyonlar</div>
+                    <div class="toggle-description">Sayfa geçişlerinde animasyon efektleri</div>
+                </div>
+                <div class="toggle-switch active" onclick="toggleOption(this)"></div>
+            </div>
+
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Yüksek Kontrast</div>
+                    <div class="toggle-description">Daha iyi görünürlük için yüksek kontrast</div>
+                </div>
+                <div class="toggle-switch" onclick="toggleOption(this)"></div>
+            </div>
+
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Büyük Dokunma Alanları</div>
+                    <div class="toggle-description">Butonları daha kolay kullanım için büyült</div>
+                </div>
+                <div class="toggle-switch" onclick="toggleOption(this)"></div>
+            </div>
+
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Vibrasyon</div>
+                    <div class="toggle-description">Dokunmatik geri bildirim</div>
+                </div>
+                <div class="toggle-switch active" onclick="toggleOption(this)"></div>
+            </div>
+
+            <div class="toggle-option">
+                <div class="toggle-info">
+                    <div class="toggle-title">Ses Efektleri</div>
+                    <div class="toggle-description">Buton ve bildirim sesleri</div>
+                </div>
+                <div class="toggle-switch active" onclick="toggleOption(this)"></div>
+            </div>
+        </div>
+
+        <div class="reset-section">
+            <h3 style="color: #b91c1c; font-size: 14px; font-weight: 600; margin-bottom: 8px;">🔄 Varsayılan Ayarlar</h3>
+            <p style="color: #7f1d1d; font-size: 13px; margin-bottom: 12px;">
+                Tüm tema ayarlarını fabrika ayarlarına döndürür
+            </p>
+            <button class="reset-btn" onclick="resetToDefaults()">Varsayılana Döndür</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'light';
+        let currentColor = 'green';
+        let currentFontSize = 16;
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectTheme(theme) {
+            currentTheme = theme;
+            document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+            event.target.closest('.theme-option').classList.add('active');
+            
+            // Preview theme change
+            applyThemePreview(theme);
+        }
+
+        function selectColor(color) {
+            currentColor = color;
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Preview color change
+            applyColorPreview(color);
+        }
+
+        function updateFontSize() {
+            const slider = document.getElementById('fontSizeSlider');
+            const preview = document.getElementById('fontPreview');
+            currentFontSize = parseInt(slider.value);
+            
+            preview.style.fontSize = currentFontSize + 'px';
+        }
+
+        function toggleOption(toggle) {
+            toggle.classList.toggle('active');
+            
+            // Add haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function applyThemePreview(theme) {
+            const body = document.body;
+            
+            // Remove existing theme classes
+            body.classList.remove('light-theme', 'dark-theme', 'auto-theme', 'green-theme-mode');
+            
+            // Apply new theme
+            switch(theme) {
+                case 'light':
+                    body.style.background = '#f5f5f5';
+                    break;
+                case 'dark':
+                    body.style.background = '#1f2937';
+                    break;
+                case 'auto':
+                    // Use system preference
+                    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    body.style.background = isDark ? '#1f2937' : '#f5f5f5';
+                    break;
+                case 'green':
+                    body.style.background = 'linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%)';
+                    break;
+            }
+        }
+
+        function applyColorPreview(color) {
+            const header = document.querySelector('.header');
+            const colorMap = {
+                'green': 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
+                'blue': 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)',
+                'purple': 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
+                'orange': 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%)',
+                'red': 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)',
+                'pink': 'linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%)',
+                'indigo': 'linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #3730a3 100%)',
+                'teal': 'linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%)'
+            };
+            
+            header.style.background = colorMap[color];
+        }
+
+        function saveTheme() {
+            const settings = {
+                theme: currentTheme,
+                color: currentColor,
+                fontSize: currentFontSize,
+                animations: document.querySelectorAll('.toggle-switch')[0].classList.contains('active'),
+                highContrast: document.querySelectorAll('.toggle-switch')[1].classList.contains('active'),
+                largeTouch: document.querySelectorAll('.toggle-switch')[2].classList.contains('active'),
+                vibration: document.querySelectorAll('.toggle-switch')[3].classList.contains('active'),
+                soundEffects: document.querySelectorAll('.toggle-switch')[4].classList.contains('active')
+            };
+
+            // Save to localStorage
+            localStorage.setItem('goalifyThemeSettings', JSON.stringify(settings));
+            
+            alert(`Tema ayarları kaydedildi! 🎨\n\nTema: ${getThemeName(currentTheme)}\nRenk: ${getColorName(currentColor)}\nYazı Boyutu: ${currentFontSize}px\n\nAyarlar tüm sayfalarda uygulanacak.`);
+            
+            window.history.back();
+        }
+
+        function resetToDefaults() {
+            if (confirm('Tüm tema ayarlarını varsayılan değerlere döndürmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.')) {
+                // Reset to defaults
+                currentTheme = 'light';
+                currentColor = 'green';
+                currentFontSize = 16;
+                
+                // Reset UI
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                document.querySelector('.theme-option').classList.add('active');
+                
+                document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+                document.querySelector('.green-theme').classList.add('active');
+                
+                document.getElementById('fontSizeSlider').value = 16;
+                updateFontSize();
+                
+                // Reset toggles
+                const toggles = document.querySelectorAll('.toggle-switch');
+                toggles[0].classList.add('active'); // animations on
+                toggles[1].classList.remove('active'); // high contrast off
+                toggles[2].classList.remove('active'); // large touch off
+                toggles[3].classList.add('active'); // vibration on
+                toggles[4].classList.add('active'); // sound effects on
+                
+                // Clear localStorage
+                localStorage.removeItem('goalifyThemeSettings');
+                
+                // Reset preview
+                applyThemePreview('light');
+                applyColorPreview('green');
+                
+                alert('Tema ayarları varsayılan değerlere döndürüldü! ✨');
+            }
+        }
+
+        function getThemeName(theme) {
+            const names = {
+                'light': 'Açık Tema',
+                'dark': 'Koyu Tema',
+                'auto': 'Otomatik',
+                'green': 'Goalify Green'
+            };
+            return names[theme] || theme;
+        }
+
+        function getColorName(color) {
+            const names = {
+                'green': 'Yeşil',
+                'blue': 'Mavi',
+                'purple': 'Mor',
+                'orange': 'Turuncu',
+                'red': 'Kırmızı',
+                'pink': 'Pembe',
+                'indigo': 'İndigo',
+                'teal': 'Teal'
+            };
+            return names[color] || color;
+        }
+
+        function loadSavedSettings() {
+            const saved = localStorage.getItem('goalifyThemeSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                
+                currentTheme = settings.theme || 'light';
+                currentColor = settings.color || 'green';
+                currentFontSize = settings.fontSize || 16;
+                
+                // Apply saved settings to UI
+                document.querySelectorAll('.theme-option').forEach((opt, index) => {
+                    opt.classList.remove('active');
+                    if ((index === 0 && currentTheme === 'light') ||
+                        (index === 1 && currentTheme === 'dark') ||
+                        (index === 2 && currentTheme === 'auto') ||
+                        (index === 3 && currentTheme === 'green')) {
+                        opt.classList.add('active');
+                    }
+                });
+                
+                document.querySelectorAll('.color-option').forEach(opt => {
+                    opt.classList.remove('active');
+                    if (opt.classList.contains(currentColor + '-theme')) {
+                        opt.classList.add('active');
+                    }
+                });
+                
+                document.getElementById('fontSizeSlider').value = currentFontSize;
+                updateFontSize();
+                
+                // Apply toggle settings
+                const toggles = document.querySelectorAll('.toggle-switch');
+                if (settings.animations !== undefined) {
+                    toggles[0].classList.toggle('active', settings.animations);
+                }
+                if (settings.highContrast !== undefined) {
+                    toggles[1].classList.toggle('active', settings.highContrast);
+                }
+                if (settings.largeTouch !== undefined) {
+                    toggles[2].classList.toggle('active', settings.largeTouch);
+                }
+                if (settings.vibration !== undefined) {
+                    toggles[3].classList.toggle('active', settings.vibration);
+                }
+                if (settings.soundEffects !== undefined) {
+                    toggles[4].classList.toggle('active', settings.soundEffects);
+                }
+                
+                // Apply theme preview
+                applyThemePreview(currentTheme);
+                applyColorPreview(currentColor);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedSettings();
+            updateFontSize();
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (currentTheme === 'auto') {
+                applyThemePreview('auto');
+            }
+        });
+    </script>
+</body>
+</html>

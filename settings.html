@@ -267,7 +267,7 @@
       <div class="section">
         <h2 class="section-title">Hesap</h2>
         
-        <a href="#" class="menu-item">
+        <a href="edit-profile.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">✏️</div>
             <div>
@@ -278,7 +278,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="change-password.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">🔒</div>
             <div>
@@ -289,23 +289,12 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="change-email.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">📧</div>
             <div>
               <div class="menu-text">Email Değiştir</div>
               <div class="menu-description">Giriş email adresinizi güncelleyin</div>
-            </div>
-          </div>
-          <span class="menu-arrow">→</span>
-        </a>
-
-        <a href="search.html" class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-icon">👥</div>
-            <div>
-              <div class="menu-text">Arkadaşlarım</div>
-              <div class="menu-description">Arkadaş listesini yönetin</div>
             </div>
           </div>
           <span class="menu-arrow">→</span>
@@ -399,7 +388,7 @@
           </div>
         </div>
 
-        <a href="#" class="menu-item">
+        <a href="blocked-users.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">🛡️</div>
             <div>
@@ -415,7 +404,7 @@
       <div class="section">
         <h2 class="section-title">Uygulama</h2>
         
-        <a href="#" class="menu-item">
+        <a href="theme-settings.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">🌙</div>
             <div>
@@ -426,7 +415,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="language-settings.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">🌍</div>
             <div>
@@ -437,7 +426,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="clearCache()">
           <div class="menu-item-left">
             <div class="menu-icon">💾</div>
             <div>
@@ -453,7 +442,7 @@
       <div class="section">
         <h2 class="section-title">Destek</h2>
         
-        <a href="#" class="menu-item">
+        <a href="help-center.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">❓</div>
             <div>
@@ -464,7 +453,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="contact.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">📞</div>
             <div>
@@ -475,7 +464,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="report-bug.html" class="menu-item">
           <div class="menu-item-left">
             <div class="menu-icon">🐛</div>
             <div>
@@ -486,7 +475,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="rateApp()">
           <div class="menu-item-left">
             <div class="menu-icon">⭐</div>
             <div>
@@ -500,7 +489,7 @@
 
       <!-- Tehlikeli İşlemler -->
       <div class="section">
-        <a href="index.html" class="menu-item danger-item">
+        <a href="index.html" class="menu-item danger-item" onclick="return confirmLogout()">
           <div class="menu-item-left">
             <div class="menu-icon">🚪</div>
             <div>
@@ -511,7 +500,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="#" class="menu-item danger-item">
+        <a href="#" class="menu-item danger-item" onclick="deleteAccount()">
           <div class="menu-item-left">
             <div class="menu-icon">🗑️</div>
             <div>
@@ -555,6 +544,36 @@
     <script>
       function toggleSwitch(element) {
         element.classList.toggle('active');
+      }
+
+      function clearCache() {
+        if (confirm('Önbellek temizlensin mi?\n\nBu işlem uygulamayı yeniden başlatabilir.')) {
+          alert('Önbellek başarıyla temizlendi! 🧹\n\nUygulama performansı artırıldı.');
+        }
+      }
+
+      function rateApp() {
+        if (confirm('App Store\'a yönlendirilsiniz.\n\nDevam etmek istiyor musunuz?')) {
+          alert('App Store\'a yönlendiriliyorsunuz... ⭐\n\nTeşekkürler!');
+          // Real app: window.open('https://apps.apple.com/app/goalify', '_blank');
+        }
+      }
+
+      function confirmLogout() {
+        return confirm('Çıkış yapmak istediğinize emin misiniz?\n\nTekrar giriş yapmanız gerekecek.');
+      }
+
+      function deleteAccount() {
+        const confirmation = prompt('Hesabınızı silmek için "SIL" yazın:\n\n⚠️ BU İŞLEM GERİ ALINAMAZ!');
+        
+        if (confirmation === 'SIL') {
+          if (confirm('Son kez soruyoruz:\n\nHesabınızı kalıcı olarak silmek istediğinize emin misiniz?\n\n• Tüm verileriniz silinecek\n• Gönderileriniz kaldırılacak\n• Bu işlem geri alınamaz')) {
+            alert('Hesabınız silme işlemi başlatıldı.\n\n24 saat içinde tüm verileriniz kalıcı olarak silinecek.\n\nGoodbye... 👋');
+            window.location.href = 'index.html';
+          }
+        } else if (confirmation !== null) {
+          alert('Yanlış metin girdiniz. Hesap silme işlemi iptal edildi.');
+        }
       }
     </script>
   </body>

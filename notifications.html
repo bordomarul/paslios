@@ -282,6 +282,124 @@
         font-size: 0.75rem;
         font-weight: 500;
       }
+      
+      /* Toast Notifications */
+      .toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #10b981;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+        transition: all 0.3s ease;
+        max-width: 350px;
+        text-align: center;
+      }
+      
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      
+      .toast.success {
+        background: #10b981;
+      }
+      
+      .toast.error {
+        background: #ef4444;
+      }
+      
+      .toast.info {
+        background: #3b82f6;
+      }
+      
+      /* Modal Styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      
+      .modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 350px;
+        margin: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: scale(0.9);
+        transition: transform 0.2s ease;
+      }
+      
+      .modal.show .modal-content {
+        transform: scale(1);
+      }
+      
+      .modal-header {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      
+      .modal-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+      
+      .modal-message {
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+      }
+      
+      .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+      
+      .modal-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+      }
+      
+      .modal-btn-primary {
+        background: #10b981;
+        color: white;
+      }
+      
+      .modal-btn-primary:hover {
+        background: #059669;
+        transform: translateY(-1px);
+      }
+      
+      .modal-btn-secondary {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      
+      .modal-btn-secondary:hover {
+        background: #e5e7eb;
+      }
     </style>
   </head>
   <body>
@@ -313,9 +431,9 @@
           <div class="notification-content">
             <div class="notification-title">Maç Daveti</div>
             <div class="notification-message">
-              <strong>Mehmet Kaya</strong> seni yarın 19:00'da Elite Football Center'daki maça davet etti.
+              <strong>Ahmet Yılmaz</strong> seni bugün 20:30'da Spor Toto Halısaha'daki maça davet etti.
             </div>
-            <div class="notification-time">15 dakika önce</div>
+            <div class="notification-time">25 dakika önce</div>
             <div class="notification-actions">
               <button class="btn-accept">Katıl</button>
               <button class="btn-decline">Reddet</button>
@@ -331,9 +449,9 @@
           <div class="notification-content">
             <div class="notification-title">Arkadaşlık İsteği</div>
             <div class="notification-message">
-              <strong>Ali Sönmez</strong> arkadaş olmak istiyor.
+              <strong>Murat Özkan</strong> arkadaş olmak istiyor.
             </div>
-            <div class="notification-time">1 saat önce</div>
+            <div class="notification-time">2 saat önce</div>
             <div class="notification-actions">
               <button class="btn-accept">Kabul Et</button>
               <button class="btn-decline">Reddet</button>
@@ -349,9 +467,9 @@
           <div class="notification-content">
             <div class="notification-title">Yeni Başarı!</div>
             <div class="notification-message">
-              "Gol Makinesi" rozetini kazandın! 10 maçta gol atmayı başardın.
+              "Hat-Trick Kralı" rozetini kazandın! Bir maçta 3 gol atmayı başardın.
             </div>
-            <div class="notification-time">3 saat önce</div>
+            <div class="notification-time">5 saat önce</div>
           </div>
         </div>
       </div>
@@ -366,13 +484,13 @@
           <div class="notification-content">
             <div class="notification-title">Maç Sonucu</div>
             <div class="notification-message">
-              Ankara Spor Halısaha'daki maçınız sona erdi. Takımınız 4-2 galip geldi! Oyuncuları değerlendirin.
+              Fenerbahçe Spor Tesisleri'ndeki maçınız sona erdi. Takımınız 3-1 galip geldi! Oyuncuları değerlendirin.
             </div>
-            <div class="notification-time">1 gün önce</div>
+            <div class="notification-time">Dün</div>
           </div>
         </div>
       </a>
-
+      
       <!-- Saha Rezervasyon Onayı -->
       <div class="notification-item">
         <div class="notification-header">
@@ -380,7 +498,7 @@
           <div class="notification-content">
             <div class="notification-title">Rezervasyon Onayı</div>
             <div class="notification-message">
-              18 Eylül 20:00 için Champions Halısaha rezervasyonunuz onaylandı.
+              20 Eylül 19:30 için Beşiktaş Halısaha rezervasyonunuz onaylandı. Ödeme başarıyla alındı.
             </div>
             <div class="notification-time">2 gün önce</div>
           </div>
@@ -394,7 +512,7 @@
           <div class="notification-content">
             <div class="notification-title">Takım Güncellemesi</div>
             <div class="notification-message">
-              <strong>Emre Tuncay</strong> "Şampiyonlar" takımına katıldı.
+              <strong>Kemal Aksoy</strong> "İstanbul United" takımına katıldı. Takımınız artık 8 kişi.
             </div>
             <div class="notification-time">3 gün önce</div>
           </div>
@@ -408,7 +526,21 @@
           <div class="notification-content">
             <div class="notification-title">Haftalık Özet</div>
             <div class="notification-message">
-              Bu hafta 3 maç oynadın, 2 gol attın ve 1 asist yaptın. Harika performans!
+              Bu hafta 4 maç oynadın, 3 gol attın ve 2 asist yaptın. Mükemmel performans! Şu an ligde 2. sıradasın.
+            </div>
+            <div class="notification-time">1 hafta önce</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yeni Mesaj -->
+      <div class="notification-item">
+        <div class="notification-header">
+          <div class="notification-icon system">💌</div>
+          <div class="notification-content">
+            <div class="notification-title">Yeni Mesaj</div>
+            <div class="notification-message">
+              <strong>Takım Kaptanı</strong> grup sohbetinde yeni bir mesaj gönderdi.
             </div>
             <div class="notification-time">1 hafta önce</div>
           </div>
@@ -431,6 +563,10 @@
           <span>💌</span>
           <span>Mesajlar</span>
         </a>
+        <a href="notifications.html" class="nav-item active">
+          <span>🔔</span>
+          <span>Bildirimler</span>
+        </a>
         <a href="profile.html" class="nav-item">
           <span>👤</span>
           <span>Profil</span>
@@ -438,7 +574,65 @@
       </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" id="modalTitle">Emin misiniz?</div>
+        </div>
+        <div class="modal-message" id="modalMessage">Bu işlemi onaylamak istediğinizden emin misiniz?</div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">İptal</button>
+          <button class="modal-btn modal-btn-primary" id="confirmBtn">Onayla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
     <script>
+      // Toast functions
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        document.getElementById('toastContainer').appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+      
+      // Modal functions
+      function showModal(title, message, onConfirm) {
+        const modal = document.getElementById('confirmationModal');
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').textContent = message;
+        
+        const confirmBtn = document.getElementById('confirmBtn');
+        confirmBtn.onclick = () => {
+          onConfirm();
+          closeModal();
+        };
+        
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+      }
+      
+      function closeModal() {
+        const modal = document.getElementById('confirmationModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 200);
+      }
+      
+      // Mark all notifications as read
       function markAllAsRead() {
         const unreadItems = document.querySelectorAll('.notification-item.unread');
         unreadItems.forEach(item => {
@@ -449,9 +643,171 @@
         const markAllBtn = document.querySelector('.mark-all-btn');
         markAllBtn.style.display = 'none';
         
-        // Show success message
-        alert('Tüm bildirimler okundu olarak işaretlendi!');
+        showToast('Tüm bildirimler okundu olarak işaretlendi!', 'success');
       }
+
+      // Accept invitation function
+      function acceptInvitation(button, type, from) {
+        const title = type === 'match' ? 'Maç Davetini Kabul Et' : 'Arkadaşlık İsteğini Kabul Et';
+        const message = type === 'match' 
+          ? `${from} tarafından gönderilen maç davetini kabul etmek istediğinizden emin misiniz?`
+          : `${from} ile arkadaş olmak istediğinizden emin misiniz?`;
+        
+        showModal(title, message, () => {
+          button.textContent = type === 'match' ? 'Katıldınız ✓' : 'Arkadaş Oldu ✓';
+          button.style.backgroundColor = '#10b981';
+          button.disabled = true;
+          
+          // Hide decline button
+          const declineBtn = button.nextElementSibling;
+          if (declineBtn) {
+            declineBtn.style.display = 'none';
+          }
+          
+          // Mark as read
+          const notificationItem = button.closest('.notification-item');
+          markNotificationAsRead(notificationItem);
+          
+          const successMessage = type === 'match' 
+            ? `Tebrikler! ${from} ile yarın 19:00'da maça katılacaksınız! ⚽`
+            : `Harika! ${from} ile artık arkadaşsınız! 👥`;
+          
+          showToast(successMessage, 'success');
+        });
+      }
+
+      // Decline invitation function
+      function declineInvitation(button, type, from) {
+        const title = type === 'match' ? 'Maç Davetini Reddet' : 'Arkadaşlık İsteğini Reddet';
+        const message = `${from} tarafından gönderilen ${type === 'match' ? 'maç davetini' : 'arkadaşlık isteğini'} reddetmek istediğinizden emin misiniz?`;
+        
+        showModal(title, message, () => {
+          const notificationItem = button.closest('.notification-item');
+          notificationItem.style.animation = 'fadeOut 0.3s ease-out';
+          
+          setTimeout(() => {
+            notificationItem.remove();
+            showToast(`${type === 'match' ? 'Maç daveti' : 'Arkadaşlık isteği'} reddedildi.`, 'info');
+          }, 300);
+        });
+      }
+
+      // Mark single notification as read
+      function markNotificationAsRead(notificationItem) {
+        if (notificationItem.classList.contains('unread')) {
+          notificationItem.classList.remove('unread');
+          
+          // Check if there are any unread notifications left
+          const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+          if (unreadCount === 0) {
+            const markAllBtn = document.querySelector('.mark-all-btn');
+            markAllBtn.style.display = 'none';
+          }
+        }
+      }
+
+      // Show notification details
+      function showNotificationDetails(element, title, message) {
+        showModal('Bildirim Detayı', `${title}\n\n${message}\n\nBu bildirimi silmek istiyor musunuz?`, () => {
+          element.style.animation = 'fadeOut 0.3s ease-out';
+          setTimeout(() => {
+            element.remove();
+            showToast('Bildirim silindi', 'info');
+          }, 300);
+        });
+      }
+
+      // Initialize event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        // Accept button events
+        document.querySelectorAll('.btn-accept').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const notificationItem = this.closest('.notification-item');
+            const title = notificationItem.querySelector('.notification-title').textContent;
+            const messageElement = notificationItem.querySelector('.notification-message');
+            const strongElement = messageElement.querySelector('strong');
+            
+            if (title.includes('Maç Daveti')) {
+              acceptInvitation(this, 'match', strongElement ? strongElement.textContent : 'Bilinmeyen');
+            } else if (title.includes('Arkadaşlık İsteği')) {
+              acceptInvitation(this, 'friend', strongElement ? strongElement.textContent : 'Bilinmeyen');
+            }
+          });
+        });
+
+        // Decline button events
+        document.querySelectorAll('.btn-decline').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const notificationItem = this.closest('.notification-item');
+            const title = notificationItem.querySelector('.notification-title').textContent;
+            const messageElement = notificationItem.querySelector('.notification-message');
+            const strongElement = messageElement.querySelector('strong');
+            
+            if (title.includes('Maç Daveti')) {
+              declineInvitation(this, 'match', strongElement ? strongElement.textContent : 'Bilinmeyen');
+            } else if (title.includes('Arkadaşlık İsteği')) {
+              declineInvitation(this, 'friend', strongElement ? strongElement.textContent : 'Bilinmeyen');
+            }
+          });
+        });
+
+        // Notification click events for details
+        document.querySelectorAll('.notification-item').forEach(item => {
+          item.addEventListener('click', function(e) {
+            // Don't trigger if clicking on action buttons
+            if (e.target.classList.contains('btn-accept') || e.target.classList.contains('btn-decline')) {
+              return;
+            }
+            
+            // If it's a link, let it navigate normally
+            if (this.tagName === 'A') {
+              markNotificationAsRead(this);
+              return;
+            }
+            
+            // Only show details for non-action notifications
+            if (!this.querySelector('.notification-actions')) {
+              const title = this.querySelector('.notification-title').textContent;
+              const message = this.querySelector('.notification-message').textContent;
+              
+              showNotificationDetails(this, title, message);
+            }
+            
+            markNotificationAsRead(this);
+          });
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('confirmationModal').addEventListener('click', function(e) {
+          if (e.target === this) {
+            closeModal();
+          }
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes fadeOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100%); }
+          }
+          .notification-item {
+            cursor: pointer;
+            transition: transform 0.1s ease;
+          }
+          .notification-item:active {
+            transform: scale(0.98);
+          }
+          .btn-accept:disabled,
+          .btn-decline:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+          }
+        `;
+        document.head.appendChild(style);
+      });
     </script>
   </body>
 </html>

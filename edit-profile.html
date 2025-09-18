@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profili Düzenle - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .save-btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .save-btn:disabled {
+            background: rgba(255,255,255,0.5);
+            color: rgba(5,150,105,0.5);
+            cursor: not-allowed;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .profile-photo-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .current-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 36px;
+            margin: 0 auto 16px auto;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .photo-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .photo-btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .photo-btn.primary {
+            background: #10b981;
+            color: white;
+        }
+
+        .photo-btn.primary:hover {
+            background: #059669;
+        }
+
+        .photo-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .photo-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            transition: all 0.3s ease;
+            max-width: 350px;
+            text-align: center;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success {
+            background: #10b981;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+        }
+        
+        .toast.info {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Profili Düzenle</h1>
+                <button class="save-btn" onclick="saveProfile()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="profile-photo-section">
+            <div class="current-photo" id="currentPhoto">EG</div>
+            <div class="photo-buttons">
+                <button class="photo-btn primary" onclick="changePhoto()">Fotoğraf Değiştir</button>
+                <button class="photo-btn secondary" onclick="removePhoto()">Kaldır</button>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoChange(event)">
+        </div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label class="form-label">Ad Soyad</label>
+                <input type="text" class="form-input" id="fullName" value="Enes Güler" placeholder="Adınızı ve soyadınızı girin">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Kullanıcı Adı</label>
+                <input type="text" class="form-input" id="username" value="enesguler" placeholder="Kullanıcı adınızı girin">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Biyografi</label>
+                <textarea class="form-input form-textarea" id="bio" placeholder="Kendinizden bahsedin..." maxlength="150" oninput="updateCharCounter()">⚽ Futsal tutkunu | 🏆 Şampiyon | 📍 İstanbul
+Haftada 4 gün saha, her gün antrenman! 💪</textarea>
+                <div class="char-counter" id="charCounter">86/150</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Şehir</label>
+                <input type="text" class="form-input" id="city" value="İstanbul" placeholder="Yaşadığınız şehir">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Telefon</label>
+                <input type="tel" class="form-input" id="phone" value="+90 555 123 4567" placeholder="Telefon numaranız">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Doğum Tarihi</label>
+                <input type="date" class="form-input" id="birthDate" value="1995-06-15">
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            // Profile settings sayfasına geri dön
+            window.location.href = 'settings.html';
+        }
+
+        function changePhoto() {
+            document.getElementById('photoInput').click();
+        }
+
+        function removePhoto() {
+            const photo = document.getElementById('currentPhoto');
+            photo.style.backgroundImage = 'none';
+            photo.textContent = 'EG';
+        }
+
+        function handlePhotoChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photo = document.getElementById('currentPhoto');
+                    photo.style.backgroundImage = `url(${e.target.result})`;
+                    photo.style.backgroundSize = 'cover';
+                    photo.style.backgroundPosition = 'center';
+                    photo.textContent = '';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Toast function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Hide and remove toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function updateCharCounter() {
+            const bio = document.getElementById('bio').value;
+            const counter = document.getElementById('charCounter');
+            counter.textContent = `${bio.length}/150`;
+            
+            if (bio.length > 130) {
+                counter.style.color = '#f59e0b';
+            } else if (bio.length >= 150) {
+                counter.style.color = '#ef4444';
+            } else {
+                counter.style.color = '#6b7280';
+            }
+        }
+
+        function saveProfile() {
+            const profileData = {
+                fullName: document.getElementById('fullName').value,
+                username: document.getElementById('username').value,
+                bio: document.getElementById('bio').value,
+                city: document.getElementById('city').value,
+                phone: document.getElementById('phone').value,
+                birthDate: document.getElementById('birthDate').value
+            };
+
+            // Validation
+            if (!profileData.fullName.trim()) {
+                showToast('Lütfen adınızı ve soyadınızı girin.', 'error');
+                return;
+            }
+
+            if (!profileData.username.trim()) {
+                showToast('Lütfen kullanıcı adınızı girin.', 'error');
+                return;
+            }
+
+            // Save profile
+            showToast('Profil bilgileriniz başarıyla güncellendi! ✅', 'success');
+            setTimeout(() => {
+                window.location.href = 'settings.html';
+            }, 1500);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCharCounter();
+        });
+    </script>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Değiştir - Goalify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn, .save-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: white;
+            color: #059669;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            width: auto;
+            height: auto;
+            font-size: 14px;
+        }
+
+        .save-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .save-btn:disabled {
+            background: rgba(255,255,255,0.5);
+            color: rgba(5,150,105,0.5);
+            cursor: not-allowed;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .current-email-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .current-email-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .current-email {
+            color: #111827;
+            font-weight: 600;
+            font-size: 16px;
+            background: #f9fafb;
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+
+        .verification-notice {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .verification-notice h3 {
+            color: #1e40af;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .verification-notice p {
+            color: #1e40af;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .verification-step {
+            display: none;
+            background: #f0fdf4;
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .verification-step.active {
+            display: block;
+        }
+
+        .verification-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .verification-title {
+            color: #065f46;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .verification-text {
+            color: #065f46;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .verification-code-input {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #10b981;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+        }
+
+        .resend-btn:hover {
+            color: #059669;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <div class="nav">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 class="page-title">Email Değiştir</h1>
+                <button class="save-btn" id="saveBtn" onclick="changeEmail()" disabled>Değiştir</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="current-email-section">
+            <div class="current-email-label">Mevcut Email Adresiniz</div>
+            <div class="current-email">enes.guler@example.com</div>
+        </div>
+
+        <div class="verification-notice">
+            <h3>📧 Doğrulama Gerekli</h3>
+            <p>Email adresinizi değiştirmek için yeni email adresinize gönderilecek doğrulama kodunu girmeniz gerekecek.</p>
+        </div>
+
+        <div class="form-section" id="emailForm">
+            <div class="form-group">
+                <label class="form-label">Yeni Email Adresi</label>
+                <input type="email" class="form-input" id="newEmail" placeholder="yeni@email.com" oninput="validateEmail()">
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Şifreniz</label>
+                <input type="password" class="form-input" id="password" placeholder="Mevcut şifrenizi girin" oninput="validateEmail()">
+                <div class="error-message" id="passwordError"></div>
+            </div>
+        </div>
+
+        <div class="verification-step" id="verificationStep">
+            <div class="verification-icon">📬</div>
+            <div class="verification-title">Doğrulama Kodu Gönderildi</div>
+            <div class="verification-text">
+                <span id="sentEmailAddress"></span> adresine 6 haneli doğrulama kodu gönderildi.
+                Lütfen kodu aşağıya girin.
+            </div>
+            
+            <div class="form-group">
+                <input type="text" class="form-input verification-code-input" id="verificationCode" placeholder="123456" maxlength="6" oninput="validateVerificationCode()">
+                <div class="error-message" id="verificationError"></div>
+            </div>
+
+            <button class="resend-btn" onclick="resendCode()">Kodu Tekrar Gönder</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <a href="home.html" class="nav-item">
+                <span>🏠</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-item">
+                <span>⚽</span>
+                <span>Maçlar</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span>💌</span>
+                <span>Mesajlar</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span>👤</span>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 'email';
+        let generatedCode = '';
+
+        function goBack() {
+            if (currentStep === 'verification') {
+                // Go back to email form
+                currentStep = 'email';
+                document.getElementById('emailForm').style.display = 'block';
+                document.getElementById('verificationStep').classList.remove('active');
+                document.querySelector('.page-title').textContent = 'Email Değiştir';
+                document.getElementById('saveBtn').textContent = 'Değiştir';
+                validateEmail();
+            } else {
+                window.history.back();
+            }
+        }
+
+        function validateEmail() {
+            const newEmail = document.getElementById('newEmail').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const saveBtn = document.getElementById('saveBtn');
+
+            // Clear previous errors
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
+
+            let isValid = true;
+
+            // Validate email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!newEmail) {
+                isValid = false;
+            } else if (!emailRegex.test(newEmail)) {
+                document.getElementById('emailError').textContent = 'Geçerli bir email adresi girin.';
+                document.getElementById('newEmail').classList.add('error');
+                isValid = false;
+            } else if (newEmail === 'enes.guler@example.com') {
+                document.getElementById('emailError').textContent = 'Yeni email mevcut email ile aynı olamaz.';
+                document.getElementById('newEmail').classList.add('error');
+                isValid = false;
+            }
+
+            // Validate password
+            if (!password) {
+                isValid = false;
+            }
+
+            saveBtn.disabled = !isValid;
+        }
+
+        function validateVerificationCode() {
+            const code = document.getElementById('verificationCode').value.trim();
+            const saveBtn = document.getElementById('saveBtn');
+
+            document.getElementById('verificationError').textContent = '';
+            document.getElementById('verificationCode').classList.remove('error');
+
+            saveBtn.disabled = code.length !== 6;
+        }
+
+        function changeEmail() {
+            if (currentStep === 'email') {
+                // Send verification code
+                const newEmail = document.getElementById('newEmail').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                // Simulate password check
+                if (password !== 'password123') {
+                    document.getElementById('passwordError').textContent = 'Şifre hatalı.';
+                    document.getElementById('password').classList.add('error');
+                    return;
+                }
+
+                // Generate verification code
+                generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                // Switch to verification step
+                currentStep = 'verification';
+                document.getElementById('emailForm').style.display = 'none';
+                document.getElementById('verificationStep').classList.add('active');
+                document.getElementById('sentEmailAddress').textContent = newEmail;
+                document.querySelector('.page-title').textContent = 'Email Doğrula';
+                document.getElementById('saveBtn').textContent = 'Doğrula';
+                document.getElementById('saveBtn').disabled = true;
+
+                // Show generated code for demo (in real app, this would be sent via email)
+                setTimeout(() => {
+                    alert(`Demo amaçlı doğrulama kodu: ${generatedCode}\n\nGerçek uygulamada bu kod email'inize gönderilecektir.`);
+                }, 1000);
+
+            } else if (currentStep === 'verification') {
+                // Verify code
+                const enteredCode = document.getElementById('verificationCode').value.trim();
+
+                if (enteredCode !== generatedCode) {
+                    document.getElementById('verificationError').textContent = 'Doğrulama kodu hatalı.';
+                    document.getElementById('verificationCode').classList.add('error');
+                    return;
+                }
+
+                // Success
+                const newEmail = document.getElementById('newEmail').value.trim();
+                alert(`Email adresiniz başarıyla değiştirildi! ✅\n\nYeni email: ${newEmail}\n\nArtık giriş yaparken bu email adresini kullanabilirsiniz.`);
+                window.history.back();
+            }
+        }
+
+        function resendCode() {
+            generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            alert(`Yeni doğrulama kodu gönderildi: ${generatedCode}\n\n(Demo amaçlı gösterilmektedir)`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            validateEmail();
+        });
+    </script>
+</body>
+</html>
