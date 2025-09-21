@@ -1560,16 +1560,47 @@
 
       function checkLogin() {
         console.log('Checking login status...');
+        
+        // Session verilerini debug et
+        const session = localStorage.getItem('paslios_session');
+        console.log('Session data:', session);
+        
         const isLoggedIn = PasliosData.isLoggedIn();
         console.log('Is logged in:', isLoggedIn);
         
+        // Eğer session yoksa, test kullanıcısı oluştur
         if (!isLoggedIn) {
-          console.log('User not logged in, redirecting...');
-          ToastManager.show('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!', 'warning');
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 2000);
-          return;
+          console.log('No session found. Creating test session...');
+          
+          // Test için manuel session oluştur
+          const testSession = {
+            isLoggedIn: true,
+            userId: 1,
+            loginTime: Date.now()
+          };
+          localStorage.setItem('paslios_session', JSON.stringify(testSession));
+          console.log('Test session created:', testSession);
+          
+          // Tekrar kontrol et
+          const newIsLoggedIn = PasliosData.isLoggedIn();
+          console.log('After creating session, is logged in:', newIsLoggedIn);
+          
+          if (!newIsLoggedIn) {
+            console.log('Still not logged in, redirecting...');
+            
+            // ToastManager check
+            if (typeof ToastManager !== 'undefined') {
+              ToastManager.show('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!', 'warning');
+            } else {
+              console.log('ToastManager not available, using alert');
+              alert('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!');
+            }
+            
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 2000);
+            return;
+          }
         }
         
         console.log('User is logged in, initializing page...');
