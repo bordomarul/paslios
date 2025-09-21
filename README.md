@@ -4,6 +4,8 @@ Futbol tutkunları için sosyal medya platformu.
 
 **"Sahada buluşalım, Paslios'ta tanışalım!"**
 
+*Son güncelleme: 21 Eylül 2025, 23:01*
+
 ## Özellikler
 
 - **Profil Yönetimi**: Kişisel futbol profilinizi oluşturun ve yönetin
