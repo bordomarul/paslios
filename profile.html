@@ -6,6 +6,31 @@
     <meta name="description" content="Paslios - Profil">
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Profil</title>
+    
+    <!-- Immediate Authentication Check -->
+    <script>
+      // Sayfa yüklenmeden önce authentication kontrolü
+      (function() {
+        try {
+          const session = localStorage.getItem('paslios_session');
+          let isLoggedIn = false;
+          
+          if (session) {
+            const sessionData = JSON.parse(session);
+            isLoggedIn = sessionData && sessionData.isLoggedIn;
+          }
+          
+          if (!isLoggedIn) {
+            window.location.href = 'index.html';
+            return;
+          }
+        } catch (e) {
+          window.location.href = 'index.html';
+          return;
+        }
+      })();
+    </script>
+    
     <style>
       * {
         margin: 0;
@@ -635,73 +660,16 @@
 
       <div class="section">
         <h2 class="section-title">Gönderilerim</h2>
-        
-        <div class="activity-item">
-          <div class="activity-header">
-            <span class="activity-type">GÖNDERI</span>
-            <span class="activity-date">3 saat önce</span>
-          </div>
-          <div class="activity-title">Bugün harika bir maç yaptık! 🔥</div>
-          <div class="activity-description">Spor Ankara Halısaha'da takım arkadaşlarımla muhteşem bir galibiyet aldık. 3-2'lik skorla bitirdik ve ben 2 gol attım! 💪 #futsal #Paslios</div>
-        </div>
-
-        <div class="activity-item">
-          <div class="activity-header">
-            <span class="activity-type">GÖNDERI</span>
-            <span class="activity-date">1 gün önce</span>
-          </div>
-          <div class="activity-title">Yeni ayakkabılarım geldi! ⚽</div>
-          <div class="activity-description">Nike Mercurial ayakkabılarım sonunda geldi. Yarın sahada test edeceğim. Kimse durduramaz beni! 😄</div>
-        </div>
-
-        <div class="activity-item">
-          <div class="activity-header">
-            <span class="activity-type">GÖNDERI</span>
-            <span class="activity-date">3 gün önce</span>
-          </div>
-          <div class="activity-title">Antrenman zamanı! 💪</div>
-          <div class="activity-description">Bugün 2 saatlik antrenman yaptık. Kondisyon ve top kontrolü üzerinde çalıştık. Gelecek hafta büyük final var!</div>
-        </div>
-
-        <div class="activity-item">
-          <div class="activity-header">
-            <span class="activity-type">GÖNDERI</span>
-            <span class="activity-date">1 hafta önce</span>
-          </div>
-          <div class="activity-title">Hat-trick! 🎯</div>
-          <div class="activity-description">Dün akşam yapığım hat-trick ile takımımızı 4-1'lik galibiyete taşıdım. Bu sezon en iyi performansımdı. Teşekkürler arkadaşlar! 🙏</div>
+        <div id="user-posts">
+          <!-- Dinamik kullanıcı gönderileri buraya yüklenecek -->
         </div>
       </div>
 
       <!-- Recent Activity -->
       <div class="section">
         <h2 class="section-title">Son Aktiviteler</h2>
-        
-        <div class="activity-item">
-          <div class="activity-header">
-            <span class="activity-type">MAÇ</span>
-            <span class="activity-date">2 gün önce</span>
-          </div>
-          <div class="activity-title">Spor Ankara Halısaha</div>
-          <div class="activity-description">Takımın ile 3-2 galip geldi. 1 gol, 2 asist yaptın.</div>
-        </div>
-
-        <div class="activity-item">
-          <div class="activity-header">
-            <span class="activity-type">BAŞARI</span>
-            <span class="activity-date">1 hafta önce</span>
-          </div>
-          <div class="activity-title">Hat-trick Kralı</div>
-          <div class="activity-description">Bir maçta 3 gol atarak yeni rozet kazandın!</div>
-        </div>
-
-        <div class="activity-item">
-          <div class="activity-header">
-            <span class="activity-type">ARKADAŞ</span>
-            <span class="activity-date">2 hafta önce</span>
-          </div>
-          <div class="activity-title">Mehmet Kaya</div>
-          <div class="activity-description">Yeni arkadaş eklendi ve seni bir maça davet etti.</div>
+        <div id="user-activities">
+          <!-- Dinamik aktiviteler buraya yüklenecek -->
         </div>
       </div>
     </div>
@@ -940,6 +908,7 @@
 
     <!-- Data Management Script -->
     <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
     <script>
       // Sayfa yüklendiğinde kullanıcı verilerini yükle
       document.addEventListener('DOMContentLoaded', function() {
@@ -950,6 +919,9 @@
         }
 
         loadUserProfile();
+        loadUserPosts();
+        loadUserActivities();
+        setupEventListeners();
       });
 
       function loadUserProfile() {
@@ -971,14 +943,17 @@
         document.getElementById('respect-rating').textContent = (currentUser.rating || 0).toFixed(1) + '/5.0';
 
         // Takım bilgisi
+        const teamElement = document.getElementById('profile-team');
         if (currentUser.teamId) {
           const teams = PasliosData.getData('teams');
           const userTeam = teams.find(team => team.id === currentUser.teamId);
           if (userTeam) {
-            document.getElementById('profile-team').textContent = userTeam.name;
+            teamElement.textContent = userTeam.name;
+            teamElement.href = 'team.html';
           }
         } else {
-          document.getElementById('profile-team').textContent = 'Takımsız';
+          teamElement.textContent = 'Takımsız';
+          teamElement.href = 'create-team.html';
         }
 
         // Takipçi sayıları (şimdilik sabit, ileride gerçek veri olacak)
@@ -986,15 +961,218 @@
         document.getElementById('following-count').textContent = Math.floor(Math.random() * 300) + 50;
       }
 
+      function loadUserPosts() {
+        const currentUser = PasliosData.getCurrentUser();
+        const allPosts = PasliosData.getPosts();
+        const userPosts = allPosts.filter(post => post.authorId === currentUser.id);
+        
+        const postsContainer = document.getElementById('user-posts');
+        postsContainer.innerHTML = '';
+
+        if (userPosts.length === 0) {
+          postsContainer.innerHTML = `
+            <div class="activity-item" style="text-align: center; color: #6b7280;">
+              <p>Henüz gönderin yok</p>
+              <a href="create-post.html" style="color: #10b981; text-decoration: underline;">İlk gönderini oluştur!</a>
+            </div>
+          `;
+          return;
+        }
+
+        userPosts.forEach(post => {
+          const postElement = createPostElement(post);
+          postsContainer.appendChild(postElement);
+        });
+      }
+
+      function createPostElement(post) {
+        const timeAgo = PasliosData.formatTimeAgo(post.timestamp);
+        
+        const postDiv = document.createElement('div');
+        postDiv.className = 'activity-item';
+        postDiv.innerHTML = `
+          <div class="activity-header">
+            <span class="activity-type">GÖNDERI</span>
+            <span class="activity-date">${timeAgo}</span>
+          </div>
+          <div class="activity-title">${post.content.substring(0, 50)}${post.content.length > 50 ? '...' : ''}</div>
+          <div class="activity-description">${post.content}</div>
+        `;
+
+        postDiv.addEventListener('click', () => {
+          ToastManager.show('Gönderi detayları görüntüleniyor...', 'info');
+        });
+
+        return postDiv;
+      }
+
+      function loadUserActivities() {
+        const currentUser = PasliosData.getCurrentUser();
+        const bookings = PasliosData.getBookings(currentUser.id);
+        
+        const activitiesContainer = document.getElementById('user-activities');
+        activitiesContainer.innerHTML = '';
+
+        // Rezervasyon aktiviteleri
+        bookings.slice(0, 3).forEach(booking => {
+          const activityElement = createActivityElement({
+            type: 'MAÇ',
+            title: booking.venueName,
+            description: `${booking.date} tarihinde ${booking.time} saatindeki rezervasyon`,
+            date: booking.bookingDate
+          });
+          activitiesContainer.appendChild(activityElement);
+        });
+
+        // Sabit aktiviteler (demo)
+        const demoActivities = [
+          {
+            type: 'BAŞARI',
+            title: 'Hat-trick Kralı',
+            description: 'Bir maçta 3 gol atarak yeni rozet kazandın!',
+            date: Date.now() - 604800000 // 1 hafta önce
+          },
+          {
+            type: 'ARKADAŞ',
+            title: 'Yeni Arkadaş',
+            description: 'Mehmet Kaya seni arkadaş olarak ekledi',
+            date: Date.now() - 1209600000 // 2 hafta önce
+          }
+        ];
+
+        demoActivities.forEach(activity => {
+          const activityElement = createActivityElement(activity);
+          activitiesContainer.appendChild(activityElement);
+        });
+
+        if (activitiesContainer.children.length === 0) {
+          activitiesContainer.innerHTML = `
+            <div class="activity-item" style="text-align: center; color: #6b7280;">
+              <p>Henüz aktivite yok</p>
+              <p>Maç oyna, takım oluştur ve sosyal ol!</p>
+            </div>
+          `;
+        }
+      }
+
+      function createActivityElement(activity) {
+        const timeAgo = PasliosData.formatTimeAgo(activity.date);
+        
+        const activityDiv = document.createElement('div');
+        activityDiv.className = 'activity-item';
+        activityDiv.innerHTML = `
+          <div class="activity-header">
+            <span class="activity-type">${activity.type}</span>
+            <span class="activity-date">${timeAgo}</span>
+          </div>
+          <div class="activity-title">${activity.title}</div>
+          <div class="activity-description">${activity.description}</div>
+        `;
+
+        activityDiv.addEventListener('click', () => {
+          ToastManager.show(`"${activity.title}" aktivitesi görüntüleniyor...`, 'info');
+        });
+
+        return activityDiv;
+      }
+
+      function setupEventListeners() {
+        // Follow stats handlers
+        document.querySelectorAll('.follow-stat').forEach(stat => {
+          stat.addEventListener('click', (e) => {
+            e.preventDefault();
+            const href = stat.getAttribute('href');
+            const type = href.includes('followers') ? 'followers' : 'following';
+            handleFollowClick(type);
+          });
+        });
+
+        // Team link handler
+        const teamLink = document.querySelector('.profile-team');
+        if (teamLink) {
+          teamLink.addEventListener('click', handleTeamClick);
+        }
+
+        // Create team button handler
+        const createTeamBtn = document.querySelector('.create-team-btn');
+        if (createTeamBtn) {
+          createTeamBtn.addEventListener('click', handleCreateTeam);
+        }
+
+        // Stats click handlers
+        document.querySelector('.stats-grid').addEventListener('click', (e) => {
+          const statCard = e.target.closest('.stat-card');
+          if (statCard) {
+            const statLabel = statCard.querySelector('.stat-label').textContent;
+            handleStatsClick(statLabel);
+          }
+        });
+      }
+
       // Profil güncelleme fonksiyonu
       function updateProfile(field, value) {
         const success = PasliosData.updateCurrentUser({ [field]: value });
         if (success) {
           loadUserProfile(); // Sayfayı yenile
-          showToast('Profil başarıyla güncellendi!', 'success');
+          ToastManager.show('Profil başarıyla güncellendi!', 'success');
         } else {
-          showToast('Profil güncellenirken hata oluştu!', 'error');
+          ToastManager.show('Profil güncellenirken hata oluştu!', 'error');
         }
+      }
+
+      // Event Handlers
+      function handleStatsClick(statType) {
+        const messages = {
+          'Oynadığı Maç': 'Maç geçmişi ve detayları görüntüleniyor...',
+          'Takım Oyuncusu': 'Takım değerlendirmen harika! Detaylar yükleniyor...',
+          'Saygılı Oyuncu': 'Saygı puanın çok yüksek! Diğer oyunculardan aldığın değerlendirmeler.'
+        };
+        
+        ToastManager.show(messages[statType] || 'İstatistik detayları yükleniyor...', 'info');
+        
+        if (statType === 'Oynadığı Maç') {
+          setTimeout(() => {
+            window.location.href = 'leaderboard.html';
+          }, 1500);
+        }
+      }
+
+      function handleFollowClick(type) {
+        const userData = {
+          followers: { count: document.getElementById('followers-count').textContent, page: 'followers.html?tab=followers' },
+          following: { count: document.getElementById('following-count').textContent, page: 'followers.html?tab=following' }
+        };
+        
+        const data = userData[type];
+        ToastManager.show(`${data.count} ${type === 'followers' ? 'takipçin' : 'takip ettiğin kişi'} var. Liste açılıyor...`, 'info');
+        
+        setTimeout(() => {
+          window.location.href = data.page;
+        }, 1500);
+      }
+
+      function handleTeamClick(e) {
+        e.preventDefault();
+        const teamName = e.target.textContent;
+        if (teamName === 'Takımsız') {
+          ToastManager.show('Takım oluşturma sayfasına yönlendiriliyorsun...', 'info');
+          setTimeout(() => {
+            window.location.href = 'create-team.html';
+          }, 1500);
+        } else {
+          ToastManager.show(`${teamName} takım sayfasına yönlendiriliyorsun...`, 'info');
+          setTimeout(() => {
+            window.location.href = 'team.html';
+          }, 1500);
+        }
+      }
+
+      function handleCreateTeam(e) {
+        e.preventDefault();
+        ToastManager.show('Takım oluşturma sayfasına yönlendiriliyorsun...', 'success');
+        setTimeout(() => {
+          window.location.href = 'create-team.html';
+        }, 1500);
       }
     </script>
   </body>
