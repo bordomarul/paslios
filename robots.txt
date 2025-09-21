@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://paslios.vercel.app/sitemap.xml
 
 # Main pages
 Allow: /home
