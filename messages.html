@@ -7,10 +7,8 @@
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Mesajlar</title>
     <script>
-        // Authentication check - redirect if not logged in
-        if (!localStorage.getItem('currentUser')) {
-            window.location.href = 'index.html';
-        }
+        // Soft authentication check - show demo data even without login
+        console.log('Messages page loading...');
     </script>
     <style>
       * {
@@ -1161,18 +1159,22 @@
         });
 
         // Oturum kontrolü ve mesajları yükle
-        if (!localStorage.getItem('currentUser')) {
-          window.location.href = 'index.html';
-          return;
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+          console.log('No current user found, but staying on messages page');
+          // Don't redirect, just show empty state or demo data
         }
+        
+        // Load conversations regardless of auth status for demo
+        loadConversations();
       });
 
       function loadConversations() {
         try {
           const currentUser = JSON.parse(localStorage.getItem('currentUser'));
           if (!currentUser) {
-            window.location.href = 'index.html';
-            return;
+            console.log('Loading demo conversations without auth');
+            // Continue with demo data even without auth
           }
 
           // Demo conversations with more realistic data
