@@ -393,9 +393,6 @@
         document.getElementById('registerForm').addEventListener('submit', function(e) {
           e.preventDefault();
           
-          // Debug: Form gönderildiğini kontrol et
-          alert('Form gönderildi! PasliosData tipi: ' + typeof PasliosData);
-          
           const fullName = document.getElementById('fullName').value;
           const email = document.getElementById('email').value;
           const phone = document.getElementById('phone').value;
