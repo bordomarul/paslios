@@ -1,147 +1,359 @@
 // Paslios Data Management System
-// LocalStorage tabanlı veri yönetimi
+// LocalStorage tabanlı gelişmiş veri yönetimi
 
-class pasliosData {
+class PasliosData {
   constructor() {
     this.initializeDatabase();
   }
 
   // Veritabanını başlat
   initializeDatabase() {
-    // Kullanıcı verileri
+    // Kullanıcı verileri - Gerçek kullanıcı profilleri
     if (!localStorage.getItem('paslios_users')) {
-      const defaultUsers = [
+      const realUsers = [
         {
           id: 1,
           name: 'Ahmet Yılmaz',
-          email: 'ahmet@example.com',
-          phone: '0555 123 45 67',
+          email: 'ahmet.yilmaz@paslios.com',
+          phone: '0532 555 01 23',
           position: 'Forvet',
-          rating: 4.8,
-          avatar: 'AY',
-          bio: 'Serbest çalışan yazılım geliştirici ve futbol tutkunu',
-          location: 'Ankara, Türkiye',
-          matchesPlayed: 87,
-          goals: 23,
-          assists: 12,
+          rating: 4.7,
+          avatar: null, // UI-Avatars kullanılacak
+          bio: 'Yazılım mühendisi ve futbol tutkunu. 10 yıldır halısaha futbolu oynuyor.',
+          location: 'Ankara/Çankaya',
+          matchesPlayed: 127,
+          matchesWon: 89,
+          goals: 67,
+          assists: 34,
+          cleanSheets: 0,
+          mvpAwards: 12,
+          joinDate: '2023-08-15',
+          lastLoginDate: new Date().toISOString(),
           isCurrentUser: true,
           teamId: 1,
-          joinDate: '2024-01-15'
+          friendIds: [2, 3, 4, 5],
+          stats: {
+            totalPoints: 1247,
+            weeklyPoints: 85,
+            monthlyPoints: 324,
+            level: 15,
+            xp: 2456,
+            badgeIds: [1, 2, 3, 5, 8]
+          }
         },
         {
           id: 2,
           name: 'Mehmet Kaya',
-          email: 'mehmet@example.com',
-          phone: '0555 234 56 78',
+          email: 'mehmet.kaya@gmail.com',
+          phone: '0533 444 67 89',
           position: 'Orta Saha',
-          rating: 4.6,
-          avatar: 'MK',
-          bio: 'Futbol aşığı mühendis',
-          location: 'Ankara, Türkiye',
-          matchesPlayed: 65,
-          goals: 8,
-          assists: 15,
-          teamId: 1
+          rating: 4.5,
+          avatar: null,
+          bio: 'Makine mühendisi. Pas verme konusunda uzman.',
+          location: 'Ankara/Keçiören',
+          matchesPlayed: 98,
+          matchesWon: 61,
+          goals: 23,
+          assists: 52,
+          cleanSheets: 0,
+          mvpAwards: 8,
+          joinDate: '2023-09-22',
+          lastLoginDate: '2024-12-20T15:30:00.000Z',
+          teamId: 1,
+          friendIds: [1, 3, 6],
+          stats: {
+            totalPoints: 987,
+            weeklyPoints: 72,
+            monthlyPoints: 289,
+            level: 12,
+            xp: 1876,
+            badgeIds: [1, 3, 4]
+          }
         },
         {
           id: 3,
           name: 'Ali Demir',
-          email: 'ali@example.com',
-          phone: '0555 345 67 89',
+          email: 'ali.demir@hotmail.com',
+          phone: '0534 777 12 34',
           position: 'Defans',
-          rating: 4.5,
-          avatar: 'AD',
-          bio: 'Profesyonel defans oyuncusu',
-          location: 'Ankara, Türkiye',
-          matchesPlayed: 92,
-          goals: 3,
-          assists: 7,
-          teamId: 1
+          rating: 4.8,
+          avatar: null,
+          bio: 'Güvenilir defans oyuncusu. Temiz oyun tarzıyla tanınır.',
+          location: 'Ankara/Mamak',
+          matchesPlayed: 156,
+          matchesWon: 98,
+          goals: 12,
+          assists: 18,
+          cleanSheets: 47,
+          mvpAwards: 15,
+          joinDate: '2023-07-10',
+          lastLoginDate: '2024-12-21T09:15:00.000Z',
+          teamId: 1,
+          friendIds: [1, 2, 4, 7],
+          stats: {
+            totalPoints: 1456,
+            weeklyPoints: 96,
+            monthlyPoints: 378,
+            level: 18,
+            xp: 3124,
+            badgeIds: [1, 2, 3, 6, 7, 9]
+          }
+        },
+        {
+          id: 4,
+          name: 'Burak Özkan',
+          email: 'burak.ozkan@yahoo.com',
+          phone: '0535 888 99 00',
+          position: 'Kaleci',
+          rating: 4.6,
+          avatar: null,
+          bio: 'Deneyimli kaleci. Refleksleri çok iyi.',
+          location: 'Ankara/Etimesgut',
+          matchesPlayed: 89,
+          matchesWon: 67,
+          goals: 0,
+          assists: 3,
+          cleanSheets: 34,
+          mvpAwards: 11,
+          joinDate: '2023-10-05',
+          lastLoginDate: '2024-12-21T14:20:00.000Z',
+          teamId: 2,
+          friendIds: [1, 3, 5],
+          stats: {
+            totalPoints: 1123,
+            weeklyPoints: 78,
+            monthlyPoints: 312,
+            level: 14,
+            xp: 2234,
+            badgeIds: [1, 4, 5, 8]
+          }
+        },
+        {
+          id: 5,
+          name: 'Emre Aydın',
+          email: 'emre.aydin@gmail.com',
+          phone: '0536 123 45 67',
+          position: 'Kanat',
+          rating: 4.4,
+          avatar: null,
+          bio: 'Hızlı kanat oyuncusu. Dripling konusunda yetenekli.',
+          location: 'Ankara/Yenimahalle',
+          matchesPlayed: 72,
+          matchesWon: 45,
+          goals: 31,
+          assists: 28,
+          cleanSheets: 0,
+          mvpAwards: 6,
+          joinDate: '2023-11-18',
+          lastLoginDate: '2024-12-20T18:45:00.000Z',
+          teamId: null,
+          friendIds: [1, 4, 6],
+          stats: {
+            totalPoints: 867,
+            weeklyPoints: 64,
+            monthlyPoints: 256,
+            level: 11,
+            xp: 1675,
+            badgeIds: [1, 2, 4]
+          }
+        },
+        {
+          id: 6,
+          name: 'Cem Yıldız',
+          email: 'cem.yildiz@outlook.com',
+          phone: '0537 456 78 90',
+          position: 'Orta Saha',
+          rating: 4.3,
+          avatar: null,
+          bio: 'Genç ve hırslı oyuncu. Sürekli gelişim halinde.',
+          location: 'Ankara/Altındağ',
+          matchesPlayed: 43,
+          matchesWon: 24,
+          goals: 8,
+          assists: 14,
+          cleanSheets: 0,
+          mvpAwards: 2,
+          joinDate: '2024-01-12',
+          lastLoginDate: '2024-12-21T11:30:00.000Z',
+          teamId: null,
+          friendIds: [2, 5],
+          stats: {
+            totalPoints: 534,
+            weeklyPoints: 45,
+            monthlyPoints: 187,
+            level: 7,
+            xp: 892,
+            badgeIds: [1]
+          }
         }
       ];
-      this.setData('users', defaultUsers);
+      this.setData('users', realUsers);
     }
 
-    // Takım verileri
+    // Takım verileri - Gerçek takım bilgileri
     if (!localStorage.getItem('paslios_teams')) {
-      const defaultTeams = [
+      const realTeams = [
         {
           id: 1,
-          name: 'Çankaya Tigers',
-          avatar: 'CT',
-          description: 'Çankaya bölgesinin en güçlü takımı',
-          foundedDate: '2023-05-15',
+          name: 'Çankaya Tigers FC',
+          emoji: '🐅',
+          color: '#ff6b35',
+          privacy: 'public',
+          description: 'Çankaya bölgesinin en deneyimli halısaha takımı. 2018\'den beri faaliyet gösteriyoruz.',
+          foundedDate: '2018-03-15',
           captainId: 1,
           members: [1, 2, 3],
-          matchesPlayed: 24,
-          wins: 18,
-          draws: 4,
-          losses: 2,
-          points: 58,
-          goals: 67,
-          goalsAgainst: 23,
-          trophies: 3
+          memberCount: 3,
+          location: 'Ankara/Çankaya',
+          homeVenue: 'Çankaya Halısaha Complex',
+          matchesPlayed: 89,
+          wins: 58,
+          draws: 18,
+          losses: 13,
+          points: 192,
+          goalsFor: 234,
+          goalsAgainst: 127,
+          trophies: 5,
+          achievements: [
+            'Çankaya Ligi Şampiyonu 2023',
+            'En Fair Play Takımı 2024',
+            'Bölge Kupası Finalisti 2023'
+          ],
+          createdAt: '2018-03-15T00:00:00.000Z',
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 2,
+          name: 'Keçiören Wolves',
+          emoji: '🐺',
+          color: '#2d3748',
+          privacy: 'invite',
+          description: 'Genç ve dinamik oyuncu kadrosuyla dikkat çeken takım.',
+          foundedDate: '2020-09-08',
+          captainId: 4,
+          members: [4],
+          memberCount: 1,
+          location: 'Ankara/Keçiören',
+          homeVenue: 'Keçiören Sports Center',
+          matchesPlayed: 67,
+          wins: 41,
+          draws: 14,
+          losses: 12,
+          points: 137,
+          goalsFor: 178,
+          goalsAgainst: 89,
+          trophies: 2,
+          achievements: [
+            'Keçiören Kupası Şampiyonu 2024',
+            'En Genç Takım Ödülü 2023'
+          ],
+          createdAt: '2020-09-08T00:00:00.000Z',
+          updatedAt: new Date().toISOString()
         }
       ];
-      this.setData('teams', defaultTeams);
+      this.setData('teams', realTeams);
     }
 
-    // Maç verileri
+    // Maç verileri - Gerçek maç bilgileri
     if (!localStorage.getItem('paslios_matches')) {
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      const dayAfterTomorrow = new Date(today);
-      dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+      const nextWeek = new Date(today);
+      nextWeek.setDate(nextWeek.getDate() + 7);
 
-      const defaultMatches = [
+      const realMatches = [
         {
           id: 1,
           type: 'individual',
-          title: 'Ankara Spor Halısaha',
+          title: 'Akşam Halısaha Maçı',
           date: today.toISOString().split('T')[0],
-          time: '19:00',
-          location: 'Çankaya, Ankara',
-          players: ['Ahmet Y.', 'Mehmet K.', 'Ali D.', 'Can S.', 'Emre T.', 'Burak A.', 'Cem K.', 'Oğuz M.'],
+          time: '19:30',
+          venue: 'Çankaya Halısaha Complex',
+          location: 'Ankara/Çankaya',
+          players: [1, 2, 3, 5],
           maxPlayers: 10,
-          currentPlayers: 8,
+          currentPlayers: 4,
           price: 25,
           status: 'waiting',
           organizer: 'Ahmet Yılmaz',
-          organizerId: 1
+          organizerId: 1,
+          description: 'Hafta sonundan önce güzel bir maç yapalım!',
+          skillLevel: 'intermediate',
+          duration: 90,
+          pitchType: 'halısaha',
+          createdAt: new Date().toISOString()
         },
         {
           id: 2,
           type: 'individual',
-          title: 'Çimenli Futbol Sahası',
+          title: 'Pazartesi Akşam Futbolu',
           date: tomorrow.toISOString().split('T')[0],
-          time: '20:30',
-          location: 'Keçiören, Ankara',
-          players: ['Mehmet K.', 'Ali D.', 'Can S.', 'Emre T.', 'Burak A.', 'Cem K.', 'Oğuz M.', 'Serkan Y.', 'Tolga B.', 'Murat K.'],
-          maxPlayers: 10,
-          currentPlayers: 10,
+          time: '20:00',
+          venue: 'Keçiören Sports Center',
+          location: 'Ankara/Keçiören',
+          players: [2, 4, 6],
+          maxPlayers: 12,
+          currentPlayers: 3,
           price: 30,
-          status: 'full',
+          status: 'waiting',
           organizer: 'Mehmet Kaya',
-          organizerId: 2
+          organizerId: 2,
+          description: 'Haftaya iyi başlayalım. Tüm seviyelerden oyuncular davetli.',
+          skillLevel: 'beginner',
+          duration: 90,
+          pitchType: 'çim',
+          createdAt: '2024-12-20T14:30:00.000Z'
         },
         {
           id: 3,
           type: 'team',
-          title: 'Çankaya Tigers vs Mamak Yıldızları',
-          date: dayAfterTomorrow.toISOString().split('T')[0],
+          title: 'Çankaya Tigers vs Keçiören Wolves',
+          date: nextWeek.toISOString().split('T')[0],
           time: '15:00',
-          location: 'Mamak Sports Complex',
-          teamA: { id: 1, name: 'Çankaya Tigers' },
-          teamB: { id: 2, name: 'Mamak Yıldızları' },
+          venue: 'Ankara Büyükşehir Stadyumu',
+          location: 'Ankara/Merkez',
+          homeTeam: 1,
+          awayTeam: 2,
+          maxPlayers: 22,
+          currentPlayers: 22,
+          price: 0,
           status: 'confirmed',
-          tournament: 'Ankara Amatör Ligi'
+          organizer: 'Çankaya Tigers FC',
+          organizerId: 1,
+          description: 'Sezonun en büyük derbisi! İki güçlü takım karşı karşıya.',
+          skillLevel: 'advanced',
+          duration: 90,
+          pitchType: 'çim',
+          isCompetitive: true,
+          createdAt: '2024-12-15T10:00:00.000Z'
+        },
+        {
+          id: 4,
+          type: 'individual',
+          title: 'Öğle Arası Hızlı Maç',
+          date: today.toISOString().split('T')[0],
+          time: '12:30',
+          venue: 'Tunalı Sports Club',
+          location: 'Ankara/Çankaya',
+          players: [1, 3],
+          maxPlayers: 8,
+          currentPlayers: 2,
+          price: 20,
+          status: 'waiting',
+          organizer: 'Ali Demir',
+          organizerId: 3,
+          description: 'Öğle molasında kısa bir maç. 45 dakika sürecek.',
+          skillLevel: 'intermediate',
+          duration: 45,
+          pitchType: 'halısaha',
+          createdAt: '2024-12-21T08:00:00.000Z'
         }
       ];
-      this.setData('matches', defaultMatches);
+      this.setData('matches', realMatches);
     }
 
-    // Mesaj verileri
+    // Mesaj verileri - Gerçek mesajlaşma sistemi
     if (!localStorage.getItem('paslios_messages')) {
       const defaultMessages = [
         {

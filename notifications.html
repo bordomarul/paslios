@@ -5,7 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paslios - Bildirimler">
     <link href="output.css" rel="stylesheet">
+    <link href="css/toast.css" rel="stylesheet">
     <title>Paslios - Bildirimler</title>
+    <script>
+      // Check authentication immediately
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      if (!currentUser) {
+        window.location.href = 'index.html';
+      }
+    </script>
     <style>
       * {
         margin: 0;
@@ -469,27 +477,56 @@
     <div id="toastContainer"></div>
 
     <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
     <script>
       // Initialize data and check authentication
-      const PasliosData = new PasliosData();
       let currentUser = null;
+      let PasliosData = null;
+
+      // Load external scripts asynchronously
+      async function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+
+      // Initialize page after authentication check
+      async function initializePage() {
+        try {
+          // Initialize data system
+          if (typeof PasliosData === 'undefined') {
+            await loadScript('js/data.js');
+          }
+          PasliosData = new window.PasliosData();
+          
+          // Get current user from localStorage
+          const userData = localStorage.getItem('currentUser');
+          if (!userData) {
+            window.location.href = 'index.html';
+            return;
+          }
+          
+          currentUser = JSON.parse(userData);
+          
+          // Load page content
+          loadNotifications();
+          setupEventListeners();
+          updateNotificationCount();
+          
+        } catch (error) {
+          console.error('Error initializing page:', error);
+          if (window.ToastManager) {
+            ToastManager.show('❌ Sayfa yüklenirken hata oluştu', 'error');
+          }
+        }
+      }
 
       // Check authentication on page load
-      document.addEventListener('DOMContentLoaded', function() {
-        currentUser = PasliosData.getCurrentUser();
-        if (!currentUser) {
-          window.location.href = 'index.html';
-          return;
-        }
-
-        initializePage();
-      });
-
-      function initializePage() {
-        loadNotifications();
-        setupEventListeners();
-        updateNotificationCount();
-      }
+      document.addEventListener('DOMContentLoaded', initializePage);
 
       function loadNotifications() {
         const notifications = PasliosData.getNotifications(currentUser.id);
@@ -825,27 +862,14 @@
         });
       }
 
-      // Toast functions
+      // Toast functions using ToastManager
       function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        
-        const container = document.getElementById('toastContainer');
-        if (container) {
-          container.appendChild(toast);
+        if (window.ToastManager) {
+          ToastManager.show(message, type);
         } else {
-          document.body.appendChild(toast);
+          // Fallback
+          console.log(`Toast: ${message} (${type})`);
         }
-        
-        // Show toast
-        setTimeout(() => toast.classList.add('show'), 100);
-        
-        // Hide and remove toast
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
       }
       
       // Modal functions

@@ -6,6 +6,12 @@
     <meta name="description" content="Paslios - Takım Oluştur">
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Takım Oluştur</title>
+    <script>
+        // Authentication check - redirect if not logged in
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+    </script>
     <style>
       * {
         margin: 0;
@@ -519,19 +525,79 @@
     </div>
 
     <script>
+      // Load required scripts
+      const loadScript = (src) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      // Initialize the page
+      async function initializePage() {
+        try {
+          await Promise.all([
+            loadScript('js/data.js'),
+            loadScript('js/toast.js')
+          ]);
+          console.log('Scripts loaded successfully');
+          
+          // Authentication check
+          if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+            return;
+          }
+          
+          checkEditMode();
+        } catch (error) {
+          console.error('Error loading scripts:', error);
+        }
+      }
+
       let selectedEmoji = '🐅';
       let selectedColor = '#10b981';
       let selectedPrivacy = 'public';
+      let isEditMode = false;
 
-      // Toast Notification System
-      function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
+      function checkEditMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        isEditMode = urlParams.get('edit') === 'true';
+        
+        if (isEditMode) {
+          document.querySelector('.page-title').textContent = 'Takımı Düzenle';
+          document.querySelector('.create-btn').textContent = 'Güncelle';
+          
+          // Load existing team data for editing
+          loadExistingTeamData();
+        }
+      }
 
-        setTimeout(() => {
-          toast.classList.add('show');
+      function loadExistingTeamData() {
+        // Demo existing team data
+        const existingTeam = {
+          name: 'Çankaya Tigers',
+          emoji: '🐅',
+          color: '#10b981',
+          location: 'Çankaya, Ankara',
+          description: 'Çankaya bölgesinin en aktif futbol takımı',
+          privacy: 'public'
+        };
+
+        document.getElementById('teamName').value = existingTeam.name;
+        document.getElementById('teamLocation').value = existingTeam.location;
+        document.getElementById('teamDescription').value = existingTeam.description;
+        
+        selectedEmoji = existingTeam.emoji;
+        selectedColor = existingTeam.color;
+        selectedPrivacy = existingTeam.privacy;
+        
+        updateSelectedEmoji();
+        updateSelectedColor();
+        updateSelectedPrivacy();
+      }
         }, 100);
 
         setTimeout(() => {
@@ -578,12 +644,23 @@
         const teamLocation = document.getElementById('teamLocation').value;
 
         if (!teamName) {
-          showToast('⚠️ Lütfen takım adını girin!', 'warning');
+          if (window.ToastManager) {
+            ToastManager.show('⚠️ Lütfen takım adını girin!', 'warning');
+          }
           return;
         }
 
         if (teamName.length < 3) {
-          showToast('⚠️ Takım adı en az 3 karakter olmalıdır!', 'warning');
+          if (window.ToastManager) {
+            ToastManager.show('⚠️ Takım adı en az 3 karakter olmalıdır!', 'warning');
+          }
+          return;
+        }
+
+        if (!teamLocation) {
+          if (window.ToastManager) {
+            ToastManager.show('⚠️ Lütfen takım lokasyonunu seçin!', 'warning');
+          }
           return;
         }
 
@@ -600,16 +677,49 @@
           createdAt: new Date().toISOString()
         };
 
-        // Başarı mesajı
-        showToast(`🎉 "${teamName}" takımı başarıyla oluşturuldu! ${selectedEmoji}`, 'success');
-        
-        // Profil sayfasına yönlendir
-        setTimeout(() => {
-          showToast('📱 Profil sayfasına yönlendiriliyorsunuz...', 'info');
+        try {
+          // Store team data (simple approach)
+          const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+          let teams = JSON.parse(localStorage.getItem('teams') || '[]');
+          
+          if (isEditMode) {
+            // Update existing team
+            const teamIndex = teams.findIndex(t => t.id === 1);
+            if (teamIndex >= 0) {
+              teams[teamIndex] = { ...teams[teamIndex], ...teamData };
+            }
+            
+            if (window.ToastManager) {
+              ToastManager.show('🎉 Takım bilgileri güncellendi!', 'success');
+            }
+          } else {
+            // Create new team
+            teamData.id = Date.now();
+            teamData.captainId = currentUser.id;
+            teams.push(teamData);
+            
+            if (window.ToastManager) {
+              ToastManager.show(`🎉 "${teamName}" takımı başarıyla oluşturuldu! ${selectedEmoji}`, 'success');
+            }
+          }
+          
+          localStorage.setItem('teams', JSON.stringify(teams));
+          
           setTimeout(() => {
-            window.location.href = 'profile.html';
-          }, 1500);
-        }, 2000);
+            if (window.ToastManager) {
+              ToastManager.show('📱 Takım sayfasına yönlendiriliyorsunuz...', 'info');
+            }
+            setTimeout(() => {
+              window.location.href = 'team.html';
+            }, 1500);
+          }, 2000);
+          
+        } catch (error) {
+          console.error('Error creating/updating team:', error);
+          if (window.ToastManager) {
+            ToastManager.show('❌ Bir hata oluştu. Tekrar deneyin.', 'error');
+          }
+        }
       }
 
       function getPrivacyText(privacy) {
@@ -621,20 +731,9 @@
         }
       }
 
-      // Form validasyonu
-      document.getElementById('teamName').addEventListener('input', function() {
-        const createBtn = document.querySelector('.create-btn');
-        if (this.value.trim().length >= 3) {
-          createBtn.disabled = false;
-        } else {
-          createBtn.disabled = true;
-        }
-      });
-
-      // Sayfa yüklendiğinde butonu devre dışı bırak
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelector('.create-btn').disabled = true;
-      });
+      function goBack() {
+        window.history.back();
+      }
     </script>
   </body>
 </html>

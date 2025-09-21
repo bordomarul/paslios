@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paslios - Liderlik Tablosu">
     <link href="output.css" rel="stylesheet">
+    <link href="css/toast.css" rel="stylesheet">
     <title>Paslios - Liderlik Tablosu</title>
+    <script>
+      // Check authentication immediately
+      if (!localStorage.getItem('currentUser')) {
+        window.location.href = 'index.html';
+      }
+    </script>
     <style>
       * {
         margin: 0;
@@ -14,10 +21,7 @@
       }
       
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'S        <a href="messages.html" class="nav-item">
-          <span style="font-size: 0.8rem; font-weight: bold;">MSG</span>
-          <span>Mesajlar</span>
-        </a> UI', Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background: #f9fafb;
         min-height: 100vh;
         display: flex;
@@ -512,7 +516,197 @@
       </div>
     </div>
 
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
     <script>
+      let currentUser = null;
+      let PasliosData = null;
+
+      // Load external scripts asynchronously
+      async function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+
+      // Initialize page after authentication check
+      async function initializePage() {
+        try {
+          // Initialize data system
+          if (typeof PasliosData === 'undefined') {
+            await loadScript('js/data.js');
+          }
+          PasliosData = new window.PasliosData();
+          
+          // Get current user from localStorage
+          const userData = localStorage.getItem('currentUser');
+          if (!userData) {
+            window.location.href = 'index.html';
+            return;
+          }
+          
+          currentUser = JSON.parse(userData);
+          
+          // Load leaderboards
+          loadLeaderboards();
+          setupEventListeners();
+          
+        } catch (error) {
+          console.error('Error initializing page:', error);
+          if (window.ToastManager) {
+            ToastManager.show('❌ Sayfa yüklenirken hata oluştu', 'error');
+          }
+        }
+      }
+
+      function loadLeaderboards() {
+        if (!PasliosData || !currentUser) return;
+
+        try {
+          // Get all users with their statistics
+          const users = PasliosData.getAllUsers();
+          const userStats = users.map(user => {
+            const stats = PasliosData.getUserStats(user.id);
+            return {
+              ...user,
+              ...stats,
+              totalPoints: calculateUserPoints(stats)
+            };
+          });
+
+          // Sort by total points
+          userStats.sort((a, b) => b.totalPoints - a.totalPoints);
+
+          // Load different period leaderboards
+          loadWeeklyLeaderboard(userStats);
+          loadMonthlyLeaderboard(userStats);
+          loadAllTimeLeaderboard(userStats);
+          
+          // Update current user's position
+          updateMyRanking(userStats);
+
+        } catch (error) {
+          console.error('Error loading leaderboards:', error);
+          if (window.ToastManager) {
+            ToastManager.show('❌ Liderlik tablosu yüklenemedi', 'error');
+          }
+        }
+      }
+
+      function calculateUserPoints(stats) {
+        // Point calculation system
+        const points = {
+          matchesPlayed: (stats.matchesPlayed || 0) * 10,
+          matchesWon: (stats.matchesWon || 0) * 25,
+          goalsScored: (stats.goalsScored || 0) * 5,
+          assists: (stats.assists || 0) * 3,
+          cleanSheets: (stats.cleanSheets || 0) * 15,
+          mvpAwards: (stats.mvpAwards || 0) * 50
+        };
+
+        return Object.values(points).reduce((total, point) => total + point, 0);
+      }
+
+      function loadWeeklyLeaderboard(userStats) {
+        const weeklyStats = userStats.filter(user => {
+          // Filter for last 7 days activity
+          const lastWeek = new Date();
+          lastWeek.setDate(lastWeek.getDate() - 7);
+          return user.lastMatchDate && new Date(user.lastMatchDate) >= lastWeek;
+        }).slice(0, 10);
+
+        renderLeaderboard('weekly', weeklyStats);
+      }
+
+      function loadMonthlyLeaderboard(userStats) {
+        const monthlyStats = userStats.filter(user => {
+          // Filter for last 30 days activity
+          const lastMonth = new Date();
+          lastMonth.setDate(lastMonth.getDate() - 30);
+          return user.lastMatchDate && new Date(user.lastMatchDate) >= lastMonth;
+        }).slice(0, 10);
+
+        renderLeaderboard('monthly', monthlyStats);
+      }
+
+      function loadAllTimeLeaderboard(userStats) {
+        const allTimeStats = userStats.slice(0, 10);
+        renderLeaderboard('alltime', allTimeStats);
+      }
+
+      function renderLeaderboard(periodId, stats) {
+        const container = document.querySelector(`#${periodId} .leaderboard-list`);
+        if (!container) return;
+
+        container.innerHTML = stats.map((user, index) => {
+          const rank = index + 1;
+          const isCurrentUser = user.id === currentUser.id;
+          
+          return `
+            <div class="rank-item ${isCurrentUser ? 'my-rank-item' : ''}" onclick="viewUserProfile('${user.id}')">
+              <div class="rank-number ${getRankClass(rank)}">
+                ${rank}
+              </div>
+              <div class="player-avatar">
+                <img src="${user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=10b981&color=fff'}" 
+                     alt="${user.name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+              </div>
+              <div class="player-info">
+                <div class="player-name">${user.name} ${isCurrentUser ? '(Sen)' : ''}</div>
+                <div class="player-stats">
+                  ${user.matchesPlayed || 0} maç • ${user.totalPoints} puan
+                </div>
+              </div>
+              <div class="player-score">
+                <div class="score-number">${user.totalPoints}</div>
+                <div class="score-label">puan</div>
+              </div>
+              ${isCurrentUser ? '<div class="current-user-badge">👤</div>' : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      function getRankClass(rank) {
+        if (rank === 1) return 'gold';
+        if (rank === 2) return 'silver';
+        if (rank === 3) return 'bronze';
+        return 'regular';
+      }
+
+      function updateMyRanking(userStats) {
+        const myIndex = userStats.findIndex(user => user.id === currentUser.id);
+        const myRank = myIndex >= 0 ? myIndex + 1 : '-';
+        const myPoints = myIndex >= 0 ? userStats[myIndex].totalPoints : 0;
+        const myMatches = myIndex >= 0 ? userStats[myIndex].matchesPlayed || 0 : 0;
+
+        // Update my rank display
+        const myRankElement = document.querySelector('.my-rank');
+        const myRankLabel = document.querySelector('.my-rank-label');
+        
+        if (myRankElement) {
+          myRankElement.textContent = myRank !== '-' ? `#${myRank}` : 'Unranked';
+        }
+        
+        if (myRankLabel) {
+          myRankLabel.textContent = myRank !== '-' 
+            ? `${myMatches} maç ile ${myRank}. sıradasın (${myPoints} puan)`
+            : 'Henüz sıralamada yer almıyorsun';
+        }
+      }
+
+      function viewUserProfile(userId) {
+        if (userId === currentUser.id) {
+          window.location.href = 'profile.html';
+        } else {
+          window.location.href = `user-profile.html?id=${userId}`;
+        }
+      }
+
       function switchTab(event, tabName) {
         // Hide all leaderboards
         const leaderboards = document.querySelectorAll('.leaderboard');
@@ -527,26 +721,37 @@
         });
         
         // Show selected leaderboard
-        document.getElementById(tabName).style.display = 'flex';
+        const selectedBoard = document.getElementById(tabName);
+        if (selectedBoard) {
+          selectedBoard.style.display = 'flex';
+        }
         
         // Add active class to clicked tab
         event.target.classList.add('active');
         
-        // Update my ranking based on tab
-        const myRank = document.querySelector('.my-rank');
-        const myRankLabel = document.querySelector('.my-rank-label');
-        
-        if (tabName === 'weekly') {
-          myRank.textContent = '#12';
-          myRankLabel.textContent = '3 maç ile 12. sıradasın';
-        } else if (tabName === 'monthly') {
-          myRank.textContent = '#8';
-          myRankLabel.textContent = '9 maç ile 8. sıradasın';
-        } else if (tabName === 'alltime') {
-          myRank.textContent = '#45';
-          myRankLabel.textContent = '24 maç ile 45. sıradasın';
+        // Track tab switch
+        if (window.ToastManager) {
+          const tabNames = {
+            'weekly': 'Haftalık',
+            'monthly': 'Aylık', 
+            'alltime': 'Tüm Zamanlar'
+          };
+          ToastManager.show(`📊 ${tabNames[tabName]} liderlik tablosu yüklendi`, 'info');
         }
       }
+
+      function setupEventListeners() {
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', function(event) {
+            const tabName = this.dataset.tab || this.onclick.toString().match(/switchTab\([^,]+,\s*'([^']+)'/)[1];
+            switchTab(event, tabName);
+          });
+        });
+      }
+
+      // Initialize page
+      document.addEventListener('DOMContentLoaded', initializePage);
     </script>
   </body>
 </html>
