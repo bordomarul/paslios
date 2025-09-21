@@ -567,8 +567,8 @@
         if (!PasliosData || !currentUser) return;
 
         try {
-          // Get all users with their statistics
-          const users = PasliosData.getAllUsers();
+          // Sadece kayıtlı gerçek kullanıcıları göster
+          const users = [currentUser]; // Şimdilik sadece mevcut kullanıcı
           const userStats = users.map(user => {
             const stats = PasliosData.getUserStats(user.id);
             return {

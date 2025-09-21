@@ -6,12 +6,10 @@
     <meta name="description" content="Paslios - Maçlar">
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Maçlar</title>
-    <script>
-        // Authentication check - redirect if not logged in
-        if (!localStorage.getItem('currentUser')) {
-            window.location.href = 'index.html';
-        }
-    </script>
+    
+    <!-- Authentication Guard -->
+    <script src="js/auth-guard.js"></script>
+    
     <style>
       * {
         margin: 0;
@@ -617,7 +615,7 @@
       <div id="individual-matches" class="tab-content active">
         <!-- Quick Actions -->
         <div class="quick-actions">
-          <button class="action-btn primary" onclick="createMatch()">⚽ Maç Oluştur</button>
+          <button class="action-btn primary" onclick="window.location.href='booking.html'">⚽ Maç Oluştur</button>
           <button class="action-btn secondary" onclick="filterMatches()">🔍 Filtrele</button>
         </div>
 

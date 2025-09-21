@@ -6,6 +6,10 @@
     <meta name="description" content="Paslios - Ana Sayfa">
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Ana Sayfa</title>
+    
+    <!-- Authentication Guard -->
+    <script src="js/auth-guard.js"></script>
+    
     <style>
       * {
         margin: 0;
@@ -566,6 +570,68 @@
         cursor: not-allowed;
         transform: none;
       }
+      
+      /* Yorum görüntüleme stilleri */
+      .post-comments-section {
+        margin-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1rem;
+      }
+      
+      .comments-header {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+      }
+      
+      .comment-item {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      
+      .comment-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      
+      .comment-content {
+        flex: 1;
+        min-width: 0;
+      }
+      
+      .comment-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .comment-author {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+      }
+      
+      .comment-time {
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+      
+      .comment-text {
+        color: #374151;
+        font-size: 0.875rem;
+        line-height: 1.4;
+        word-wrap: break-word;
+      }
     </style>
   </head>
   <body>
@@ -699,16 +765,45 @@
     <script>
       // Sayfa yüklendiğinde oturum kontrolü
       document.addEventListener('DOMContentLoaded', function() {
-        if (!PasliosData.isLoggedIn()) {
+        console.log('Home sayfa yüklendi');
+        console.log('window.pasliosData:', window.pasliosData);
+        console.log('window.PasliosData:', window.PasliosData);
+        
+        // pasliosData yüklenene kadar bekle
+        if (typeof pasliosData === 'undefined') {
+          console.error('pasliosData yüklenmedi! Script yükleme sorunu var.');
+          setTimeout(() => {
+            if (typeof pasliosData !== 'undefined') {
+              console.log('pasliosData gecikmeli olarak yüklendi');
+              initializePage();
+            } else {
+              console.error('pasliosData hala yüklenmedi!');
+            }
+          }, 1000);
+          return;
+        }
+        
+        initializePage();
+      });
+      
+      function initializePage() {
+        console.log('initializePage çağırıldı');
+        console.log('pasliosData:', window.pasliosData);
+        console.log('isAuthenticated:', pasliosData.isAuthenticated());
+        console.log('currentUser:', pasliosData.getCurrentUser());
+        
+        if (!pasliosData.isAuthenticated()) {
+          console.log('Kullanıcı giriş yapmamış, index.html\'e yönlendiriliyor');
           window.location.href = 'index.html';
           return;
         }
         
+        console.log('Kullanıcı giriş yapmış, sayfa yükleniyor...');
         loadUserInfo();
-        loadUpcomingMatches();
+        // loadUpcomingMatches(); // Geçici olarak devre dışı
         loadSocialFeed();
         setupEventListeners();
-      });
+      }
 
       function loadUserInfo() {
         // localStorage'dan gerçek kullanıcı verilerini oku
@@ -852,14 +947,21 @@
       }
 
       function loadSocialFeed() {
-        const posts = PasliosData.getPosts(5);
+        console.log('loadSocialFeed çağırıldı');
+        const posts = pasliosData.getPosts(5);
+        console.log('Bulunan posts:', posts);
         const feedContainer = document.querySelector('#socialFeed');
+        console.log('feedContainer:', feedContainer);
         
-        if (!feedContainer) return;
+        if (!feedContainer) {
+          console.log('feedContainer bulunamadı!');
+          return;
+        }
 
         feedContainer.innerHTML = '';
 
         if (posts.length === 0) {
+          console.log('Hiç gönderi yok, boş mesaj gösteriliyor');
           feedContainer.innerHTML = `
             <div class="post-card" style="text-align: center; color: #6b7280;">
               <p>Henüz gönderi yok</p>
@@ -869,25 +971,56 @@
           return;
         }
 
+        console.log('Gönderiler yükleniyor:', posts.length, 'adet');
         posts.forEach(post => {
           const postCard = createPostCard(post);
           feedContainer.appendChild(postCard);
         });
+        console.log('Gönderiler yüklendi');
       }
 
       function createPostCard(post) {
         const timeAgo = PasliosData.formatTimeAgo(post.timestamp);
+        console.log('createPostCard çağırıldı, post:', post);
+        console.log('timeAgo:', timeAgo);
         
         // localStorage'dan gerçek kullanıcı verilerini oku
         const currentUserData = localStorage.getItem('currentUser');
         const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
         const isLiked = currentUser && post.likedBy.includes(currentUser.id);
+        
+        // Yorum sayısını hesapla
+        const commentCount = post.comments ? post.comments.length : 0;
+        
+        // Yorumları HTML olarak oluştur
+        let commentsHtml = '';
+        if (post.comments && post.comments.length > 0) {
+          commentsHtml = `
+            <div class="post-comments-section">
+              <div class="comments-header">Yorumlar (${commentCount})</div>
+              <div class="comments-list">
+                ${post.comments.map(comment => `
+                  <div class="comment-item">
+                    <div class="comment-avatar">${comment.authorAvatar || '👤'}</div>
+                    <div class="comment-content">
+                      <div class="comment-header">
+                        <span class="comment-author">${comment.authorName}</span>
+                        <span class="comment-time">${PasliosData.formatTimeAgo(comment.timestamp)}</span>
+                      </div>
+                      <div class="comment-text">${comment.content}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
 
         const postCard = document.createElement('div');
         postCard.className = 'post-card';
         postCard.innerHTML = `
           <div class="post-header">
-            <div class="post-avatar">${post.authorAvatar}</div>
+            <div class="post-avatar">${post.authorAvatar || '👤'}</div>
             <div class="post-info">
               <div class="post-author" onclick="viewUserProfile(${post.authorId})">${post.authorName}</div>
               <div class="post-time">${timeAgo}</div>
@@ -896,13 +1029,15 @@
           <div class="post-content">${post.content}</div>
           <div class="post-actions">
             <span class="post-likes ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id}, this)">
-              ${isLiked ? '❤️' : '🤍'} ${post.likes}
+              ${isLiked ? '❤️' : '🤍'} ${post.likedBy ? post.likedBy.length : 0}
             </span>
-            <span class="post-comments" onclick="commentPost(${post.id}, this)">💬 ${post.comments}</span>
-            <span class="post-shares" onclick="sharePost(${post.id}, this)">🔗 ${post.shares}</span>
+            <span class="post-comments" onclick="commentPost(${post.id}, this)">💬 ${commentCount}</span>
+            <span class="post-shares" onclick="sharePost(${post.id}, this)">🔗 0</span>
           </div>
+          ${commentsHtml}
         `;
 
+        console.log('Post card oluşturuldu:', postCard);
         return postCard;
       }
 
@@ -946,22 +1081,33 @@
 
       // Post interaction functions
       function likePost(postId, element) {
-        const result = PasliosData.likePost(postId);
+        const result = pasliosData.togglePostLike(postId);
         
-        if (result.success) {
-          element.innerHTML = `${result.liked ? '❤️' : '🤍'} ${result.likes}`;
-          element.className = `post-likes ${result.liked ? 'liked' : ''}`;
+        if (result) {
+          // Güncellenmiş post bilgilerini al
+          const posts = pasliosData.getPosts();
+          const post = posts.find(p => p.id === postId);
           
-          // Add animation
-          element.style.transform = 'scale(1.2)';
-          setTimeout(() => {
-            element.style.transform = 'scale(1)';
-          }, 200);
-          
-          ToastManager.show(
-            result.liked ? 'Gönderi beğenildi! ❤️' : 'Beğeni kaldırıldı',
-            result.liked ? 'success' : 'info'
-          );
+          if (post) {
+            const currentUserData = localStorage.getItem('currentUser');
+            const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
+            const isLiked = currentUser && post.likedBy.includes(currentUser.id);
+            const likeCount = post.likedBy ? post.likedBy.length : 0;
+            
+            element.innerHTML = `${isLiked ? '❤️' : '🤍'} ${likeCount}`;
+            element.className = `post-likes ${isLiked ? 'liked' : ''}`;
+            
+            // Add animation
+            element.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+              element.style.transform = 'scale(1)';
+            }, 200);
+            
+            ToastManager.show(
+              isLiked ? 'Gönderi beğenildi! ❤️' : 'Beğeni kaldırıldı',
+              isLiked ? 'success' : 'info'
+            );
+          }
         }
       }
 
@@ -970,37 +1116,59 @@
       let currentCommentElement = null;
       
       function commentPost(postId, element) {
+        console.log('commentPost çağırıldı, postId:', postId, 'element:', element);
         currentCommentPostId = postId;
         currentCommentElement = element;
         
-        const posts = PasliosData.getPosts();
+        const posts = pasliosData.getPosts();
         const post = posts.find(p => p.id === postId);
+        console.log('Bulunan post:', post);
         
         if (post) {
           // Set author info in modal
           document.getElementById('commentAuthorName').textContent = post.authorName;
-          document.getElementById('commentAuthorAvatar').textContent = post.authorAvatar;
+          document.getElementById('commentAuthorAvatar').textContent = post.authorAvatar || '👤';
           document.getElementById('commentText').value = '';
           
           // Show modal
           const modal = document.getElementById('commentModal');
-          modal.style.display = 'flex';
-          setTimeout(() => modal.classList.add('show'), 10);
-          
-          // Focus textarea
-          setTimeout(() => document.getElementById('commentText').focus(), 100);
+          console.log('Modal element:', modal);
+          if (modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            
+            // Focus textarea
+            setTimeout(() => document.getElementById('commentText').focus(), 100);
+          } else {
+            console.error('Comment modal bulunamadı!');
+          }
+        } else {
+          console.error('Post bulunamadı!');
         }
       }
       
       function closeCommentModal() {
+        console.log('closeCommentModal çağırıldı');
         const modal = document.getElementById('commentModal');
-        modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 200);
+        const commentText = document.getElementById('commentText');
+        
+        if (modal) {
+          modal.classList.remove('show');
+          modal.style.display = 'none'; // Hemen gizle
+          console.log('Modal gizlendi');
+        }
+        
+        if (commentText) {
+          commentText.value = ''; // Text alanını temizle
+        }
+        
         currentCommentPostId = null;
         currentCommentElement = null;
+        console.log('Modal kapatma işlemi tamamlandı');
       }
       
       function submitComment() {
+        console.log('submitComment çağırıldı');
         const commentText = document.getElementById('commentText').value.trim();
         if (!commentText) {
           ToastManager.show('Lütfen bir yorum yazın', 'error');
@@ -1008,13 +1176,23 @@
         }
         
         if (currentCommentPostId && currentCommentElement) {
-          const result = PasliosData.addComment(currentCommentPostId, commentText);
+          console.log('Yorum ekleniyor...', commentText);
+          const result = pasliosData.addComment(currentCommentPostId, commentText);
           
           if (result.success) {
-            currentCommentElement.textContent = `💬 ${result.comments}`;
-            ToastManager.show(`Yorumunuz eklendi: "${commentText}"`, 'success');
+            console.log('Yorum başarıyla eklendi');
+            ToastManager.show(`Yorumunuz eklendi!`, 'success');
+            
+            // Önce modal'ı kapat
             closeCommentModal();
+            
+            // Sonra feed'i yenile (kısa gecikme)
+            setTimeout(() => {
+              console.log('Feed yenileniyor...');
+              loadSocialFeed();
+            }, 100);
           } else {
+            console.log('Yorum ekleme hatası:', result.message);
             ToastManager.show(result.message, 'error');
           }
         }

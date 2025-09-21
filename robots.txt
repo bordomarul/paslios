@@ -2,15 +2,32 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://paslios.com/sitemap.xml
+Sitemap: https://yourdomain.com/sitemap.xml
 
-# Disallow admin areas (if any in future)
+# Main pages
+Allow: /home
+Allow: /matches
+Allow: /booking
+Allow: /profile
+Allow: /register
+Allow: /search
+Allow: /leaderboard
+Allow: /contact
+Allow: /help-center
+Allow: /privacy-policy
+Allow: /terms-of-service
+
+# Static files
+Allow: /js/
+Allow: /css/
+Allow: /output.css
+
+# Disallow private/admin areas
 Disallow: /admin/
 Disallow: /api/
+Disallow: /settings/
+Disallow: /messages/
 
-# Allow important pages
-Allow: /index.html
-Allow: /register.html
-Allow: /home.html
-Allow: /about.html
-Allow: /contact.html
+# Disallow temporary and test files
+Disallow: /*?test=*
+Disallow: /*?debug=*

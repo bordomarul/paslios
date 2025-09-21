@@ -703,13 +703,10 @@
                     createdAt: new Date().toISOString()
                 };
                 
-                // Add post using PasliosData
-                if (window.PasliosData) {
-                    PasliosData.addPost(postData);
-                }
+                // Yeni gönderi oluşturma sistemi
+                const result = pasliosData.createPost(text, 'text');
                 
-                // Simulate upload delay
-                setTimeout(() => {
+                if (result.success) {
                     if (window.ToastManager) {
                         ToastManager.show('Gönderiniz başarıyla paylaşıldı! 🎉', 'success');
                     }
@@ -718,7 +715,15 @@
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 1500);
-                }, 800);
+                } else {
+                    if (window.ToastManager) {
+                        ToastManager.show(result.message, 'error');
+                    }
+                    
+                    // Reset button state
+                    postBtn.disabled = false;
+                    postBtn.textContent = 'Paylaş';
+                }
                 
             } catch (error) {
                 console.error('Error creating post:', error);

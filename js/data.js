@@ -1,880 +1,763 @@
 // Paslios Data Management System
-// LocalStorage tabanlı gelişmiş veri yönetimi
+// Gerçek kullanıcılar için temiz veri yönetimi
 
 class PasliosData {
   constructor() {
     this.initializeDatabase();
   }
 
-  // Veritabanını başlat
+  // Temiz veritabanı başlatma
   initializeDatabase() {
-    // Kullanıcı verileri - Gerçek kullanıcı profilleri
+    // Kullanıcılar - başlangıçta boş
     if (!localStorage.getItem('paslios_users')) {
-      const realUsers = [
+      localStorage.setItem('paslios_users', JSON.stringify([]));
+    }
+    
+    // Gönderiler - başlangıçta boş
+    if (!localStorage.getItem('paslios_posts')) {
+      localStorage.setItem('paslios_posts', JSON.stringify([]));
+    }
+    
+    // Takımlar - başlangıçta boş
+    if (!localStorage.getItem('paslios_teams')) {
+      localStorage.setItem('paslios_teams', JSON.stringify([]));
+    }
+    
+    // Maçlar - başlangıçta boş
+    if (!localStorage.getItem('paslios_matches')) {
+      localStorage.setItem('paslios_matches', JSON.stringify([]));
+    }
+    
+    // Rezervasyonlar - başlangıçta boş
+    if (!localStorage.getItem('paslios_bookings')) {
+      localStorage.setItem('paslios_bookings', JSON.stringify([]));
+    }
+    
+    // Sahalar - demo sahalar
+    if (!localStorage.getItem('paslios_venues')) {
+      const venues = [
         {
           id: 1,
-          name: 'Ahmet Yılmaz',
-          email: 'ahmet.yilmaz@paslios.com',
-          phone: '0532 555 01 23',
-          position: 'Forvet',
-          rating: 4.7,
-          avatar: null, // UI-Avatars kullanılacak
-          bio: 'Yazılım mühendisi ve futbol tutkunu. 10 yıldır halısaha futbolu oynuyor.',
-          location: 'Ankara/Çankaya',
-          matchesPlayed: 127,
-          matchesWon: 89,
-          goals: 67,
-          assists: 34,
-          cleanSheets: 0,
-          mvpAwards: 12,
-          joinDate: '2023-08-15',
-          lastLoginDate: new Date().toISOString(),
-          isCurrentUser: true,
-          teamId: 1,
-          friendIds: [2, 3, 4, 5],
-          stats: {
-            totalPoints: 1247,
-            weeklyPoints: 85,
-            monthlyPoints: 324,
-            level: 15,
-            xp: 2456,
-            badgeIds: [1, 2, 3, 5, 8]
-          }
+          name: 'Arena Spor Kompleksi',
+          address: 'Çankaya, Ankara',
+          hourlyRate: 250,
+          features: ['Soyunma Odası', 'Duş', 'Otopark'],
+          type: 'futsal'
         },
         {
           id: 2,
-          name: 'Mehmet Kaya',
-          email: 'mehmet.kaya@gmail.com',
-          phone: '0533 444 67 89',
-          position: 'Orta Saha',
-          rating: 4.5,
-          avatar: null,
-          bio: 'Makine mühendisi. Pas verme konusunda uzman.',
-          location: 'Ankara/Keçiören',
-          matchesPlayed: 98,
-          matchesWon: 61,
-          goals: 23,
-          assists: 52,
-          cleanSheets: 0,
-          mvpAwards: 8,
-          joinDate: '2023-09-22',
-          lastLoginDate: '2024-12-20T15:30:00.000Z',
-          teamId: 1,
-          friendIds: [1, 3, 6],
-          stats: {
-            totalPoints: 987,
-            weeklyPoints: 72,
-            monthlyPoints: 289,
-            level: 12,
-            xp: 1876,
-            badgeIds: [1, 3, 4]
-          }
+          name: 'Champions League Sahası',
+          address: 'Kızılay, Ankara',
+          hourlyRate: 300,
+          features: ['Soyunma Odası', 'Duş', 'Otopark', 'Kafeterya'],
+          type: 'football'
         },
         {
           id: 3,
-          name: 'Ali Demir',
-          email: 'ali.demir@hotmail.com',
-          phone: '0534 777 12 34',
-          position: 'Defans',
-          rating: 4.8,
-          avatar: null,
-          bio: 'Güvenilir defans oyuncusu. Temiz oyun tarzıyla tanınır.',
-          location: 'Ankara/Mamak',
-          matchesPlayed: 156,
-          matchesWon: 98,
-          goals: 12,
-          assists: 18,
-          cleanSheets: 47,
-          mvpAwards: 15,
-          joinDate: '2023-07-10',
-          lastLoginDate: '2024-12-21T09:15:00.000Z',
-          teamId: 1,
-          friendIds: [1, 2, 4, 7],
-          stats: {
-            totalPoints: 1456,
-            weeklyPoints: 96,
-            monthlyPoints: 378,
-            level: 18,
-            xp: 3124,
-            badgeIds: [1, 2, 3, 6, 7, 9]
-          }
+          name: 'Goal Futsal Center',
+          address: 'Bahçelievler, Ankara',
+          hourlyRate: 200,
+          features: ['Soyunma Odası', 'Otopark'],
+          type: 'futsal'
+        }
+      ];
+      localStorage.setItem('paslios_venues', JSON.stringify(venues));
+    }
+    
+    // Sistem rozetleri - başarı sistemi için gerekli
+    if (!localStorage.getItem('paslios_badges')) {
+      const systemBadges = [
+        {
+          id: 1,
+          name: 'Hoş Geldin',
+          description: 'Paslios\'a katıldığın için tebrikler!',
+          icon: '🎉',
+          type: 'welcome',
+          rarity: 'common',
+          points: 50
+        },
+        {
+          id: 2,
+          name: 'İlk Gönderi',
+          description: 'İlk gönderini paylaştın!',
+          icon: '📝',
+          type: 'social',
+          rarity: 'common',
+          points: 25
+        },
+        {
+          id: 3,
+          name: 'İlk Maç',
+          description: 'İlk maçını oynadın!',
+          icon: '⚽',
+          type: 'match',
+          rarity: 'common',
+          points: 100
         },
         {
           id: 4,
-          name: 'Burak Özkan',
-          email: 'burak.ozkan@yahoo.com',
-          phone: '0535 888 99 00',
-          position: 'Kaleci',
-          rating: 4.6,
-          avatar: null,
-          bio: 'Deneyimli kaleci. Refleksleri çok iyi.',
-          location: 'Ankara/Etimesgut',
-          matchesPlayed: 89,
-          matchesWon: 67,
-          goals: 0,
-          assists: 3,
-          cleanSheets: 34,
-          mvpAwards: 11,
-          joinDate: '2023-10-05',
-          lastLoginDate: '2024-12-21T14:20:00.000Z',
-          teamId: 2,
-          friendIds: [1, 3, 5],
-          stats: {
-            totalPoints: 1123,
-            weeklyPoints: 78,
-            monthlyPoints: 312,
-            level: 14,
-            xp: 2234,
-            badgeIds: [1, 4, 5, 8]
-          }
+          name: 'Takım Oyuncusu',
+          description: 'Bir takıma katıldın!',
+          icon: '👥',
+          type: 'team',
+          rarity: 'common',
+          points: 150
         },
         {
           id: 5,
-          name: 'Emre Aydın',
-          email: 'emre.aydin@gmail.com',
-          phone: '0536 123 45 67',
-          position: 'Kanat',
-          rating: 4.4,
-          avatar: null,
-          bio: 'Hızlı kanat oyuncusu. Dripling konusunda yetenekli.',
-          location: 'Ankara/Yenimahalle',
-          matchesPlayed: 72,
-          matchesWon: 45,
-          goals: 31,
-          assists: 28,
-          cleanSheets: 0,
-          mvpAwards: 6,
-          joinDate: '2023-11-18',
-          lastLoginDate: '2024-12-20T18:45:00.000Z',
-          teamId: null,
-          friendIds: [1, 4, 6],
-          stats: {
-            totalPoints: 867,
-            weeklyPoints: 64,
-            monthlyPoints: 256,
-            level: 11,
-            xp: 1675,
-            badgeIds: [1, 2, 4]
-          }
-        },
-        {
-          id: 6,
-          name: 'Cem Yıldız',
-          email: 'cem.yildiz@outlook.com',
-          phone: '0537 456 78 90',
-          position: 'Orta Saha',
-          rating: 4.3,
-          avatar: null,
-          bio: 'Genç ve hırslı oyuncu. Sürekli gelişim halinde.',
-          location: 'Ankara/Altındağ',
-          matchesPlayed: 43,
-          matchesWon: 24,
-          goals: 8,
-          assists: 14,
-          cleanSheets: 0,
-          mvpAwards: 2,
-          joinDate: '2024-01-12',
-          lastLoginDate: '2024-12-21T11:30:00.000Z',
-          teamId: null,
-          friendIds: [2, 5],
-          stats: {
-            totalPoints: 534,
-            weeklyPoints: 45,
-            monthlyPoints: 187,
-            level: 7,
-            xp: 892,
-            badgeIds: [1]
-          }
+          name: 'Aktif Kullanıcı',
+          description: '7 gün üst üste giriş yaptın!',
+          icon: '🔥',
+          type: 'activity',
+          rarity: 'uncommon',
+          points: 200
         }
       ];
-      this.setData('users', realUsers);
-    }
-
-    // Takım verileri - Gerçek takım bilgileri
-    if (!localStorage.getItem('paslios_teams')) {
-      const realTeams = [
-        {
-          id: 1,
-          name: 'Çankaya Tigers FC',
-          emoji: '🐅',
-          color: '#ff6b35',
-          privacy: 'public',
-          description: 'Çankaya bölgesinin en deneyimli halısaha takımı. 2018\'den beri faaliyet gösteriyoruz.',
-          foundedDate: '2018-03-15',
-          captainId: 1,
-          members: [1, 2, 3],
-          memberCount: 3,
-          location: 'Ankara/Çankaya',
-          homeVenue: 'Çankaya Halısaha Complex',
-          matchesPlayed: 89,
-          wins: 58,
-          draws: 18,
-          losses: 13,
-          points: 192,
-          goalsFor: 234,
-          goalsAgainst: 127,
-          trophies: 5,
-          achievements: [
-            'Çankaya Ligi Şampiyonu 2023',
-            'En Fair Play Takımı 2024',
-            'Bölge Kupası Finalisti 2023'
-          ],
-          createdAt: '2018-03-15T00:00:00.000Z',
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 2,
-          name: 'Keçiören Wolves',
-          emoji: '🐺',
-          color: '#2d3748',
-          privacy: 'invite',
-          description: 'Genç ve dinamik oyuncu kadrosuyla dikkat çeken takım.',
-          foundedDate: '2020-09-08',
-          captainId: 4,
-          members: [4],
-          memberCount: 1,
-          location: 'Ankara/Keçiören',
-          homeVenue: 'Keçiören Sports Center',
-          matchesPlayed: 67,
-          wins: 41,
-          draws: 14,
-          losses: 12,
-          points: 137,
-          goalsFor: 178,
-          goalsAgainst: 89,
-          trophies: 2,
-          achievements: [
-            'Keçiören Kupası Şampiyonu 2024',
-            'En Genç Takım Ödülü 2023'
-          ],
-          createdAt: '2020-09-08T00:00:00.000Z',
-          updatedAt: new Date().toISOString()
-        }
-      ];
-      this.setData('teams', realTeams);
-    }
-
-    // Maç verileri - Gerçek maç bilgileri
-    if (!localStorage.getItem('paslios_matches')) {
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const nextWeek = new Date(today);
-      nextWeek.setDate(nextWeek.getDate() + 7);
-
-      const realMatches = [
-        {
-          id: 1,
-          type: 'individual',
-          title: 'Akşam Halısaha Maçı',
-          date: today.toISOString().split('T')[0],
-          time: '19:30',
-          venue: 'Çankaya Halısaha Complex',
-          location: 'Ankara/Çankaya',
-          players: [1, 2, 3, 5],
-          maxPlayers: 10,
-          currentPlayers: 4,
-          price: 25,
-          status: 'waiting',
-          organizer: 'Ahmet Yılmaz',
-          organizerId: 1,
-          description: 'Hafta sonundan önce güzel bir maç yapalım!',
-          skillLevel: 'intermediate',
-          duration: 90,
-          pitchType: 'halısaha',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 2,
-          type: 'individual',
-          title: 'Pazartesi Akşam Futbolu',
-          date: tomorrow.toISOString().split('T')[0],
-          time: '20:00',
-          venue: 'Keçiören Sports Center',
-          location: 'Ankara/Keçiören',
-          players: [2, 4, 6],
-          maxPlayers: 12,
-          currentPlayers: 3,
-          price: 30,
-          status: 'waiting',
-          organizer: 'Mehmet Kaya',
-          organizerId: 2,
-          description: 'Haftaya iyi başlayalım. Tüm seviyelerden oyuncular davetli.',
-          skillLevel: 'beginner',
-          duration: 90,
-          pitchType: 'çim',
-          createdAt: '2024-12-20T14:30:00.000Z'
-        },
-        {
-          id: 3,
-          type: 'team',
-          title: 'Çankaya Tigers vs Keçiören Wolves',
-          date: nextWeek.toISOString().split('T')[0],
-          time: '15:00',
-          venue: 'Ankara Büyükşehir Stadyumu',
-          location: 'Ankara/Merkez',
-          homeTeam: 1,
-          awayTeam: 2,
-          maxPlayers: 22,
-          currentPlayers: 22,
-          price: 0,
-          status: 'confirmed',
-          organizer: 'Çankaya Tigers FC',
-          organizerId: 1,
-          description: 'Sezonun en büyük derbisi! İki güçlü takım karşı karşıya.',
-          skillLevel: 'advanced',
-          duration: 90,
-          pitchType: 'çim',
-          isCompetitive: true,
-          createdAt: '2024-12-15T10:00:00.000Z'
-        },
-        {
-          id: 4,
-          type: 'individual',
-          title: 'Öğle Arası Hızlı Maç',
-          date: today.toISOString().split('T')[0],
-          time: '12:30',
-          venue: 'Tunalı Sports Club',
-          location: 'Ankara/Çankaya',
-          players: [1, 3],
-          maxPlayers: 8,
-          currentPlayers: 2,
-          price: 20,
-          status: 'waiting',
-          organizer: 'Ali Demir',
-          organizerId: 3,
-          description: 'Öğle molasında kısa bir maç. 45 dakika sürecek.',
-          skillLevel: 'intermediate',
-          duration: 45,
-          pitchType: 'halısaha',
-          createdAt: '2024-12-21T08:00:00.000Z'
-        }
-      ];
-      this.setData('matches', realMatches);
-    }
-
-    // Mesaj verileri - Gerçek mesajlaşma sistemi
-    if (!localStorage.getItem('paslios_messages')) {
-      const defaultMessages = [
-        {
-          id: 1,
-          senderId: 2,
-          receiverId: 1,
-          message: 'Selam! Bu akşam maça gelecek misin?',
-          timestamp: Date.now() - 3600000,
-          read: false
-        },
-        {
-          id: 2,
-          senderId: 1,
-          receiverId: 2,
-          message: 'Evet kesinlikle! Saat kaçta başlıyor?',
-          timestamp: Date.now() - 3480000,
-          read: true
-        }
-      ];
-      this.setData('messages', defaultMessages);
-    }
-
-    // Bildirim verileri
-    if (!localStorage.getItem('paslios_notifications')) {
-      const defaultNotifications = [
-        {
-          id: 1,
-          type: 'match_invite',
-          title: 'Maç Daveti',
-          message: 'Mehmet Kaya sizi yarınki maça davet etti',
-          timestamp: Date.now() - 1800000,
-          read: false,
-          actionUrl: 'matches.html'
-        },
-        {
-          id: 2,
-          type: 'team_update',
-          title: 'Takım Güncellemesi',
-          message: 'Çankaya Tigers takımında yeni bir üye var',
-          timestamp: Date.now() - 7200000,
-          read: false,
-          actionUrl: 'team.html'
-        }
-      ];
-      this.setData('notifications', defaultNotifications);
-    }
-
-    // Sosyal gönderi verileri
-    if (!localStorage.getItem('paslios_posts')) {
-      const defaultPosts = [
-        {
-          id: 1,
-          authorId: 2,
-          authorName: 'Mehmet Kaya',
-          authorAvatar: 'MK',
-          content: 'Bugünkü maçta harika bir performans sergiledik! Takım arkadaşlarım çok iyiydi. Bu tempo devam ederse şampiyonluk bizim! 🏆⚽',
-          timestamp: Date.now() - 7200000, // 2 saat önce
-          likes: 24,
-          comments: 8,
-          shares: 3,
-          likedBy: [1, 3, 4, 5],
-          type: 'match_result'
-        },
-        {
-          id: 2,
-          authorId: 3,
-          authorName: 'Emre Demir',
-          authorAvatar: 'ED',
-          content: 'Yeni ayakkabılarım geldi! Nike Mercurial Vapor 15. Yarın sahada test edeceğim. Kim durmak ister? 😏⚽',
-          timestamp: Date.now() - 14400000, // 4 saat önce
-          likes: 18,
-          comments: 12,
-          shares: 2,
-          likedBy: [1, 2, 6],
-          type: 'equipment'
-        },
-        {
-          id: 3,
-          authorId: 4,
-          authorName: 'Can Özkan',
-          authorAvatar: 'CÖ',
-          content: 'Geçen hafta 5 gol attım! Bu sezonki en iyi performansımdı. Antrenmanlar gerçekten işe yarıyor 💪🔥',
-          timestamp: Date.now() - 86400000, // 1 gün önce
-          likes: 32,
-          comments: 6,
-          shares: 5,
-          likedBy: [1, 2, 3, 7, 8],
-          type: 'achievement'
-        },
-        {
-          id: 4,
-          authorId: 5,
-          authorName: 'Burak Tunç',
-          authorAvatar: 'BT',
-          content: 'Yeni saha keşfettim! Çimenli ve çok güzel. Bu hafta sonu orada maç yapacağız. Kimse gelecek? 🌱⚽',
-          timestamp: Date.now() - 172800000, // 2 gün önce
-          likes: 21,
-          comments: 15,
-          shares: 4,
-          likedBy: [1, 2, 9, 10],
-          type: 'venue_discovery'
-        }
-      ];
-      this.setData('posts', defaultPosts);
-    }
-
-    // Rezervasyon verileri
-    if (!localStorage.getItem('paslios_bookings')) {
-      const defaultBookings = [
-        {
-          id: 1,
-          userId: 1,
-          userName: 'Ahmet Yılmaz',
-          userPhone: '0555 123 45 67',
-          venueName: 'Spor A Halısaha',
-          venuePrice: 150,
-          date: new Date().toISOString().split('T')[0],
-          time: '19:00',
-          playerCount: 10,
-          totalPrice: 150,
-          status: 'confirmed',
-          bookingDate: Date.now() - 86400000, // 1 gün önce
-          paymentMethod: 'credit_card',
-          notes: 'Çankaya bölgesindeki arkadaşlarla maç'
-        }
-      ];
-      this.setData('bookings', defaultBookings);
-    }
-
-    // Ayarlar
-    if (!localStorage.getItem('paslios_settings')) {
-      const defaultSettings = {
-        theme: 'light',
-        language: 'tr',
-        notifications: {
-          push: true,
-          matchInvites: true,
-          weeklyReport: true,
-          teamUpdates: true
-        },
-        privacy: {
-          profileVisible: true,
-          contactVisible: true,
-          statsVisible: true
-        }
-      };
-      this.setData('settings', defaultSettings);
+      localStorage.setItem('paslios_badges', JSON.stringify(systemBadges));
     }
   }
 
-  // Veri getir
-  getData(key) {
-    const data = localStorage.getItem(`paslios_${key}`);
-    return data ? JSON.parse(data) : null;
-  }
-
-  // Veri kaydet
-  setData(key, data) {
-    localStorage.setItem(`paslios_${key}`, JSON.stringify(data));
-  }
-
-  // Veri güncelle
-  updateData(key, id, updatedData) {
-    const data = this.getData(key);
-    if (data && Array.isArray(data)) {
-      const index = data.findIndex(item => item.id === id);
-      if (index !== -1) {
-        data[index] = { ...data[index], ...updatedData };
-        this.setData(key, data);
-        return true;
-      }
+  // GÜVENLIK FONKSİYONLARI
+  
+  // Basit password hashing (production'da bcrypt kullanılmalı)
+  hashPassword(password) {
+    // Bu sadece demo amaçlı basit hash - gerçek projede bcrypt kullanın
+    let hash = 0;
+    for (let i = 0; i < password.length; i++) {
+      const char = password.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // 32bit integer'a çevir
     }
-    return false;
+    return 'hash_' + Math.abs(hash).toString(36) + '_' + password.length;
+  }
+  
+  // Password doğrulama
+  verifyPassword(password, hash) {
+    return this.hashPassword(password) === hash;
   }
 
-  // Veri ekle
-  addData(key, newData) {
-    const data = this.getData(key) || [];
-    const newId = Math.max(...data.map(item => item.id || 0)) + 1;
-    const dataWithId = { ...newData, id: newId };
-    data.push(dataWithId);
-    this.setData(key, data);
-    return dataWithId;
-  }
-
-  // Veri sil
-  deleteData(key, id) {
-    const data = this.getData(key);
-    if (data && Array.isArray(data)) {
-      const filteredData = data.filter(item => item.id !== id);
-      this.setData(key, filteredData);
-      return true;
-    }
-    return false;
-  }
-
-  // Kullanıcı yönetimi
-  getCurrentUser() {
-    const users = this.getData('users');
-    return users ? users.find(user => user.isCurrentUser) : null;
-  }
-
-  updateCurrentUser(userData) {
-    const currentUser = this.getCurrentUser();
-    if (currentUser) {
-      return this.updateData('users', currentUser.id, userData);
-    }
-    return false;
-  }
-
-  // Oturum yönetimi
-  login(email, password) {
-    const users = this.getData('users');
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-      // Tüm kullanıcıları isCurrentUser: false yap
-      users.forEach(u => u.isCurrentUser = false);
-      // Giriş yapan kullanıcıyı işaretle
-      user.isCurrentUser = true;
-      this.setData('users', users);
-      
-      // Oturum bilgisini kaydet
-      this.setData('session', {
-        isLoggedIn: true,
-        userId: user.id,
-        loginTime: Date.now()
-      });
-      
-      return { success: true, user };
+  // KULLANICI YÖNETİMİ
+  
+  // Yeni kullanıcı kaydı
+  registerUser(userData) {
+    // Input validation ve sanitization
+    if (!userData.name || !userData.email || !userData.password) {
+      return { success: false, message: 'Tüm zorunlu alanları doldurun!' };
     }
     
-    return { success: false, message: 'Kullanıcı bulunamadı' };
-  }
-
-  register(userData) {
+    // Security validation
+    if (!window.SecurityUtils.isValidEmail(userData.email)) {
+      return { success: false, message: 'Geçerli bir email adresi girin!' };
+    }
+    
+    if (!window.SecurityUtils.isStrongPassword(userData.password)) {
+      return { success: false, message: 'Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir!' };
+    }
+    
+    // Rate limiting kontrolü
+    const rateLimitCheck = window.SecurityUtils.checkRateLimit('register', 3, 300000); // 5 dakikada 3 deneme
+    if (!rateLimitCheck.allowed) {
+      return { success: false, message: rateLimitCheck.message };
+    }
+    
     const users = this.getData('users');
     
     // Email kontrolü
-    const existingUser = users.find(u => u.email === userData.email);
-    if (existingUser) {
-      return { success: false, message: 'Bu email zaten kayıtlı' };
+    if (users.find(u => u.email === userData.email.toLowerCase())) {
+      return { success: false, message: 'Bu email adresi zaten kullanılıyor!' };
     }
-
-    // Yeni kullanıcı oluştur
+    
+    // Sanitize inputs
+    const sanitizedData = {
+      name: window.SecurityUtils.sanitizeInput(userData.name),
+      email: userData.email.toLowerCase().trim(),
+      phone: window.SecurityUtils.sanitizeInput(userData.phone || ''),
+      position: window.SecurityUtils.sanitizeInput(userData.position || 'Belirsiz'),
+      location: window.SecurityUtils.sanitizeInput(userData.location || '')
+    };
+    
+    // Yeni kullanıcı objesi
     const newUser = {
-      ...userData,
+      id: window.SecurityUtils.generateSecureId(),
+      name: sanitizedData.name,
+      email: sanitizedData.email,
+      password: this.hashPassword(userData.password), // Password hash'le
+      phone: sanitizedData.phone,
+      position: sanitizedData.position,
       rating: 0,
-      avatar: userData.name.split(' ').map(n => n[0]).join('').toUpperCase(),
+      avatar: null,
+      bio: '',
+      location: sanitizedData.location,
       matchesPlayed: 0,
+      matchesWon: 0,
       goals: 0,
       assists: 0,
-      isCurrentUser: true,
-      joinDate: new Date().toISOString().split('T')[0]
+      cleanSheets: 0,
+      mvpAwards: 0,
+      joinDate: new Date().toISOString(),
+      lastLoginDate: new Date().toISOString(),
+      teamId: null,
+      friendIds: [],
+      stats: {
+        totalPoints: 50, // Hoş geldin rozeti puanı
+        weeklyPoints: 50,
+        monthlyPoints: 50,
+        level: 1,
+        xp: 50,
+        badgeIds: [1] // Hoş geldin rozeti
+      }
     };
-
-    // Diğer kullanıcıları isCurrentUser: false yap
-    users.forEach(u => u.isCurrentUser = false);
     
-    const addedUser = this.addData('users', newUser);
-    
-    // Oturum bilgisini kaydet
-    this.setData('session', {
-      isLoggedIn: true,
-      userId: addedUser.id,
-      loginTime: Date.now()
-    });
-    
-    return { success: true, user: addedUser };
-  }
-
-  logout() {
-    const users = this.getData('users');
-    users.forEach(u => u.isCurrentUser = false);
+    // Kullanıcıyı ekle
+    users.push(newUser);
     this.setData('users', users);
     
-    this.setData('session', {
-      isLoggedIn: false,
-      userId: null,
-      loginTime: null
-    });
+    // Mevcut kullanıcı olarak ayarla
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    
+    return { success: true, user: newUser };
   }
-
-  isLoggedIn() {
-    const session = this.getData('session');
-    return session && session.isLoggedIn;
-  }
-
-  // Yardımcı fonksiyonlar
-  searchUsers(query) {
+  
+  // Kullanıcı girişi
+  loginUser(email, password) {
+    // Input validation
+    if (!email || !password) {
+      return { success: false, message: 'Email ve şifre gereklidir!' };
+    }
+    
+    // Rate limiting kontrolü
+    const rateLimitCheck = window.SecurityUtils.checkRateLimit('login', 5, 900000); // 15 dakikada 5 deneme
+    if (!rateLimitCheck.allowed) {
+      return { success: false, message: rateLimitCheck.message };
+    }
+    
+    // Email validation
+    if (!window.SecurityUtils.isValidEmail(email)) {
+      return { success: false, message: 'Geçerli bir email adresi girin!' };
+    }
+    
     const users = this.getData('users');
-    return users.filter(user => 
-      user.name.toLowerCase().includes(query.toLowerCase()) ||
-      user.position.toLowerCase().includes(query.toLowerCase()) ||
-      user.location.toLowerCase().includes(query.toLowerCase())
-    );
+    const user = users.find(u => u.email === email.toLowerCase());
+    
+    if (user && this.verifyPassword(password, user.password)) {
+      // Son giriş tarihini güncelle
+      user.lastLoginDate = new Date().toISOString();
+      this.updateData('users', user.id, { lastLoginDate: user.lastLoginDate });
+      
+      // Session oluştur (güvenli)
+      const sessionData = {
+        isLoggedIn: true,
+        userId: user.id,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          position: user.position,
+          rating: user.rating
+        },
+        loginTime: new Date().getTime(),
+        expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 saat
+      };
+      
+      // Session'ı güvenli storage'a kaydet
+      window.SecurityUtils.secureStorage.set('paslios_session', sessionData);
+      localStorage.setItem('paslios_session', JSON.stringify(sessionData));
+      localStorage.setItem('currentUserId', user.id);
+      
+      return { success: true, user: user };
+    } else {
+      return { success: false, message: 'Email veya şifre hatalı!' };
+    }
   }
-
-  searchTeams(query) {
-    const teams = this.getData('teams');
-    return teams.filter(team => 
-      team.name.toLowerCase().includes(query.toLowerCase()) ||
-      team.description.toLowerCase().includes(query.toLowerCase())
-    );
+  
+  // Mevcut kullanıcıyı getir
+  getCurrentUser() {
+    const currentUserData = localStorage.getItem('currentUser');
+    return currentUserData ? JSON.parse(currentUserData) : null;
   }
-
-  getUpcomingMatches() {
-    const matches = this.getData('matches');
-    const now = new Date();
-    return matches.filter(match => {
-      const matchDate = new Date(`${match.date} ${match.time}`);
-      return matchDate > now;
-    }).sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
-  }
-
-  getUserStats(userId) {
-    const user = this.getData('users').find(u => u.id === userId);
-    if (!user) return null;
-
-    return {
-      matchesPlayed: user.matchesPlayed || 0,
-      goals: user.goals || 0,
-      assists: user.assists || 0,
-      rating: user.rating || 0,
-      winRate: user.matchesPlayed > 0 ? ((user.wins || 0) / user.matchesPlayed * 100).toFixed(1) : 0
-    };
-  }
-
-  // Sosyal gönderi yönetimi
-  getPosts(limit = 10) {
-    const posts = this.getData('posts') || [];
-    return posts
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, limit);
-  }
-
-  createPost(content, type = 'general') {
+  
+  // Mevcut kullanıcıyı güncelle
+  updateCurrentUser(updates) {
     const currentUser = this.getCurrentUser();
-    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...updates };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      
+      // Kullanıcılar listesinde de güncelle
+      this.updateData('users', currentUser.id, updates);
+      
+      return updatedUser;
+    }
+    return null;
+  }
+  
+  // Kullanıcı çıkışı
+  logoutUser() {
+    localStorage.removeItem('currentUser');
+    return true;
+  }
+  
+  // Kimlik doğrulama kontrolü
+  isAuthenticated() {
+    return this.getCurrentUser() !== null;
+  }
 
+  // GÖNDERİ YÖNETİMİ
+  
+  // Yeni gönderi oluştur
+  createPost(content, type = 'text') {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Gönderi oluşturmak için giriş yapmalısınız!' };
+    }
+    
+    const posts = this.getData('posts');
     const newPost = {
+      id: Date.now(),
       authorId: currentUser.id,
       authorName: currentUser.name,
       authorAvatar: currentUser.avatar,
       content: content,
-      timestamp: Date.now(),
-      likes: 0,
-      comments: 0,
-      shares: 0,
+      type: type,
+      timestamp: new Date().toISOString(),
       likedBy: [],
-      type: type
+      comments: [],
+      visibility: 'public'
     };
-
-    const addedPost = this.addData('posts', newPost);
-    return { success: true, post: addedPost };
-  }
-
-  likePost(postId) {
-    const currentUser = this.getCurrentUser();
-    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
-
-    const posts = this.getData('posts');
-    const postIndex = posts.findIndex(p => p.id === postId);
     
-    if (postIndex === -1) return { success: false, message: 'Gönderi bulunamadı' };
-
-    const post = posts[postIndex];
-    const userLikedIndex = post.likedBy.indexOf(currentUser.id);
-
-    if (userLikedIndex === -1) {
-      // Beğeni ekle
-      post.likedBy.push(currentUser.id);
-      post.likes++;
-    } else {
-      // Beğeniyi kaldır
-      post.likedBy.splice(userLikedIndex, 1);
-      post.likes--;
+    // Gönderiyi ekle (en üste)
+    posts.unshift(newPost);
+    this.setData('posts', posts);
+    
+    // İlk gönderi rozeti kontrolü
+    if (posts.filter(p => p.authorId === currentUser.id).length === 1) {
+      this.awardBadge(currentUser.id, 2); // İlk gönderi rozeti
     }
-
-    this.setData('posts', posts);
-    return { success: true, liked: userLikedIndex === -1, likes: post.likes };
+    
+    return { success: true, post: newPost };
   }
-
-  sharePost(postId) {
+  
+  // Gönderileri getir
+  getPosts(limit = null) {
     const posts = this.getData('posts');
-    const postIndex = posts.findIndex(p => p.id === postId);
-    
-    if (postIndex === -1) return { success: false, message: 'Gönderi bulunamadı' };
-
-    posts[postIndex].shares++;
-    this.setData('posts', posts);
-    return { success: true, shares: posts[postIndex].shares };
+    return limit ? posts.slice(0, limit) : posts;
   }
-
-  addComment(postId, comment) {
+  
+  // Kullanıcının gönderilerini getir
+  getUserPosts(userId, limit = null) {
+    const posts = this.getData('posts').filter(p => p.authorId === userId);
+    return limit ? posts.slice(0, limit) : posts;
+  }
+  
+  // Gönderiyi beğen/beğenme
+  togglePostLike(postId) {
     const currentUser = this.getCurrentUser();
-    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
-
+    if (!currentUser) return false;
+    
     const posts = this.getData('posts');
-    const postIndex = posts.findIndex(p => p.id === postId);
+    const post = posts.find(p => p.id === postId);
     
-    if (postIndex === -1) return { success: false, message: 'Gönderi bulunamadı' };
-
-    posts[postIndex].comments++;
-    this.setData('posts', posts);
-
-    // Yorumu ayrı olarak da saklayabiliriz (gelecekte detaylı yorum sistemi için)
-    return { success: true, comments: posts[postIndex].comments };
-  }
-
-  formatTimeAgo(timestamp) {
-    const now = Date.now();
-    const diffInSeconds = Math.floor((now - timestamp) / 1000);
-    
-    if (diffInSeconds < 60) return 'Az önce';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} dakika önce`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} saat önce`;
-    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} gün önce`;
-    
-    return new Date(timestamp).toLocaleDateString('tr-TR');
-  }
-
-  // Rezervasyon yönetimi
-  getBookings(userId = null) {
-    const bookings = this.getData('bookings') || [];
-    if (userId) {
-      return bookings.filter(booking => booking.userId === userId);
-    }
-    return bookings;
-  }
-
-  createBooking(bookingData) {
-    const currentUser = this.getCurrentUser();
-    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
-
-    const newBooking = {
-      userId: currentUser.id,
-      userName: currentUser.name,
-      userPhone: currentUser.phone || '',
-      venueName: bookingData.venueName,
-      venuePrice: bookingData.venuePrice,
-      date: bookingData.date,
-      time: bookingData.time,
-      playerCount: bookingData.playerCount,
-      totalPrice: bookingData.totalPrice,
-      status: 'confirmed',
-      bookingDate: Date.now(),
-      paymentMethod: bookingData.paymentMethod || 'credit_card',
-      notes: bookingData.notes || ''
-    };
-
-    const addedBooking = this.addData('bookings', newBooking);
-    return { success: true, booking: addedBooking };
-  }
-
-  cancelBooking(bookingId) {
-    const currentUser = this.getCurrentUser();
-    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
-
-    const bookings = this.getData('bookings');
-    const bookingIndex = bookings.findIndex(b => b.id === bookingId && b.userId === currentUser.id);
-    
-    if (bookingIndex === -1) return { success: false, message: 'Rezervasyon bulunamadı' };
-
-    bookings[bookingIndex].status = 'cancelled';
-    this.setData('bookings', bookings);
-    return { success: true };
-  }
-
-  // Saha keşfedelme fonksiyonları
-  getVenues() {
-    return this.getData('venues') || this.getDefaultVenues();
-  }
-
-  getDefaultVenues() {
-    const defaultVenues = [
-      {
-        id: 1,
-        name: 'Spor A Halısaha',
-        location: 'Çankaya, Ankara',
-        distance: '1.2 km',
-        price: 150,
-        rating: 4.8,
-        reviewCount: 156,
-        type: 'Halı Saha',
-        features: ['Duş', 'Soyunma Odası', 'Otopark', 'Kafe', 'WiFi'],
-        availableSlots: ['17:00', '18:00', '19:00', '20:00', '22:00'],
-        image: '🏟️'
-      },
-      {
-        id: 2,
-        name: 'Champions Halısaha',
-        location: 'Keçiören, Ankara',
-        distance: '2.8 km',
-        price: 180,
-        rating: 4.6,
-        reviewCount: 89,
-        type: 'Halı Saha',
-        features: ['Duş', 'Soyunma Odası', 'Otopark', 'Tribün'],
-        availableSlots: ['16:00', '17:00', '18:00', '19:00', '20:00', '21:00'],
-        image: '🏟️'
-      },
-      {
-        id: 3,
-        name: 'Elite Football Center',
-        location: 'Kızılay, Ankara',
-        distance: '3.5 km',
-        price: 200,
-        rating: 4.9,
-        reviewCount: 234,
-        type: 'Çim Saha',
-        features: ['Duş', 'Soyunma Odası', 'Otopark', 'Kafe', 'Klima', 'Ses Sistemi'],
-        availableSlots: ['15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'],
-        image: '🌱'
+    if (post) {
+      if (post.likedBy.includes(currentUser.id)) {
+        // Beğeniyi kaldır
+        post.likedBy = post.likedBy.filter(id => id !== currentUser.id);
+      } else {
+        // Beğeni ekle
+        post.likedBy.push(currentUser.id);
       }
-    ];
+      
+      this.setData('posts', posts);
+      return true;
+    }
     
-    this.setData('venues', defaultVenues);
-    return defaultVenues;
+    return false;
+  }
+  
+  // Gönderi sil
+  deletePost(postId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return false;
+    
+    const posts = this.getData('posts');
+    const postIndex = posts.findIndex(p => p.id === postId && p.authorId === currentUser.id);
+    
+    if (postIndex !== -1) {
+      posts.splice(postIndex, 1);
+      this.setData('posts', posts);
+      return true;
+    }
+    
+    return false;
+  }
+
+  // YORUM SİSTEMİ
+  
+  // Yorum ekle
+  addComment(postId, commentText) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Yorum yapmak için giriş yapmalısınız!' };
+    }
+    
+    if (!commentText || commentText.trim().length === 0) {
+      return { success: false, message: 'Yorum boş olamaz!' };
+    }
+    
+    const posts = this.getData('posts');
+    const post = posts.find(p => p.id === postId);
+    
+    if (!post) {
+      return { success: false, message: 'Gönderi bulunamadı!' };
+    }
+    
+    const newComment = {
+      id: Date.now(),
+      postId: postId,
+      authorId: currentUser.id,
+      authorName: currentUser.name,
+      authorAvatar: currentUser.avatar,
+      content: commentText.trim(),
+      timestamp: new Date().toISOString(),
+      likedBy: []
+    };
+    
+    // Yorumu gönderinin comments dizisine ekle
+    if (!post.comments) {
+      post.comments = [];
+    }
+    post.comments.push(newComment);
+    
+    // Veritabanını güncelle
+    this.setData('posts', posts);
+    
+    // İlk yorum rozeti kontrolü
+    const allComments = this.getAllComments().filter(c => c.authorId === currentUser.id);
+    if (allComments.length === 1) {
+      this.awardBadge(currentUser.id, 5); // İlk yorum rozeti (ID: 5)
+    }
+    
+    return { success: true, comment: newComment };
+  }
+  
+  // Gönderinin yorumlarını getir
+  getPostComments(postId) {
+    const posts = this.getData('posts');
+    const post = posts.find(p => p.id === postId);
+    return post ? (post.comments || []) : [];
+  }
+  
+  // Tüm yorumları getir
+  getAllComments() {
+    const posts = this.getData('posts');
+    const allComments = [];
+    
+    posts.forEach(post => {
+      if (post.comments && post.comments.length > 0) {
+        allComments.push(...post.comments);
+      }
+    });
+    
+    return allComments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }
+  
+  // Yorum sil
+  deleteComment(postId, commentId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return false;
+    
+    const posts = this.getData('posts');
+    const post = posts.find(p => p.id === postId);
+    
+    if (!post || !post.comments) return false;
+    
+    const commentIndex = post.comments.findIndex(c => 
+      c.id === commentId && c.authorId === currentUser.id
+    );
+    
+    if (commentIndex !== -1) {
+      post.comments.splice(commentIndex, 1);
+      this.setData('posts', posts);
+      return true;
+    }
+    
+    return false;
+  }
+  
+  // Yorumu beğen/beğenme
+  toggleCommentLike(postId, commentId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return false;
+    
+    const posts = this.getData('posts');
+    const post = posts.find(p => p.id === postId);
+    
+    if (!post || !post.comments) return false;
+    
+    const comment = post.comments.find(c => c.id === commentId);
+    
+    if (comment) {
+      if (!comment.likedBy) comment.likedBy = [];
+      
+      if (comment.likedBy.includes(currentUser.id)) {
+        // Beğeniyi kaldır
+        comment.likedBy = comment.likedBy.filter(id => id !== currentUser.id);
+      } else {
+        // Beğeni ekle
+        comment.likedBy.push(currentUser.id);
+      }
+      
+      this.setData('posts', posts);
+      return true;
+    }
+    
+    return false;
+  }
+
+  // TAKIM YÖNETİMİ
+  
+  // Yeni takım oluştur
+  createTeam(teamData) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Takım oluşturmak için giriş yapmalısınız!' };
+    }
+    
+    const teams = this.getData('teams');
+    const newTeam = {
+      id: Date.now(),
+      name: teamData.name,
+      description: teamData.description || '',
+      captainId: currentUser.id,
+      members: [currentUser.id],
+      memberCount: 1,
+      location: teamData.location || '',
+      privacy: teamData.privacy || 'public',
+      matchesPlayed: 0,
+      wins: 0,
+      draws: 0,
+      losses: 0,
+      points: 0,
+      goalsFor: 0,
+      goalsAgainst: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    teams.push(newTeam);
+    this.setData('teams', teams);
+    
+    // Kullanıcının takım ID'sini güncelle
+    this.updateCurrentUser({ teamId: newTeam.id });
+    
+    // Takım oyuncusu rozeti
+    this.awardBadge(currentUser.id, 4);
+    
+    return { success: true, team: newTeam };
+  }
+  
+  // Takımları getir
+  getTeams() {
+    return this.getData('teams');
+  }
+  
+  // Kullanıcının takımını getir
+  getUserTeam(userId = null) {
+    const targetUserId = userId || this.getCurrentUser()?.id;
+    if (!targetUserId) return null;
+    
+    const teams = this.getData('teams');
+    return teams.find(t => t.members.includes(targetUserId));
+  }
+
+  // MAÇ YÖNETİMİ
+  
+  // Yeni maç oluştur
+  createMatch(matchData) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Maç oluşturmak için giriş yapmalısınız!' };
+    }
+    
+    const matches = this.getData('matches');
+    const newMatch = {
+      id: Date.now(),
+      title: matchData.title,
+      date: matchData.date,
+      time: matchData.time,
+      location: matchData.location,
+      organizerId: currentUser.id,
+      participants: [currentUser.id],
+      maxPlayers: matchData.maxPlayers || 10,
+      currentPlayers: 1,
+      price: matchData.price || 0,
+      status: 'upcoming',
+      description: matchData.description || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    matches.push(newMatch);
+    this.setData('matches', matches);
+    
+    return { success: true, match: newMatch };
+  }
+  
+  // Maçları getir
+  getMatches() {
+    return this.getData('matches');
+  }
+  
+  // Yaklaşan maçları getir
+  getUpcomingMatches(limit = 5) {
+    const matches = this.getData('matches');
+    const upcoming = matches.filter(m => m.status === 'upcoming');
+    return limit ? upcoming.slice(0, limit) : upcoming;
+  }
+
+  // ROZET SİSTEMİ
+  
+  // Kullanıcıya rozet ver
+  awardBadge(userId, badgeId) {
+    const users = this.getData('users');
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex !== -1 && !users[userIndex].stats.badgeIds.includes(badgeId)) {
+      users[userIndex].stats.badgeIds.push(badgeId);
+      
+      // Rozet puanını ekle
+      const badges = this.getData('badges');
+      const badge = badges.find(b => b.id === badgeId);
+      if (badge) {
+        users[userIndex].stats.totalPoints += badge.points;
+        users[userIndex].stats.weeklyPoints += badge.points;
+        users[userIndex].stats.monthlyPoints += badge.points;
+      }
+      
+      this.setData('users', users);
+      
+      // Mevcut kullanıcıysa güncelle
+      const currentUser = this.getCurrentUser();
+      if (currentUser && currentUser.id === userId) {
+        localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+      }
+      
+      return true;
+    }
+    
+    return false;
+  }
+  
+  // Rozetleri getir
+  getBadges() {
+    return this.getData('badges');
+  }
+
+  // GENEL VERİ YÖNETİMİ
+  
+  // Veri kaydet
+  setData(key, data) {
+    try {
+      localStorage.setItem(`paslios_${key}`, JSON.stringify(data));
+      return true;
+    } catch (error) {
+      console.error('LocalStorage yazma hatası:', error);
+      return false;
+    }
+  }
+  
+  // Veri oku
+  getData(key) {
+    try {
+      const data = localStorage.getItem(`paslios_${key}`);
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('LocalStorage okuma hatası:', error);
+      return [];
+    }
+  }
+  
+  // Veri güncelle
+  updateData(type, id, updates) {
+    const data = this.getData(type);
+    const index = data.findIndex(item => item.id === id);
+    
+    if (index !== -1) {
+      data[index] = { ...data[index], ...updates };
+      return this.setData(type, data);
+    }
+    
+    return false;
+  }
+  
+  // Veri sil
+  deleteData(type, id) {
+    const data = this.getData(type);
+    const filteredData = data.filter(item => item.id !== id);
+    return this.setData(type, filteredData);
+  }
+  
+  // Tüm verileri temizle (geliştirme amaçlı)
+  clearAllData() {
+    const keys = ['users', 'posts', 'teams', 'matches', 'bookings'];
+    keys.forEach(key => localStorage.removeItem(`paslios_${key}`));
+    localStorage.removeItem('currentUser');
+    this.initializeDatabase();
+    return true;
+  }
+  
+  // Kullanıcı istatistikleri
+  getUserStats(userId) {
+    const user = this.getData('users').find(u => u.id === userId);
+    if (!user) return null;
+    
+    const userPosts = this.getData('posts').filter(p => p.authorId === userId);
+    const userMatches = this.getData('matches').filter(m => m.participants.includes(userId));
+    
+    return {
+      postsCount: userPosts.length,
+      matchesCount: userMatches.length,
+      totalLikes: userPosts.reduce((sum, post) => sum + post.likedBy.length, 0),
+      ...user.stats
+    };
+  }
+
+  // SAHA YÖNETİMİ
+  
+  // Tüm sahaları getir
+  getAllVenues() {
+    return this.getData('venues');
+  }
+  
+  // Saha bilgisi getir
+  getVenue(venueId) {
+    const venues = this.getData('venues');
+    return venues.find(v => v.id === venueId);
+  }
+
+  // YARDIMCI FONKSİYONLAR
+  
+  // Zaman farkını formatla (örn: "2 saat önce")
+  static formatTimeAgo(timestamp) {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInMs = now - time;
+    const diffInSeconds = Math.floor(diffInMs / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    
+    if (diffInDays > 0) {
+      return `${diffInDays} gün önce`;
+    } else if (diffInHours > 0) {
+      return `${diffInHours} saat önce`;
+    } else if (diffInMinutes > 0) {
+      return `${diffInMinutes} dakika önce`;
+    } else {
+      return 'Az önce';
+    }
   }
 }
 
-// Global instance oluştur
-window.PasliosData = new pasliosData();
+// Global instance
+const pasliosData = new PasliosData();

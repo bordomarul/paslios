@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paslios - Veritabanı Sıfırla</title>
+</head>
+<body>
+    <h1>Paslios - Veritabanı Sıfırlama</h1>
+    <p>Bu sayfa tüm demo verileri temizler ve temiz bir başlangıç yapmanızı sağlar.</p>
+    <button onclick="clearAllData()">Tüm Verileri Temizle</button>
+    <p id="status"></p>
+    
+    <script src="js/data.js"></script>
+    <script>
+        function clearAllData() {
+            // Tüm localStorage verilerini temizle
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('paslios_') || key === 'currentUser') {
+                    keysToRemove.push(key);
+                }
+            }
+            
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            
+            // Yeni temiz veritabanını başlat
+            if (window.pasliosData) {
+                pasliosData.initializeDatabase();
+            }
+            
+            document.getElementById('status').innerHTML = '✅ Tüm veriler temizlendi! Şimdi <a href="register.html">kayıt olabilirsiniz</a>.';
+        }
+    </script>
+</body>
+</html>

@@ -906,12 +906,17 @@
     <script>
       // Sayfa yüklendiğinde kullanıcı verilerini yükle
       document.addEventListener('DOMContentLoaded', function() {
+        console.log('Profile sayfa yüklendi');
+        console.log('pasliosData:', window.pasliosData);
+        
         // Oturum kontrolü
-        if (!PasliosData.isLoggedIn()) {
+        if (!pasliosData.isAuthenticated()) {
+          console.log('Kullanıcı giriş yapmamış, index.html\'e yönlendiriliyor');
           window.location.href = 'index.html';
           return;
         }
 
+        console.log('Kullanıcı giriş yapmış, profil yükleniyor...');
         loadUserProfile();
         loadUserPosts();
         loadUserActivities();
@@ -970,8 +975,9 @@
         if (!currentUserData) return;
         
         const currentUser = JSON.parse(currentUserData);
-        const allPosts = PasliosData.getPosts();
+        const allPosts = pasliosData.getPosts();
         const userPosts = allPosts.filter(post => post.authorId === currentUser.id);
+        console.log('Kullanıcı gönderileri:', userPosts);
         
         const postsContainer = document.getElementById('user-posts');
         postsContainer.innerHTML = '';
@@ -1122,7 +1128,7 @@
 
       // Profil güncelleme fonksiyonu
       function updateProfile(field, value) {
-        const success = PasliosData.updateCurrentUser({ [field]: value });
+        const success = pasliosData.updateCurrentUser({ [field]: value });
         if (success) {
           loadUserProfile(); // Sayfayı yenile
           ToastManager.show('Profil başarıyla güncellendi!', 'success');

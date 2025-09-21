@@ -18,6 +18,10 @@
     <link href="output.css" rel="stylesheet">
     <link href="css/toast.css" rel="stylesheet">
     <title>Paslios - Türkiye'nin Futbol Sosyal Platformu</title>
+    
+    <!-- Security Utils -->
+    <script src="js/security.js"></script>
+    
     <style>
       * {
         margin: 0;
@@ -405,45 +409,45 @@
             return;
           }
           
-          // Test kullanıcısı oluştur
-          const testUser = {
-            id: 1,
-            name: 'Test Kullanıcı',
-            email: email,
-            phone: '0555 123 45 67',
-            position: 'Forvet',
-            rating: 4.5,
-            location: 'Ankara/Çankaya',
-            bio: 'Test kullanıcısı',
-            matchesPlayed: 10,
-            matchesWon: 7,
-            goals: 5,
-            assists: 3,
-            cleanSheets: 0,
-            mvpAwards: 2,
-            joinDate: new Date().toISOString(),
-            lastLoginDate: new Date().toISOString(),
-            teamId: null,
-            friendIds: [],
-            stats: {
-              totalPoints: 250,
-              weeklyPoints: 50,
-              monthlyPoints: 150,
-              level: 5,
-              xp: 450,
-              badgeIds: [1, 2]
-            }
-          };
+          // Yeni giriş sistemi ile kullanıcı doğrula
+          const result = pasliosData.loginUser(email, password);
           
-          // Başarılı giriş simüle et
-          localStorage.setItem('currentUser', JSON.stringify(testUser));
-          
-          // Güzel toast bildirimi
-          toastManager.show('Giriş başarılı! Hoş geldiniz ' + testUser.name + '!', 'success', '🎉 Hoş Geldiniz');
-          
-          setTimeout(function() {
-            window.location.href = 'home.html';
-          }, 2000);
+          if (result.success) {
+            // Session oluştur - production ready
+            const sessionData = {
+              isLoggedIn: true,
+              userId: result.user.id,
+              user: result.user,
+              loginTime: new Date().getTime(),
+              expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 saat
+            };
+            
+            localStorage.setItem('paslios_session', JSON.stringify(sessionData));
+            localStorage.setItem('currentUserId', result.user.id);
+            
+            // Güzel toast bildirimi
+            toastManager.show('Giriş başarılı! Hoş geldiniz ' + result.user.name + '!', 'success', '🎉 Hoş Geldiniz');
+            
+            // Redirect URL'ini kontrol et
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+            
+            setTimeout(function() {
+              if (redirectUrl && redirectUrl !== 'index.html') {
+                // Güvenlik kontrolü - sadece kendi domain'imizdeki sayfalara redirect
+                if (redirectUrl.startsWith('/') || !redirectUrl.includes('://')) {
+                  window.location.href = redirectUrl;
+                } else {
+                  window.location.href = 'home.html';
+                }
+              } else {
+                window.location.href = 'home.html';
+              }
+            }, 1500);
+          } else {
+            // Hata mesajı
+            toastManager.show(result.message, 'error', 'Giriş Hatası');
+          }
         });
       });
     </script>

@@ -1,45 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Ana Sayfa -->
   <url>
-    <loc>https://paslios.com/</loc>
-    <lastmod>2025-09-21</lastmod>
+    <loc>https://yourdomain.com/</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Kayıt Sayfası -->
   <url>
-    <loc>https://paslios.com/register.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://yourdomain.com/register</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
+
+  <!-- Ana Dashboard -->
   <url>
-    <loc>https://paslios.com/home.html</loc>
-    <lastmod>2025-09-21</lastmod>
+    <loc>https://yourdomain.com/home</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Maçlar -->
+  <url>
+    <loc>https://yourdomain.com/matches</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Rezervasyon -->
   <url>
-    <loc>https://paslios.com/contact.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://yourdomain.com/booking</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Profil -->
+  <url>
+    <loc>https://yourdomain.com/profile</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Takım Yönetimi -->
+  <url>
+    <loc>https://yourdomain.com/team</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Liderlik Tablosu -->
+  <url>
+    <loc>https://yourdomain.com/leaderboard</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Arama -->
+  <url>
+    <loc>https://yourdomain.com/search</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
+  <!-- Sohbet -->
   <url>
-    <loc>https://paslios.com/help-center.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://yourdomain.com/chat</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- İletişim -->
+  <url>
+    <loc>https://yourdomain.com/contact</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+
+  <!-- Yardım Merkezi -->
   <url>
-    <loc>https://paslios.com/privacy-policy.html</loc>
-    <lastmod>2025-09-21</lastmod>
+    <loc>https://yourdomain.com/help-center</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Gizlilik Politikası -->
+  <url>
+    <loc>https://yourdomain.com/privacy-policy</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
+
+  <!-- Kullanım Şartları -->
   <url>
-    <loc>https://paslios.com/terms-of-service.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://yourdomain.com/terms-of-service</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
+
 </urlset>
