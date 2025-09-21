@@ -368,4 +368,4 @@ class pasliosData {
 }
 
 // Global instance oluştur
-window.pasliosData = new pasliosData();
+window.PasliosData = new pasliosData();
