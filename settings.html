@@ -614,9 +614,13 @@
           return;
         }
         
-        const currentUser = PasliosData.getCurrentUser();
+        // localStorage'dan gerçek kullanıcı verilerini oku
+        const currentUserData = localStorage.getItem('currentUser');
+        const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
         if (currentUser) {
-          PasliosData.updateCurrentUser({ email: newEmail });
+          // Yeni email'i localStorage'da güncelle
+          currentUser.email = newEmail;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
           alert('Email adresiniz başarıyla değiştirildi! 📧');
         }
       }
@@ -649,11 +653,11 @@
         
         if (confirmation === 'SIL') {
           if (confirm('Son kez soruyoruz:\n\nHesabınızı kalıcı olarak silmek istediğinize emin misiniz?\n\n• Tüm verileriniz silinecek\n• Gönderileriniz kaldırılacak\n• Bu işlem geri alınamaz')) {
-            const currentUser = PasliosData.getCurrentUser();
-            if (currentUser) {
-              PasliosData.deleteData('users', currentUser.id);
-              PasliosData.logout();
-            }
+            // localStorage'dan kullanıcı verilerini sil
+            localStorage.removeItem('currentUser');
+            
+            alert('Hesabınız başarıyla silindi. Güle güle! 👋');
+            window.location.href = 'index.html';
             alert('Hesabınız silme işlemi başlatıldı.\n\n24 saat içinde tüm verileriniz kalıcı olarak silinecek.\n\nGoodbye... 👋');
             window.location.href = 'index.html';
           }
