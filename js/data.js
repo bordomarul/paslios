@@ -251,7 +251,7 @@ class pasliosData {
   // Oturum yönetimi
   login(email, password) {
     const users = this.getData('users');
-    const user = users.find(u => u.email === email);
+    const user = users.find(u => u.email === email && u.password === password);
     
     if (user) {
       // Tüm kullanıcıları isCurrentUser: false yap
