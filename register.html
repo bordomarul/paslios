@@ -386,16 +386,20 @@
     <!-- Data Management Script -->
     <script src="js/data.js"></script>
     <script>
-      document.getElementById('registerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+      document.addEventListener('DOMContentLoaded', function() {
+        // Debug: Sayfa yüklendiğinde kontrol
+        console.log('DOM yüklendi, PasliosData:', typeof PasliosData);
         
-        // Debug: Form gönderildiğini kontrol et
-        alert('Form gönderildi! PasliosData tipi: ' + typeof PasliosData);
-        
-        const fullName = document.getElementById('fullName').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
-        const password = document.getElementById('password').value;
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Debug: Form gönderildiğini kontrol et
+          alert('Form gönderildi! PasliosData tipi: ' + typeof PasliosData);
+          
+          const fullName = document.getElementById('fullName').value;
+          const email = document.getElementById('email').value;
+          const phone = document.getElementById('phone').value;
+          const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         const position = document.getElementById('position').value;
         const termsAccepted = document.getElementById('termsAccepted').checked;
@@ -438,13 +442,12 @@
       });
 
       // Sayfa yüklendiğinde oturum kontrolü
-      document.addEventListener('DOMContentLoaded', function() {
-        if (PasliosData.isLoggedIn()) {
-          // Zaten giriş yapmış, home'a yönlendir
-          window.location.href = 'home.html';
-        }
-      });
-      </div>
-    </div>
+      if (PasliosData && PasliosData.isLoggedIn()) {
+        // Zaten giriş yapmış, home'a yönlendir
+        window.location.href = 'home.html';
+      }
+      
+      }); // DOMContentLoaded kapanış
+    </script>
   </body>
 </html>
