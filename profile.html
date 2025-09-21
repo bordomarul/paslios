@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Profil">
+    <meta name="description" content="Paslios - Profil">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Profil</title>
+    <title>Paslios - Profil</title>
     <style>
       * {
         margin: 0;
@@ -585,20 +585,20 @@
         <!-- Profile Info -->
         <div class="profile-info">
           <div class="profile-avatar">
-            <span style="color: #3b82f6; font-weight: bold; font-size: 1.5rem;">AY</span>
+            <span id="profile-avatar" style="color: #3b82f6; font-weight: bold; font-size: 1.5rem;">AY</span>
           </div>
-          <div class="profile-name">Ahmet Yılmaz</div>
-          <a href="team.html" class="profile-team">Çankaya Tigers</a>
+          <div id="profile-name" class="profile-name">Ahmet Yılmaz</div>
+          <a id="profile-team" href="team.html" class="profile-team">Çankaya Tigers</a>
           
           <!-- Follow Stats -->
           <div class="follow-stats">
             <a href="followers.html?tab=followers" class="follow-stat">
-              <span class="follow-number">248</span>
+              <span id="followers-count" class="follow-number">248</span>
               <span class="follow-label">Takipçi</span>
             </a>
             <span class="stat-divider">•</span>
             <a href="followers.html?tab=following" class="follow-stat">
-              <span class="follow-number">175</span>
+              <span id="following-count" class="follow-number">175</span>
               <span class="follow-label">Takip</span>
             </a>
           </div>
@@ -606,8 +606,8 @@
           <div class="profile-actions">
             <a href="create-team.html" class="create-team-btn">+ Yeni Takım Oluştur</a>
           </div>
-          <div class="profile-title">Orta Saha Oyuncusu</div>
-          <div class="profile-location">📍 Ankara, Türkiye</div>
+          <div id="profile-position" class="profile-title">Orta Saha Oyuncusu</div>
+          <div id="profile-location" class="profile-location">📍 Ankara, Türkiye</div>
         </div>
       </div>
     </div>
@@ -617,15 +617,15 @@
       <!-- Statistics -->
       <div class="stats-grid">
         <a href="leaderboard.html" class="stat-card" style="text-decoration: none; color: inherit;">
-          <div class="stat-value">24</div>
+          <div id="matches-played" class="stat-value">24</div>
           <div class="stat-label">Oynadığı Maç</div>
         </a>
         <div class="stat-card">
-          <div class="stat-value">4.6/5.0</div>
+          <div id="team-rating" class="stat-value">4.6/5.0</div>
           <div class="stat-label">Takım Oyuncusu</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">4.8/5.0</div>
+          <div id="respect-rating" class="stat-value">4.8/5.0</div>
           <div class="stat-label">Saygılı Oyuncu</div>
         </div>
       </div>
@@ -642,7 +642,7 @@
             <span class="activity-date">3 saat önce</span>
           </div>
           <div class="activity-title">Bugün harika bir maç yaptık! 🔥</div>
-          <div class="activity-description">Spor Ankara Halısaha'da takım arkadaşlarımla muhteşem bir galibiyet aldık. 3-2'lik skorla bitirdik ve ben 2 gol attım! 💪 #futsal #goalify</div>
+          <div class="activity-description">Spor Ankara Halısaha'da takım arkadaşlarımla muhteşem bir galibiyet aldık. 3-2'lik skorla bitirdik ve ben 2 gol attım! 💪 #futsal #Paslios</div>
         </div>
 
         <div class="activity-item">
@@ -936,6 +936,66 @@
           closeCurrentModal();
         }
       });
+    </script>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
+    <script>
+      // Sayfa yüklendiğinde kullanıcı verilerini yükle
+      document.addEventListener('DOMContentLoaded', function() {
+        // Oturum kontrolü
+        if (!PasliosData.isLoggedIn()) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        loadUserProfile();
+      });
+
+      function loadUserProfile() {
+        const currentUser = PasliosData.getCurrentUser();
+        if (!currentUser) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        // Profil bilgilerini güncelle
+        document.getElementById('profile-avatar').textContent = currentUser.avatar;
+        document.getElementById('profile-name').textContent = currentUser.name;
+        document.getElementById('profile-position').textContent = currentUser.position + ' Oyuncusu';
+        document.getElementById('profile-location').textContent = '📍 ' + currentUser.location;
+
+        // İstatistikleri güncelle
+        document.getElementById('matches-played').textContent = currentUser.matchesPlayed || 0;
+        document.getElementById('team-rating').textContent = (currentUser.rating || 0).toFixed(1) + '/5.0';
+        document.getElementById('respect-rating').textContent = (currentUser.rating || 0).toFixed(1) + '/5.0';
+
+        // Takım bilgisi
+        if (currentUser.teamId) {
+          const teams = PasliosData.getData('teams');
+          const userTeam = teams.find(team => team.id === currentUser.teamId);
+          if (userTeam) {
+            document.getElementById('profile-team').textContent = userTeam.name;
+          }
+        } else {
+          document.getElementById('profile-team').textContent = 'Takımsız';
+        }
+
+        // Takipçi sayıları (şimdilik sabit, ileride gerçek veri olacak)
+        document.getElementById('followers-count').textContent = Math.floor(Math.random() * 500) + 100;
+        document.getElementById('following-count').textContent = Math.floor(Math.random() * 300) + 50;
+      }
+
+      // Profil güncelleme fonksiyonu
+      function updateProfile(field, value) {
+        const success = PasliosData.updateCurrentUser({ [field]: value });
+        if (success) {
+          loadUserProfile(); // Sayfayı yenile
+          showToast('Profil başarıyla güncellendi!', 'success');
+        } else {
+          showToast('Profil güncellenirken hata oluştu!', 'error');
+        }
+      }
     </script>
   </body>
 </html>

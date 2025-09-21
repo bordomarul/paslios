@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Sohbet">
+    <meta name="description" content="Paslios - Sohbet">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Sohbet</title>
+    <title>Paslios - Sohbet</title>
     <style>
       * {
         margin: 0;
@@ -648,6 +648,74 @@
         updateSendButton();
       }
 
+      // Mesaj gönder
+      function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Mesajı UI'ye ekle
+        const messagesArea = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message sent';
+        messageElement.innerHTML = `
+          <div class="message-content">
+            <div class="message-text">${message}</div>
+            <div class="message-time">${new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}</div>
+          </div>
+        `;
+        
+        messagesArea.appendChild(messageElement);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+        
+        // Input'u temizle
+        input.value = '';
+        updateSendButton();
+        
+        // Data management sistemine kaydet (basit yaklaşım)
+        const currentUser = PasliosData.getCurrentUser();
+        if (currentUser) {
+          const newMessage = {
+            id: Date.now(),
+            senderId: currentUser.id,
+            receiverId: new URLSearchParams(window.location.search).get('user') || 'group',
+            message: message,
+            timestamp: Date.now(),
+            read: false
+          };
+          
+          let messages = PasliosData.getData('messages') || [];
+          messages.push(newMessage);
+          PasliosData.setData('messages', messages);
+        }
+        
+        // Simüle edilmiş cevap (demo için)
+        setTimeout(() => {
+          const responses = [
+            'Anladım! 👍',
+            'Tamam, görüştük!',
+            'Harika! 🔥',
+            'Evet, kesinlikle!',
+            'İyi fikir! ⚽'
+          ];
+          
+          const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+          const responseElement = document.createElement('div');
+          responseElement.className = 'message received';
+          responseElement.innerHTML = `
+            <div class="message-avatar">MK</div>
+            <div class="message-content">
+              <div class="message-text">${randomResponse}</div>
+              <div class="message-time">${new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}</div>
+            </div>
+          `;
+          
+          messagesArea.appendChild(responseElement);
+          messagesArea.scrollTop = messagesArea.scrollHeight;
+        }, 1000 + Math.random() * 2000);
+      }
+
       // Gönder butonu durumunu güncelle
       function updateSendButton() {
         const input = document.getElementById('messageInput');
@@ -667,9 +735,18 @@
 
       // Mesajları en alta kaydır
       document.addEventListener('DOMContentLoaded', function() {
+        // Oturum kontrolü
+        if (!PasliosData.isLoggedIn()) {
+          window.location.href = 'index.html';
+          return;
+        }
+        
         const messagesArea = document.getElementById('messages');
         messagesArea.scrollTop = messagesArea.scrollHeight;
       });
     </script>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
   </body>
 </html>

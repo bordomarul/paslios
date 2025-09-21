@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dil Ayarları - Goalify</title>
+    <title>Dil Ayarları - Paslios</title>
     <style>
         * {
             margin: 0;
@@ -676,7 +676,7 @@
                 autoTranslateVenues: document.querySelectorAll('.toggle-switch')[2].classList.contains('active')
             };
 
-            localStorage.setItem('goalifyLanguageSettings', JSON.stringify(languageSettings));
+            localStorage.setItem('PasliosLanguageSettings', JSON.stringify(languageSettings));
 
             alert(`Dil ayarları uygulandı! 🌍\n\nDil: ${languageNames[selectedLanguage]}\nBölge: ${regionNames[selectedRegion]}\n\nUygulama yeniden başlatılıyor...`);
             
@@ -687,7 +687,7 @@
         }
 
         function loadSavedSettings() {
-            const saved = localStorage.getItem('goalifyLanguageSettings');
+            const saved = localStorage.getItem('PasliosLanguageSettings');
             if (saved) {
                 const settings = JSON.parse(saved);
                 

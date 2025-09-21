@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Oyuncu Değerlendirmesi">
+    <meta name="description" content="Paslios - Oyuncu Değerlendirmesi">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Oyuncu Değerlendirmesi</title>
+    <title>Paslios - Oyuncu Değerlendirmesi</title>
     <style>
       * {
         margin: 0;
@@ -553,25 +553,277 @@
       </div>
     </div>
 
+    <!-- Include Data Management System -->
+    <script src="js/data.js"></script>
+    
     <script>
-      const ratings = {};
-      
-      // Initialize ratings object
-      const players = ['mehmet', 'emre', 'can', 'burak'];
-      const categories = ['teamwork', 'skill', 'respect'];
-      
-      players.forEach(player => {
-        ratings[player] = {};
-        categories.forEach(category => {
-          ratings[player][category] = null;
-        });
+      // Authentication check - redirect if not logged in
+      if (!PasliosData.isAuthenticated()) {
+        window.location.href = 'index.html';
+      }
+
+      let currentUser = PasliosData.getCurrentUser();
+      let currentMatch = null;
+      let matchPlayers = [];
+      let ratings = {};
+
+      // Get match ID from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const matchId = urlParams.get('matchId');
+
+      // Initialize page
+      document.addEventListener('DOMContentLoaded', function() {
+        if (matchId) {
+          loadMatchData();
+        } else {
+          // Show recent matches to rate
+          showRecentMatches();
+        }
       });
-      
+
+      function loadMatchData() {
+        currentMatch = PasliosData.getMatch(matchId);
+        if (!currentMatch) {
+          showToast('Maç bulunamadı!', 'error');
+          return;
+        }
+
+        // Check if user participated in this match
+        const userParticipated = currentMatch.participants?.includes(currentUser.id) ||
+                                 currentMatch.teamParticipants?.[currentUser.teamId]?.includes(currentUser.id);
+
+        if (!userParticipated) {
+          showToast('Bu maça katılmadığınız için değerlendirme yapamazsınız!', 'error');
+          return;
+        }
+
+        // Check if user already rated this match
+        const existingRating = PasliosData.getUserRating(currentUser.id, matchId);
+        if (existingRating) {
+          showCompletionMessage(true);
+          return;
+        }
+
+        // Load match info in header
+        updateMatchHeader();
+        
+        // Load players who participated in this match
+        loadMatchPlayers();
+        
+        // Initialize ratings object
+        initializeRatings();
+      }
+
+      function updateMatchHeader() {
+        const venue = PasliosData.getVenue(currentMatch.venueId);
+        const matchDate = new Date(currentMatch.date);
+        
+        document.querySelector('.match-title').textContent = venue?.name || 'Maç';
+        document.querySelector('.match-details').textContent = 
+          `${matchDate.toLocaleDateString('tr-TR')} • ${matchDate.toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})} • ${currentMatch.type === 'team' ? 'Takım Maçı' : 'Bireysel Maç'}`;
+      }
+
+      function loadMatchPlayers() {
+        matchPlayers = [];
+        
+        if (currentMatch.type === 'individual') {
+          // Individual match - load other participants
+          currentMatch.participants?.forEach(playerId => {
+            if (playerId !== currentUser.id) {
+              const player = PasliosData.getUser(playerId);
+              if (player) {
+                matchPlayers.push({
+                  id: playerId,
+                  name: player.name,
+                  position: player.position || 'Oyuncu',
+                  avatar: player.name.split(' ').map(n => n[0]).join('').toUpperCase()
+                });
+              }
+            }
+          });
+        } else if (currentMatch.type === 'team') {
+          // Team match - load team members who participated
+          const userTeam = PasliosData.getTeam(currentUser.teamId);
+          if (userTeam) {
+            const teamParticipants = currentMatch.teamParticipants?.[userTeam.id] || [];
+            teamParticipants.forEach(playerId => {
+              if (playerId !== currentUser.id) {
+                const player = PasliosData.getUser(playerId);
+                if (player) {
+                  matchPlayers.push({
+                    id: playerId,
+                    name: player.name,
+                    position: player.position || 'Oyuncu',
+                    avatar: player.name.split(' ').map(n => n[0]).join('').toUpperCase()
+                  });
+                }
+              }
+            });
+          }
+        }
+
+        if (matchPlayers.length === 0) {
+          document.getElementById('playersList').innerHTML = `
+            <div style="text-align: center; padding: 3rem 1rem; color: #6b7280;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">Değerlendirilecek oyuncu yok</div>
+              <div style="font-size: 0.875rem;">Bu maçta sizinle beraber oynayan başka oyuncu bulunmuyor.</div>
+            </div>
+          `;
+          document.getElementById('submitBtn').style.display = 'none';
+          return;
+        }
+
+        renderPlayers();
+      }
+
+      function renderPlayers() {
+        const playersList = document.getElementById('playersList');
+        playersList.innerHTML = '';
+
+        matchPlayers.forEach(player => {
+          const playerCard = createPlayerCard(player);
+          playersList.appendChild(playerCard);
+        });
+      }
+
+      function createPlayerCard(player) {
+        const playerCard = document.createElement('div');
+        playerCard.className = 'player-card';
+        playerCard.dataset.player = player.id;
+
+        playerCard.innerHTML = `
+          <div class="player-header">
+            <div class="player-avatar">${player.avatar}</div>
+            <div class="player-info">
+              <h3>${player.name}</h3>
+              <div class="player-position">${player.position}</div>
+            </div>
+          </div>
+          
+          <div class="rating-categories">
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🤝</span>
+                <span>Takım Oyuncusu</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="teamwork" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="teamwork" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="teamwork" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>⚽</span>
+                <span>Yetenekli</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="skill" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="skill" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="skill" data-value="good">İyi</button>
+              </div>
+            </div>
+            
+            <div class="rating-category">
+              <div class="category-label">
+                <span>🙏</span>
+                <span>Saygılı</span>
+              </div>
+              <div class="rating-buttons">
+                <button class="rating-btn" data-category="respect" data-value="poor">Zayıf</button>
+                <button class="rating-btn" data-category="respect" data-value="average">Orta</button>
+                <button class="rating-btn" data-category="respect" data-value="good">İyi</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        return playerCard;
+      }
+
+      function initializeRatings() {
+        const categories = ['teamwork', 'skill', 'respect'];
+        
+        matchPlayers.forEach(player => {
+          ratings[player.id] = {};
+          categories.forEach(category => {
+            ratings[player.id][category] = null;
+          });
+        });
+      }
+
+      function showRecentMatches() {
+        const recentMatches = PasliosData.getUserMatches(currentUser.id)
+          .filter(match => {
+            // Show completed matches that haven't been rated yet
+            const completedRecently = new Date(match.date) < new Date() && 
+                                    new Date() - new Date(match.date) < 7 * 24 * 60 * 60 * 1000; // Last 7 days
+            const notRated = !PasliosData.getUserRating(currentUser.id, match.id);
+            return completedRecently && notRated;
+          })
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (recentMatches.length === 0) {
+          document.querySelector('.main-content').innerHTML = `
+            <div style="text-align: center; padding: 3rem 1rem; color: #6b7280;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">Değerlendirilecek maç yok</div>
+              <div style="font-size: 0.875rem; margin-bottom: 1.5rem;">Son 7 gün içinde tamamlanan maçınız bulunmuyor.</div>
+              <a href="matches.html" style="background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Yeni Maç Bul
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        // Update header
+        document.querySelector('.match-title').textContent = 'Son Maçlarınız';
+        document.querySelector('.match-details').textContent = 'Değerlendirme bekleyen maçlar';
+
+        // Show match selection
+        const playersList = document.getElementById('playersList');
+        playersList.innerHTML = `
+          <div class="instruction">
+            <div class="instruction-icon">📋</div>
+            <div class="instruction-title">Hangi Maçı Değerlendireceksiniz?</div>
+            <div class="instruction-text">
+              Son 7 gün içinde oynadığınız maçlardan birini seçin ve oyuncuları değerlendirin.
+            </div>
+          </div>
+          
+          ${recentMatches.map(match => {
+            const venue = PasliosData.getVenue(match.venueId);
+            const matchDate = new Date(match.date);
+            return `
+              <div class="match-selection-card" onclick="selectMatch('${match.id}')" style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.2s;">
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">${venue?.name || 'Maç'}</div>
+                <div style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                  ${matchDate.toLocaleDateString('tr-TR')} • ${matchDate.toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}
+                </div>
+                <div style="color: #10b981; font-size: 0.875rem; font-weight: 600;">
+                  ${match.type === 'team' ? '🏆 Takım Maçı' : '⚽ Bireysel Maç'} • Değerlendirme Bekliyor
+                </div>
+              </div>
+            `;
+          }).join('')}
+        `;
+
+        document.getElementById('submitBtn').style.display = 'none';
+      }
+
+      function selectMatch(selectedMatchId) {
+        // Reload page with selected match
+        window.location.href = `rating.html?matchId=${selectedMatchId}`;
+      }
+
       // Handle rating button clicks
       document.addEventListener('click', function(e) {
         if (e.target.classList.contains('rating-btn')) {
           const playerCard = e.target.closest('.player-card');
-          const player = playerCard.dataset.player;
+          const playerId = playerCard.dataset.player;
           const category = e.target.dataset.category;
           const value = e.target.dataset.value;
           
@@ -585,38 +837,145 @@
           e.target.classList.add('selected', value);
           
           // Store the rating
-          ratings[player][category] = value;
+          if (!ratings[playerId]) {
+            ratings[playerId] = {};
+          }
+          ratings[playerId][category] = value;
           
           // Check if all ratings are complete
           updateSubmitButton();
         }
       });
-      
+
       function updateSubmitButton() {
         const submitBtn = document.getElementById('submitBtn');
+        if (!submitBtn) return;
+
         let allRatingsComplete = true;
+        const categories = ['teamwork', 'skill', 'respect'];
         
-        players.forEach(player => {
+        matchPlayers.forEach(player => {
           categories.forEach(category => {
-            if (ratings[player][category] === null) {
+            if (!ratings[player.id] || ratings[player.id][category] === null) {
               allRatingsComplete = false;
             }
           });
         });
         
         submitBtn.disabled = !allRatingsComplete;
+        if (allRatingsComplete) {
+          submitBtn.textContent = '✅ Değerlendirmeleri Gönder';
+          submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        } else {
+          submitBtn.textContent = `📝 ${getRatingProgress()} değerlendirme tamamlandı`;
+          submitBtn.style.background = 'linear-gradient(135deg, #6b7280, #4b5563)';
+        }
       }
-      
+
+      function getRatingProgress() {
+        let completed = 0;
+        const total = matchPlayers.length * 3; // 3 categories per player
+        const categories = ['teamwork', 'skill', 'respect'];
+        
+        matchPlayers.forEach(player => {
+          categories.forEach(category => {
+            if (ratings[player.id] && ratings[player.id][category] !== null) {
+              completed++;
+            }
+          });
+        });
+        
+        return `${completed}/${total}`;
+      }
+
       function submitRatings() {
-        // Hide the form and show completion message
-        document.getElementById('playersList').style.display = 'none';
-        document.getElementById('submitBtn').style.display = 'none';
-        document.getElementById('completionMessage').style.display = 'block';
+        if (!currentMatch) return;
+
+        // Convert ratings to numeric values for storage
+        const numericRatings = {};
+        const valueMap = { poor: 1, average: 3, good: 5 };
+        
+        Object.keys(ratings).forEach(playerId => {
+          numericRatings[playerId] = {};
+          Object.keys(ratings[playerId]).forEach(category => {
+            numericRatings[playerId][category] = valueMap[ratings[playerId][category]];
+          });
+        });
+
+        // Create rating data
+        const ratingData = {
+          raterId: currentUser.id,
+          matchId: currentMatch.id,
+          matchDate: currentMatch.date,
+          ratings: numericRatings,
+          submittedAt: new Date().toISOString()
+        };
+
+        // Save rating
+        PasliosData.createRating(ratingData);
+
+        // Update player stats
+        Object.keys(numericRatings).forEach(playerId => {
+          const playerRating = numericRatings[playerId];
+          const avgRating = (playerRating.teamwork + playerRating.skill + playerRating.respect) / 3;
+          PasliosData.updatePlayerRating(playerId, avgRating);
+        });
+
+        // Show completion message
+        showCompletionMessage(false);
         
         // Scroll to top
         window.scrollTo(0, 0);
+      }
+
+      function showCompletionMessage(alreadyRated = false) {
+        // Hide the form and show completion message
+        document.getElementById('playersList').style.display = 'none';
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) submitBtn.style.display = 'none';
         
-        console.log('Ratings submitted:', ratings);
+        document.getElementById('completionMessage').style.display = 'block';
+        
+        if (alreadyRated) {
+          document.querySelector('.completion-title').textContent = 'Zaten Değerlendirildi';
+          document.querySelector('.completion-text').textContent = 'Bu maç için daha önce değerlendirme yapmışsınız.';
+          document.querySelector('.completion-icon').textContent = '✅';
+        }
+      }
+
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+          color: white;
+          padding: 12px 20px;
+          border-radius: 12px;
+          font-weight: 600;
+          z-index: 9999;
+          opacity: 0;
+          transform: translateX(100%);
+          transition: all 0.3s ease;
+          max-width: 300px;
+        `;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
       }
     </script>
   </body>

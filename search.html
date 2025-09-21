@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Arama">
+    <meta name="description" content="Paslios - Arama">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Arama</title>
+    <title>Paslios - Arama</title>
     <style>
       * {
         margin: 0;
@@ -452,6 +452,8 @@
             type="text" 
             placeholder="Oyuncu, maç veya saha ara..."
             class="search-input"
+            id="searchInput"
+            oninput="performSearch()"
           />
           <span class="search-icon">🔍</span>
         </div>
@@ -662,7 +664,12 @@
     </div>
 
     <script>
+      let currentTab = 'players';
+      let searchQuery = '';
+
       function showTab(tabName) {
+        currentTab = tabName;
+        
         // Hide all results
         const results = document.querySelectorAll('.search-results');
         results.forEach(result => result.classList.remove('active'));
@@ -676,7 +683,213 @@
         
         // Add active class to clicked tab
         event.target.classList.add('active');
+        
+        // Refresh search results for new tab
+        performSearch();
       }
+
+      function performSearch() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        searchQuery = query;
+        
+        switch(currentTab) {
+          case 'players':
+            searchPlayers(query);
+            break;
+          case 'matches':
+            searchMatches(query);
+            break;
+          case 'venues':
+            searchVenues(query);
+            break;
+        }
+      }
+
+      function searchPlayers(query) {
+        const players = PasliosData.searchUsers(query);
+        const container = document.getElementById('players');
+        
+        if (players.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+              <span style="font-size: 3rem;">🔍</span>
+              <p style="margin-top: 1rem;">Oyuncu bulunamadı</p>
+              <p style="font-size: 0.875rem; margin-top: 0.5rem;">Farklı anahtar kelimeler deneyin</p>
+            </div>
+          `;
+          return;
+        }
+
+        const playersHTML = players.map(player => `
+          <div class="result-card">
+            <div class="player-card">
+              <div class="player-avatar">
+                <span style="color: white; font-weight: bold;">${player.avatar}</span>
+              </div>
+              <div class="player-info">
+                <div class="player-name">${player.name}</div>
+                <div class="player-position">${player.position}</div>
+                <div class="player-stats">${player.matchesPlayed || 0} maç • ${player.goals || 0} gol • ${player.assists || 0} asist</div>
+              </div>
+              <div class="player-actions">
+                <button class="btn-add" onclick="addFriend('${player.name}')">Arkadaş Ekle</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        container.innerHTML = playersHTML;
+      }
+
+      function searchMatches(query) {
+        const matches = PasliosData.getUpcomingMatches();
+        const filteredMatches = matches.filter(match => 
+          match.title.toLowerCase().includes(query) ||
+          match.location.toLowerCase().includes(query)
+        );
+        
+        const container = document.getElementById('matches');
+        
+        if (filteredMatches.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+              <span style="font-size: 3rem;">⚽</span>
+              <p style="margin-top: 1rem;">Maç bulunamadı</p>
+              <p style="font-size: 0.875rem; margin-top: 0.5rem;">Farklı anahtar kelimeler deneyin</p>
+            </div>
+          `;
+          return;
+        }
+
+        const matchesHTML = filteredMatches.map(match => {
+          const dateStr = new Date(match.date + ' ' + match.time).toLocaleDateString('tr-TR', {
+            day: 'numeric',
+            month: 'long'
+          });
+          
+          return `
+            <div class="result-card match-card">
+              <div class="match-header">
+                <span class="match-time">${dateStr} ${match.time}</span>
+                <span class="match-status">${match.currentPlayers}/${match.maxPlayers} Oyuncu</span>
+              </div>
+              <div class="match-venue">${match.title}</div>
+              <div class="match-location">
+                <span>📍</span>
+                <span>${match.location}</span>
+              </div>
+              <div class="match-footer">
+                <span class="match-players">₺${match.price || 25} kişi başı</span>
+                <button class="btn-join" onclick="joinMatch(${match.id})">Katıl</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = matchesHTML;
+      }
+
+      function searchVenues(query) {
+        // Venue verisi (demo için sabit)
+        const venues = [
+          {
+            id: 1,
+            name: 'Spor A Halısaha',
+            location: 'Çankaya, Ankara (2.3 km)',
+            rating: 4.8,
+            reviews: 156,
+            price: 150
+          },
+          {
+            id: 2,
+            name: 'Elite Football Center',
+            location: 'Mamak, Ankara (3.5 km)',
+            rating: 4.9,
+            reviews: 203,
+            price: 200
+          },
+          {
+            id: 3,
+            name: 'Champions Halısaha',
+            location: 'Keçiören, Ankara (4.1 km)',
+            rating: 4.7,
+            reviews: 89,
+            price: 180
+          }
+        ];
+
+        const filteredVenues = venues.filter(venue => 
+          venue.name.toLowerCase().includes(query) ||
+          venue.location.toLowerCase().includes(query)
+        );
+        
+        const container = document.getElementById('venues');
+        
+        if (filteredVenues.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+              <span style="font-size: 3rem;">🏟️</span>
+              <p style="margin-top: 1rem;">Saha bulunamadı</p>
+              <p style="font-size: 0.875rem; margin-top: 0.5rem;">Farklı anahtar kelimeler deneyin</p>
+            </div>
+          `;
+          return;
+        }
+
+        const venuesHTML = filteredVenues.map(venue => `
+          <div class="result-card">
+            <div class="venue-card">
+              <div class="venue-image">
+                <span style="color: white; font-size: 1.5rem;">🏟️</span>
+              </div>
+              <div class="venue-info">
+                <div class="venue-name">${venue.name}</div>
+                <div class="venue-location">📍 ${venue.location}</div>
+                <div class="venue-rating">⭐ ${venue.rating} • ${venue.reviews} değerlendirme</div>
+                <div class="venue-price">₺${venue.price}/saat</div>
+              </div>
+              <div class="venue-actions">
+                <button class="btn-book" onclick="bookVenue('${venue.name}')">Rezervasyon</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        container.innerHTML = venuesHTML;
+      }
+
+      function addFriend(playerName) {
+        alert(`${playerName} adlı oyuncuya arkadaşlık isteği gönderildi! 👥`);
+      }
+
+      function joinMatch(matchId) {
+        const currentUser = PasliosData.getCurrentUser();
+        if (!currentUser) {
+          alert('Maça katılmak için giriş yapmalısınız!');
+          return;
+        }
+        
+        alert(`Maça katılım isteği gönderildi! Onay bekliyor... ⚽`);
+      }
+
+      function bookVenue(venueName) {
+        alert(`${venueName} için rezervasyon sayfasına yönlendiriliyorsunuz... 🏟️`);
+        window.location.href = 'booking.html';
+      }
+
+      // Sayfa yüklendiğinde
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!PasliosData.isLoggedIn()) {
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        // İlk search sonuçlarını yükle
+        performSearch();
+      });
     </script>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
   </body>
 </html>

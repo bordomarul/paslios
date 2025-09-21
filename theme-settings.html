@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tema Ayarları - Goalify</title>
+    <title>Tema Ayarları - Paslios</title>
     <style>
         * {
             margin: 0;
@@ -395,7 +395,7 @@
                 </div>
                 <div class="theme-option" onclick="selectTheme('green')">
                     <div class="theme-preview green-preview"></div>
-                    <div class="theme-name">Goalify Green</div>
+                    <div class="theme-name">Paslios Green</div>
                 </div>
             </div>
         </div>
@@ -425,7 +425,7 @@
                 </div>
                 <div class="font-size-preview" id="fontPreview">
                     <div style="font-weight: 600; margin-bottom: 8px;">Başlık Metni</div>
-                    <div>Bu bir örnek metin. Yazı boyutunu test etmek için kullanılır. Goalify uygulamasında bu boyutta metin görüntülenecek.</div>
+                    <div>Bu bir örnek metin. Yazı boyutunu test etmek için kullanılır. Paslios uygulamasında bu boyutta metin görüntülenecek.</div>
                 </div>
             </div>
         </div>
@@ -602,7 +602,7 @@
             };
 
             // Save to localStorage
-            localStorage.setItem('goalifyThemeSettings', JSON.stringify(settings));
+            localStorage.setItem('PasliosThemeSettings', JSON.stringify(settings));
             
             alert(`Tema ayarları kaydedildi! 🎨\n\nTema: ${getThemeName(currentTheme)}\nRenk: ${getColorName(currentColor)}\nYazı Boyutu: ${currentFontSize}px\n\nAyarlar tüm sayfalarda uygulanacak.`);
             
@@ -635,7 +635,7 @@
                 toggles[4].classList.add('active'); // sound effects on
                 
                 // Clear localStorage
-                localStorage.removeItem('goalifyThemeSettings');
+                localStorage.removeItem('PasliosThemeSettings');
                 
                 // Reset preview
                 applyThemePreview('light');
@@ -650,7 +650,7 @@
                 'light': 'Açık Tema',
                 'dark': 'Koyu Tema',
                 'auto': 'Otomatik',
-                'green': 'Goalify Green'
+                'green': 'Paslios Green'
             };
             return names[theme] || theme;
         }
@@ -670,7 +670,7 @@
         }
 
         function loadSavedSettings() {
-            const saved = localStorage.getItem('goalifyThemeSettings');
+            const saved = localStorage.getItem('PasliosThemeSettings');
             if (saved) {
                 const settings = JSON.parse(saved);
                 

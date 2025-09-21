@@ -1,11 +1,11 @@
 {
-  "name": "goalify",
+  "name": "paslios",
   "version": "1.0.0",
-  "description": "",
+  "description": "Paslios - Futbol Sosyal Medya Platformu",
   "main": "index.js",
   "scripts": {
-    "build-css": "tailwindcss -i ./src/input.css -o ./src/output.css --watch",
-    "build": "tailwindcss -i ./src/input.css -o ./src/output.css",
+    "build-css": "tailwindcss -i ./input.css -o ./output.css --watch",
+    "build": "tailwindcss -i ./input.css -o ./output.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

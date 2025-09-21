@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Takım Detayı">
+    <meta name="description" content="Paslios - Takım Detayı">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Çankaya Tigers</title>
+    <title>Paslios - Çankaya Tigers</title>
     <style>
       * {
         margin: 0;
@@ -14,10 +14,7 @@
       }
       
       body {
-        fon        <a href="messages.html" class="nav-item">
-          <span style="font-size: 0.8rem; font-weight: bold;">MSG</span>
-          <span>Mesajlar</span>
-        </a>mily: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background: #f9fafb;
         min-height: 100vh;
         display: flex;
@@ -303,6 +300,105 @@
         font-size: 0.75rem;
         font-weight: 500;
       }
+
+      /* Tab System */
+      .tabs {
+        display: flex;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        background: white;
+        color: #6b7280;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 0.875rem;
+      }
+
+      .tab.active {
+        background: #047857;
+        color: white;
+      }
+
+      .tab:hover:not(.active) {
+        background: #f0fdf4;
+        color: #047857;
+      }
+
+      /* Tab Content */
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Leaderboard Styles */
+      .leaderboard-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #f3f4f6;
+        transition: all 0.2s;
+      }
+
+      .leaderboard-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+
+      .rank-badge {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+        flex-shrink: 0;
+      }
+
+      .rank-1 { background: #fbbf24; color: white; }
+      .rank-2 { background: #94a3b8; color: white; }
+      .rank-3 { background: #f97316; color: white; }
+      .rank-other { background: #e5e7eb; color: #374151; }
+
+      .team-leaderboard-info {
+        flex: 1;
+      }
+
+      .team-leaderboard-name {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+      }
+
+      .team-leaderboard-stats {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+
+      .team-points {
+        text-align: right;
+        font-weight: bold;
+        color: #047857;
+        font-size: 1.125rem;
+      }
     </style>
   </head>
   <body>
@@ -332,106 +428,164 @@
 
     <!-- Main Content -->
     <div class="main-content">
-      <!-- Team Statistics -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value">6</div>
-          <div class="stat-label">Aktif Oyuncu</div>
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('team-info')">
+          🏆 Takımım
+        </button>
+        <button class="tab" onclick="switchTab('leaderboard')">
+          📊 Başarı Listesi
+        </button>
+      </div>
+
+      <!-- Team Info Tab Content -->
+      <div id="team-info" class="tab-content active">
+        <!-- Team Statistics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">6</div>
+            <div class="stat-label">Aktif Oyuncu</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">23</div>
+            <div class="stat-label">Toplam Maç</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">4.5</div>
+            <div class="stat-label">Ortalama Puan</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value">23</div>
-          <div class="stat-label">Toplam Maç</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">4.5</div>
-          <div class="stat-label">Ortalama Puan</div>
+
+        <!-- Team Members -->
+        <div class="section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 class="section-title">Takım Üyeleri</h2>
+            <button onclick="inviteMember()" style="background: #10b981; color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 0.875rem; cursor: pointer; font-weight: 600;">
+              👥 Üye Davet Et
+            </button>
+          </div>
+          
+          <!-- Members will be loaded dynamically -->
+          <div id="teamMembersList"></div>
+          
+          <!-- Add new functionality buttons -->
+          <div style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <button onclick="showMatchEntry()" style="background: #059669; color: white; border: none; border-radius: 12px; padding: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              ⚽ Maç Sonucu Gir
+            </button>
+            <button onclick="showTeamSettings()" style="background: #7c3aed; color: white; border: none; border-radius: 12px; padding: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              ⚙️ Takım Ayarları
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Team Members -->
-      <div class="section">
-        <h2 class="section-title">Takım Üyeleri</h2>
-        
-        <!-- Captain -->
-        <div class="member-item captain">
-          <div class="member-avatar">
-            AY
-            <div class="captain-badge">👑</div>
+      <!-- Leaderboard Tab Content -->
+      <div id="leaderboard" class="tab-content">
+        <div class="section">
+          <h2 class="section-title">Takım Başarı Sıralaması</h2>
+          <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem; text-align: center;">
+            📊 Puan Hesabı: Galibiyet 3P • Beraberlik 1P • Üye Performans Ortalaması
+          </p>
+          
+          <!-- 1st Place -->
+          <div class="leaderboard-item">
+            <div class="rank-badge rank-1">1</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">🏆 Ankara Spor</div>
+              <div class="team-leaderboard-stats">32G • 8B • 5M | Takım Ort: 4.6⭐</div>
+            </div>
+            <div class="team-points">109 Puan</div>
           </div>
-          <div class="member-info">
-            <div class="member-name">Ahmet Yılmaz (Kaptan)</div>
-            <div class="member-position">Orta Saha Oyuncusu</div>
-            <div class="member-rating">⭐ 4.7 puan</div>
-          </div>
-          <div class="member-stats">
-            <div class="member-matches">24</div>
-            <div class="member-matches-label">maç</div>
-          </div>
-        </div>
 
-        <!-- Members -->
-        <div class="member-item">
-          <div class="member-avatar">MK</div>
-          <div class="member-info">
-            <div class="member-name">Mehmet Kaya</div>
-            <div class="member-position">Kaleci</div>
-            <div class="member-rating">⭐ 4.8 puan</div>
+          <!-- 2nd Place -->
+          <div class="leaderboard-item">
+            <div class="rank-badge rank-2">2</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">⚽ Keçiören United</div>
+              <div class="team-leaderboard-stats">28G • 12B • 5M | Takım Ort: 4.4⭐</div>
+            </div>
+            <div class="team-points">98 Puan</div>
           </div>
-          <div class="member-stats">
-            <div class="member-matches">18</div>
-            <div class="member-matches-label">maç</div>
-          </div>
-        </div>
 
-        <div class="member-item">
-          <div class="member-avatar">ED</div>
-          <div class="member-info">
-            <div class="member-name">Emre Demir</div>
-            <div class="member-position">Forvet</div>
-            <div class="member-rating">⭐ 4.3 puan</div>
+          <!-- 3rd Place -->
+          <div class="leaderboard-item">
+            <div class="rank-badge rank-3">3</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">🔥 Mamak Fire</div>
+              <div class="team-leaderboard-stats">25G • 10B • 10M | Takım Ort: 4.1⭐</div>
+            </div>
+            <div class="team-points">85 Puan</div>
           </div>
-          <div class="member-stats">
-            <div class="member-matches">16</div>
-            <div class="member-matches-label">maç</div>
-          </div>
-        </div>
 
-        <div class="member-item">
-          <div class="member-avatar">CÖ</div>
-          <div class="member-info">
-            <div class="member-name">Can Özkan</div>
-            <div class="member-position">Defans</div>
-            <div class="member-rating">⭐ 4.5 puan</div>
+          <!-- Current Team - 4th Place -->
+          <div class="leaderboard-item" style="background: #f0fdf4; border: 2px solid #10b981;">
+            <div class="rank-badge rank-other" style="background: #10b981; color: white;">4</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">🐅 Çankaya Tigers (Takımınız)</div>
+              <div class="team-leaderboard-stats">18G • 5B • 2M | Takım Ort: 4.5⭐</div>
+            </div>
+            <div class="team-points">71 Puan</div>
           </div>
-          <div class="member-stats">
-            <div class="member-matches">15</div>
-            <div class="member-matches-label">maç</div>
-          </div>
-        </div>
 
-        <div class="member-item">
-          <div class="member-avatar">BT</div>
-          <div class="member-info">
-            <div class="member-name">Burak Tunç</div>
-            <div class="member-position">Orta Saha</div>
-            <div class="member-rating">⭐ 4.2 puan</div>
+          <!-- 5th Place -->
+          <div class="leaderboard-item">
+            <div class="rank-badge rank-other">5</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">⚡ Yenimahalle Thunder</div>
+              <div class="team-leaderboard-stats">15G • 8B • 12M | Takım Ort: 3.8⭐</div>
+            </div>
+            <div class="team-points">58 Puan</div>
           </div>
-          <div class="member-stats">
-            <div class="member-matches">12</div>
-            <div class="member-matches-label">maç</div>
-          </div>
-        </div>
 
-        <div class="member-item">
-          <div class="member-avatar">AS</div>
-          <div class="member-info">
-            <div class="member-name">Ali Şen</div>
-            <div class="member-position">Kanat</div>
-            <div class="member-rating">⭐ 4.0 puan</div>
+          <!-- 6th Place -->
+          <div class="leaderboard-item">
+            <div class="rank-badge rank-other">6</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">🌟 Etimesgut Stars</div>
+              <div class="team-leaderboard-stats">12G • 10B • 13M | Takım Ort: 3.9⭐</div>
+            </div>
+            <div class="team-points">50 Puan</div>
           </div>
-          <div class="member-stats">
-            <div class="member-matches">8</div>
-            <div class="member-matches-label">maç</div>
+
+          <!-- 7th Place -->
+          <div class="leaderboard-item">
+            <div class="rank-badge rank-other">7</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">💪 Sincan Power</div>
+              <div class="team-leaderboard-stats">10G • 12B • 13M | Takım Ort: 3.7⭐</div>
+            </div>
+            <div class="team-points">44 Puan</div>
+          </div>
+
+          <!-- 8th Place -->
+          <div class="leaderboard-item">
+            <div class="rank-badge rank-other">8</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">🌊 Altındağ Waves</div>
+              <div class="team-leaderboard-stats">8G • 14B • 13M | Takım Ort: 3.5⭐</div>
+            </div>
+            <div class="team-points">40 Puan</div>
+          </div>
+
+          <!-- Match Result Entry Button (for Captain) -->
+          <div style="margin-top: 2rem; text-align: center;">
+            <button onclick="showMatchEntry()" style="background: #047857; color: white; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              ⚽ Maç Sonucu Gir
+            </button>
+          </div>
+
+          <!-- Pending Matches Section -->
+          <div id="pendingMatchesSection" style="margin-top: 2rem;">
+            <h3 style="color: #374151; font-size: 1rem; font-weight: 600; margin-bottom: 1rem; text-align: center;">
+              ⏳ Onay Bekleyen Maçlar
+            </h3>
+            <div id="pendingMatchesList" style="display: none;">
+              <!-- Pending matches will be shown here -->
+            </div>
+            <div id="noPendingMatches" style="text-align: center; color: #6b7280; font-style: italic; font-size: 0.875rem;">
+              Şu anda onay bekleyen maç yok
+            </div>
           </div>
         </div>
       </div>
@@ -458,5 +612,880 @@
         </a>
       </div>
     </div>
+
+    <!-- Include Data Management System -->
+    <script src="js/data.js"></script>
+    
+    <script>
+      // Authentication check - redirect if not logged in
+      if (!PasliosData.isAuthenticated()) {
+        window.location.href = 'index.html';
+      }
+
+      // Global variables
+      let currentUser = PasliosData.getCurrentUser();
+      let currentTeam = null;
+      let teamMembers = [];
+
+      // Initialize page
+      document.addEventListener('DOMContentLoaded', function() {
+        loadTeamData();
+        loadTeamStats();
+        loadTeamMembers();
+        loadLeaderboard();
+        updatePendingMatchesDisplay();
+      });
+
+      // Update team suggestions with real data
+      function getValidTeams() {
+        if (!PasliosData) return [];
+        const allTeams = PasliosData.getAllTeams();
+        return allTeams
+          .filter(team => team.id !== (currentTeam ? currentTeam.id : null))
+          .map(team => team.name);
+      }
+
+      function switchTab(tabId) {
+        // Hide all tab contents
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+          tab.classList.remove('active');
+        });
+
+        // Show selected tab content
+        document.getElementById(tabId).classList.add('active');
+
+        // Add active class to clicked tab
+        event.target.classList.add('active');
+      }
+
+      function loadTeamData() {
+        if (!currentUser.teamId) {
+          // User is not in a team - create one or show join team interface
+          showCreateTeamInterface();
+          return;
+        }
+
+        currentTeam = PasliosData.getTeam(currentUser.teamId);
+        if (!currentTeam) {
+          console.error('Team not found');
+          return;
+        }
+
+        // Update team header info
+        document.querySelector('.team-logo').textContent = currentTeam.logo || '⚽';
+        document.querySelector('.team-name').textContent = currentTeam.name;
+        document.querySelector('.team-founded').textContent = `Kurulma: ${new Date(currentTeam.founded).toLocaleDateString('tr-TR')}`;
+        document.querySelector('.team-location').textContent = `📍 ${currentTeam.location}`;
+        document.querySelector('title').textContent = `Paslios - ${currentTeam.name}`;
+      }
+
+      function loadTeamStats() {
+        if (!currentTeam) return;
+
+        const teamStats = PasliosData.getTeamStats(currentTeam.id);
+        const members = PasliosData.getTeamMembers(currentTeam.id);
+        
+        // Update stats cards
+        const statCards = document.querySelectorAll('.stat-card .stat-value');
+        if (statCards.length >= 3) {
+          statCards[0].textContent = members.length; // Active players
+          statCards[1].textContent = teamStats.totalMatches; // Total matches
+          statCards[2].textContent = teamStats.averageRating.toFixed(1); // Average rating
+        }
+      }
+
+      function loadTeamMembers() {
+        if (!currentTeam) return;
+
+        teamMembers = PasliosData.getTeamMembers(currentTeam.id);
+        const membersList = document.getElementById('teamMembersList');
+        
+        if (!membersList) return;
+
+        // Clear existing members
+        membersList.innerHTML = '';
+
+        if (teamMembers.length === 0) {
+          membersList.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">Henüz takım üyesi yok</div>
+              <div style="font-size: 0.875rem;">Yeni üyeler davet etmek için "Üye Davet Et" butonunu kullanın</div>
+            </div>
+          `;
+          return;
+        }
+
+        // Add team members
+        teamMembers.forEach(member => {
+          const memberElement = createMemberElement(member);
+          membersList.appendChild(memberElement);
+        });
+      }
+
+      function createMemberElement(member) {
+        const memberDiv = document.createElement('div');
+        memberDiv.className = `member-item ${member.role === 'captain' ? 'captain' : ''}`;
+        
+        const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        const stats = PasliosData.getPlayerStats(member.userId);
+        
+        memberDiv.innerHTML = `
+          <div class="member-avatar">
+            ${initials}
+            ${member.role === 'captain' ? '<div class="captain-badge">👑</div>' : ''}
+          </div>
+          <div class="member-info">
+            <div class="member-name">${member.name}${member.role === 'captain' ? ' (Kaptan)' : ''}</div>
+            <div class="member-position">${member.position || 'Genel'}</div>
+            <div class="member-rating">⭐ ${stats.rating.toFixed(1)} puan</div>
+          </div>
+          <div class="member-stats">
+            <div class="member-matches">${stats.totalMatches}</div>
+            <div class="member-matches-label">maç</div>
+          </div>
+        `;
+
+        // Add member management for captain
+        if (currentUser.id === currentTeam.captainId && member.userId !== currentUser.id) {
+          const removeBtn = document.createElement('button');
+          removeBtn.innerHTML = '🗑️';
+          removeBtn.style.cssText = 'background: #ef4444; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; margin-left: 8px;';
+          removeBtn.onclick = () => removeMember(member.userId);
+          memberDiv.appendChild(removeBtn);
+        }
+
+        return memberDiv;
+      }
+
+      function invitePlayer(userId) {
+        PasliosData.addToTeam(currentTeam.id, userId, 'member');
+        
+        // Create notification for invited user
+        PasliosData.createNotification(userId, {
+          type: 'team_invite',
+          title: 'Takım Daveti',
+          message: `${currentTeam.name} takımına davet edildiniz!`,
+          actionUrl: 'team.html'
+        });
+
+        showToast('Oyuncu takıma eklendi!', 'success');
+        closeModal();
+        
+        // Reload members
+        loadTeamMembers();
+        loadTeamStats();
+      }
+
+      function showTeamSettings() {
+        if (currentUser.id !== currentTeam.captainId) {
+          showToast('Sadece kaptan takım ayarlarını düzenleyebilir!', 'error');
+          return;
+        }
+
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+        `;
+
+        modal.innerHTML = `
+          <div style="background: white; border-radius: 16px; padding: 2rem; width: 90%; max-width: 350px; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: bold; text-align: center;">⚙️ Takım Ayarları</h3>
+            
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Takım Adı:</label>
+              <input type="text" id="editTeamName" value="${currentTeam.name}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Logo (Emoji):</label>
+              <input type="text" id="editTeamLogo" value="${currentTeam.logo}" maxlength="2" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; text-align: center; font-size: 24px;">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Lokasyon:</label>
+              <input type="text" id="editTeamLocation" value="${currentTeam.location}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            </div>
+
+            <div style="background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px; margin-bottom: 1.5rem;">
+              <p style="margin: 0; font-size: 0.875rem; color: #991b1b; text-align: center;">
+                <strong>⚠️ Tehlikeli Bölge</strong>
+              </p>
+              <button onclick="deleteTeam()" style="width: 100%; background: #dc2626; color: white; padding: 8px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 8px;">
+                🗑️ Takımı Sil
+              </button>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button onclick="updateTeamSettings()" style="flex: 1; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                ✅ Güncelle
+              </button>
+              <button onclick="closeModal()" style="flex: 1; background: #6b7280; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                ❌ İptal
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        window.currentModal = modal;
+      }
+
+      function updateTeamSettings() {
+        const newName = document.getElementById('editTeamName').value.trim();
+        const newLogo = document.getElementById('editTeamLogo').value.trim();
+        const newLocation = document.getElementById('editTeamLocation').value.trim();
+
+        if (!newName || !newLocation) {
+          showToast('Takım adı ve lokasyon gerekli!', 'error');
+          return;
+        }
+
+        if (newName.length < 3) {
+          showToast('Takım adı en az 3 karakter olmalı!', 'error');
+          return;
+        }
+
+        // Check if name is taken by another team
+        const existingTeams = PasliosData.getAllTeams();
+        const nameConflict = existingTeams.some(team => 
+          team.id !== currentTeam.id && 
+          team.name.toLowerCase() === newName.toLowerCase()
+        );
+
+        if (nameConflict) {
+          showToast('Bu takım adı zaten kullanılıyor!', 'error');
+          return;
+        }
+
+        // Update team data
+        PasliosData.updateTeam(currentTeam.id, {
+          name: newName,
+          logo: newLogo || '⚽',
+          location: newLocation
+        });
+
+        showToast('Takım bilgileri güncellendi!', 'success');
+        closeModal();
+        
+        // Reload page data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+
+      function deleteTeam() {
+        const confirmText = prompt('Takımı silmek için "TAKIMI SIL" yazın:');
+        
+        if (confirmText !== 'TAKIMI SIL') {
+          if (confirmText !== null) {
+            showToast('Silme işlemi iptal edildi.', 'error');
+          }
+          return;
+        }
+
+        // Remove all members from team
+        teamMembers.forEach(member => {
+          PasliosData.updateUser(member.userId, { teamId: null });
+        });
+
+        // Delete team
+        PasliosData.deleteTeam(currentTeam.id);
+
+        showToast('Takım silindi. Ana sayfaya yönlendiriliyorsunuz...', 'success');
+        
+        setTimeout(() => {
+          window.location.href = 'profile.html';
+        }, 2000);
+      }
+
+      function loadLeaderboard() {
+        const teams = PasliosData.getAllTeams();
+        const leaderboard = teams
+          .map(team => {
+            const stats = PasliosData.getTeamStats(team.id);
+            const members = PasliosData.getTeamMembers(team.id);
+            const avgRating = members.length > 0 
+              ? members.reduce((sum, member) => sum + PasliosData.getPlayerStats(member.userId).rating, 0) / members.length 
+              : 0;
+            
+            const points = (stats.wins * 3) + (stats.draws * 1) + Math.floor(avgRating * 10);
+            
+            return {
+              ...team,
+              wins: stats.wins,
+              draws: stats.draws,
+              losses: stats.losses,
+              avgRating: avgRating,
+              totalPoints: points
+            };
+          })
+          .sort((a, b) => b.totalPoints - a.totalPoints);
+
+        const leaderboardContainer = document.querySelector('#leaderboard');
+        const existingItems = leaderboardContainer.querySelectorAll('.leaderboard-item');
+        existingItems.forEach(item => item.remove());
+
+        leaderboard.forEach((team, index) => {
+          const rank = index + 1;
+          const isCurrentTeam = currentTeam && team.id === currentTeam.id;
+          
+          const leaderboardItem = document.createElement('div');
+          leaderboardItem.className = 'leaderboard-item';
+          if (isCurrentTeam) {
+            leaderboardItem.style.cssText = 'background: #f0fdf4; border: 2px solid #10b981;';
+          }
+
+          const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+          const rankStyle = isCurrentTeam && rank > 3 ? 'background: #10b981; color: white;' : '';
+
+          leaderboardItem.innerHTML = `
+            <div class="rank-badge ${rankClass}" ${rankStyle ? `style="${rankStyle}"` : ''}>${rank}</div>
+            <div class="team-leaderboard-info">
+              <div class="team-leaderboard-name">${team.logo} ${team.name}${isCurrentTeam ? ' (Takımınız)' : ''}</div>
+              <div class="team-leaderboard-stats">${team.wins}G • ${team.draws}B • ${team.losses}M | Takım Ort: ${team.avgRating.toFixed(1)}⭐</div>
+            </div>
+            <div class="team-points">${team.totalPoints} Puan</div>
+          `;
+
+          leaderboardContainer.appendChild(leaderboardItem);
+        });
+      }
+
+      function showCreateTeamInterface() {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+        `;
+
+        modal.innerHTML = `
+          <div style="background: white; border-radius: 16px; padding: 2rem; width: 90%; max-width: 350px;">
+            <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: bold; text-align: center;">⚽ Takım Oluştur</h3>
+            
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Takım Adı:</label>
+              <input type="text" id="teamName" placeholder="Takım adını girin..." style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Logo (Emoji):</label>
+              <input type="text" id="teamLogo" placeholder="⚽" maxlength="2" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; text-align: center; font-size: 24px;">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Lokasyon:</label>
+              <input type="text" id="teamLocation" placeholder="Şehir, İlçe..." style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button onclick="createTeam()" style="flex: 1; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                ✅ Takım Oluştur
+              </button>
+              <button onclick="window.location.href='profile.html'" style="flex: 1; background: #6b7280; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                ❌ İptal
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        window.currentModal = modal;
+      }
+
+      function createTeam() {
+        const name = document.getElementById('teamName').value.trim();
+        const logo = document.getElementById('teamLogo').value.trim() || '⚽';
+        const location = document.getElementById('teamLocation').value.trim();
+
+        if (!name || !location) {
+          showToast('Takım adı ve lokasyon gerekli!', 'error');
+          return;
+        }
+
+        if (name.length < 3) {
+          showToast('Takım adı en az 3 karakter olmalı!', 'error');
+          return;
+        }
+
+        // Check if team name already exists
+        const existingTeams = PasliosData.getAllTeams();
+        if (existingTeams.some(team => team.name.toLowerCase() === name.toLowerCase())) {
+          showToast('Bu takım adı zaten kullanılıyor!', 'error');
+          return;
+        }
+
+        const teamData = {
+          name: name,
+          logo: logo,
+          location: location,
+          captainId: currentUser.id,
+          founded: new Date().toISOString(),
+          members: [{
+            userId: currentUser.id,
+            name: currentUser.name,
+            role: 'captain',
+            position: 'Kaptan',
+            joinDate: new Date().toISOString()
+          }]
+        };
+
+        const newTeam = PasliosData.createTeam(teamData);
+        
+        // Update user's team ID
+        PasliosData.updateUser(currentUser.id, { teamId: newTeam.id });
+        currentUser = PasliosData.getCurrentUser();
+
+        showToast('Takım başarıyla oluşturuldu! 🎉', 'success');
+        closeModal();
+        
+        // Reload page data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+
+      function removeMember(userId) {
+        if (!confirm('Bu üyeyi takımdan çıkarmak istediğinizden emin misiniz?')) {
+          return;
+        }
+
+        PasliosData.removeFromTeam(currentTeam.id, userId);
+        showToast('Üye takımdan çıkarıldı.', 'success');
+        
+        // Reload members
+        loadTeamMembers();
+        loadTeamStats();
+      }
+
+      function inviteMember() {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+        `;
+
+        modal.innerHTML = `
+          <div style="background: white; border-radius: 16px; padding: 2rem; width: 90%; max-width: 350px;">
+            <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: bold; text-align: center;">👥 Üye Davet Et</h3>
+            
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Oyuncu Ara:</label>
+              <input type="text" id="playerSearch" placeholder="İsim veya kullanıcı adı..." style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;" oninput="searchPlayers(this.value)">
+              <div id="playerResults" style="max-height: 200px; overflow-y: auto; margin-top: 8px;"></div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button onclick="closeModal()" style="flex: 1; background: #6b7280; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                ❌ İptal
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        window.currentModal = modal;
+      }
+
+      function searchPlayers(query) {
+        const resultsDiv = document.getElementById('playerResults');
+        
+        if (!query || query.length < 2) {
+          resultsDiv.innerHTML = '';
+          return;
+        }
+
+        const users = PasliosData.searchUsers(query);
+        const availableUsers = users.filter(user => 
+          user.id !== currentUser.id && 
+          !user.teamId &&
+          !teamMembers.some(member => member.userId === user.id)
+        );
+
+        if (availableUsers.length === 0) {
+          resultsDiv.innerHTML = '<div style="padding: 12px; color: #6b7280;">Takımsız oyuncu bulunamadı</div>';
+          return;
+        }
+
+        resultsDiv.innerHTML = availableUsers.map(user => `
+          <div onclick="invitePlayer('${user.id}')" style="padding: 12px; cursor: pointer; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+            <div style="font-weight: 600;">${user.name}</div>
+            <div style="font-size: 0.875rem; color: #6b7280;">@${user.username} • ⭐ ${PasliosData.getPlayerStats(user.id).rating.toFixed(1)}</div>
+          </div>
+        `).join('');
+      }
+
+      // Toast notification system
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: ${type === 'success' ? '#10b981' : '#ef4444'};
+          color: white;
+          padding: 12px 20px;
+          border-radius: 12px;
+          font-weight: 600;
+          z-index: 9999;
+          opacity: 0;
+          transform: translateX(100%);
+          transition: all 0.3s ease;
+        `;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      // Match result entry modal
+      function showMatchEntry() {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        `;
+
+        modal.innerHTML = `
+          <div style="background: white; border-radius: 16px; padding: 2rem; width: 90%; max-width: 350px; transform: scale(0.9); transition: transform 0.3s ease;">
+            <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: bold; text-align: center;">⚽ Maç Sonucu Gir</h3>
+            
+            <div style="margin-bottom: 1rem; position: relative;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Rakip Takım:</label>
+              <input type="text" id="opponentTeam" placeholder="Takım adını seçin..." style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;" oninput="showTeamSuggestions(this.value)" autocomplete="off">
+              <div id="teamSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 1000; display: none;"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Bizim Skor:</label>
+                <input type="number" id="ourScore" min="0" max="20" value="0" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; text-align: center;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600;">Rakip Skor:</label>
+                <input type="number" id="theirScore" min="0" max="20" value="0" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; text-align: center;">
+              </div>
+            </div>
+
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 1.5rem;">
+              <p style="margin: 0; font-size: 0.875rem; color: #92400e;">
+                ⚠️ <strong>Önemli:</strong> Bu sonuç rakip takıma da gönderilecek ve onayları beklenecek. Sahte sonuç girişi tespit edilirse takımınız ceza alabilir.
+              </p>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button onclick="submitMatch()" style="flex: 1; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                📤 Gönder (Onay Bekleyecek)
+              </button>
+              <button onclick="closeModal()" style="flex: 1; background: #6b7280; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                ❌ İptal
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        window.currentModal = modal;
+
+        // Show modal with animation
+        setTimeout(() => {
+          modal.style.opacity = '1';
+          modal.querySelector('div').style.transform = 'scale(1)';
+        }, 10);
+      }
+
+      function closeModal() {
+        if (window.currentModal) {
+          window.currentModal.style.opacity = '0';
+          window.currentModal.querySelector('div').style.transform = 'scale(0.9)';
+          setTimeout(() => {
+            window.currentModal.remove();
+            window.currentModal = null;
+          }, 300);
+        }
+      }
+
+      function submitMatch() {
+        const opponent = document.getElementById('opponentTeam').value.trim();
+        const ourScore = parseInt(document.getElementById('ourScore').value);
+        const theirScore = parseInt(document.getElementById('theirScore').value);
+
+        // Validation
+        if (!opponent) {
+          showToast('Rakip takım adını seçin!', 'error');
+          return;
+        }
+
+        if (!isValidTeam(opponent)) {
+          showToast('Geçersiz takım! Lütfen listeden seçin.', 'error');
+          return;
+        }
+
+        if (opponent === currentTeam.name) {
+          showToast('Kendi takımınızla maç yapamazsınız!', 'error');
+          return;
+        }
+
+        // Anti-spam check
+        if (!validateMatchSubmission()) {
+          return;
+        }
+
+        // Determine result and points
+        let result = '';
+        let points = 0;
+        
+        if (ourScore > theirScore) {
+          result = 'win';
+          points = 3;
+        } else if (ourScore === theirScore) {
+          result = 'draw';
+          points = 1;
+        } else {
+          result = 'loss';
+          points = 0;
+        }
+
+        // Get opponent team
+        const opponentTeam = PasliosData.getAllTeams().find(team => team.name === opponent);
+        if (!opponentTeam) {
+          showToast('Rakip takım bulunamadı!', 'error');
+          return;
+        }
+
+        // Create match data
+        const matchData = {
+          homeTeamId: currentTeam.id,
+          awayTeamId: opponentTeam.id,
+          homeScore: ourScore,
+          awayScore: theirScore,
+          result: result,
+          status: 'pending_confirmation',
+          submittedBy: currentTeam.id,
+          submittedAt: new Date().toISOString(),
+          venue: 'Saha bilgisi eklenecek',
+          type: 'friendly'
+        };
+
+        // Save match
+        const newMatch = PasliosData.createMatch(matchData);
+        
+        // Create notification for opponent team captain
+        const opponentCaptain = PasliosData.getUser(opponentTeam.captainId);
+        if (opponentCaptain) {
+          PasliosData.createNotification(opponentCaptain.id, {
+            type: 'match_confirmation',
+            title: 'Maç Sonucu Onayı',
+            message: `${currentTeam.name} takımı ${ourScore}-${theirScore} sonuçlu maç için onayınızı bekliyor.`,
+            actionUrl: `match-confirmation.html?matchId=${newMatch.id}`,
+            metadata: { matchId: newMatch.id }
+          });
+        }
+
+        showToast(`${opponent} takımına maç sonucu gönderildi! Onaylarını bekleniyor... ⏳`, 'success');
+        
+        // Close modal
+        closeModal();
+        
+        // Add to pending matches list
+        addToPendingMatches(matchData);
+        
+        // Reload stats
+        loadTeamStats();
+        loadLeaderboard();
+      }
+
+      // Team suggestions database
+      const validTeams = [
+        '🏆 Ankara Spor',
+        '⚽ Keçiören United', 
+        '🔥 Mamak Fire',
+        '⚡ Yenimahalle Thunder',
+        '🌟 Etimesgut Stars',
+        '💪 Sincan Power',
+        '🌊 Altındağ Waves',
+        '🦅 Polatlı Eagles',
+        '🚀 Gölbaşı Rockets',
+        '⭐ Beypazarı Stars',
+        '� Çubuk United',
+        '🔴 Kalecik Red',
+        '💙 Haymana Blue'
+      ];
+
+      function showTeamSuggestions(query) {
+        const suggestionsDiv = document.getElementById('teamSuggestions');
+        
+        if (!query || query.length < 2) {
+          suggestionsDiv.style.display = 'none';
+          return;
+        }
+
+        const validTeams = getValidTeams();
+        const filtered = validTeams.filter(team => 
+          team.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filtered.length === 0) {
+          suggestionsDiv.innerHTML = '<div style="padding: 12px; color: #6b7280; font-style: italic;">Takım bulunamadı</div>';
+        } else {
+          suggestionsDiv.innerHTML = filtered.map(team => 
+            `<div onclick="selectTeam('${team}')" style="padding: 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">${team}</div>`
+          ).join('');
+        }
+        
+        suggestionsDiv.style.display = 'block';
+      }
+
+      function selectTeam(teamName) {
+        document.getElementById('opponentTeam').value = teamName;
+        document.getElementById('teamSuggestions').style.display = 'none';
+      }
+
+      function isValidTeam(teamName) {
+        const validTeams = getValidTeams();
+        return validTeams.includes(teamName);
+      }
+
+      // Anti-spam validation
+      function validateMatchSubmission() {
+        const lastSubmission = localStorage.getItem('lastMatchSubmission');
+        const now = Date.now();
+        
+        if (lastSubmission) {
+          const timeDiff = now - parseInt(lastSubmission);
+          const minInterval = 5 * 60 * 1000; // 5 minutes
+          
+          if (timeDiff < minInterval) {
+            const remainingTime = Math.ceil((minInterval - timeDiff) / 60000);
+            showToast(`Spam koruması! ${remainingTime} dakika sonra tekrar deneyebilirsiniz.`, 'error');
+            return false;
+          }
+        }
+        
+        localStorage.setItem('lastMatchSubmission', now.toString());
+        return true;
+      }
+
+      // Pending matches management
+      function addToPendingMatches(matchData) {
+        let pendingMatches = JSON.parse(localStorage.getItem('pendingMatches') || '[]');
+        pendingMatches.push(matchData);
+        localStorage.setItem('pendingMatches', JSON.stringify(pendingMatches));
+        
+        updatePendingMatchesDisplay();
+      }
+
+      function updatePendingMatchesDisplay() {
+        const pendingMatches = JSON.parse(localStorage.getItem('pendingMatches') || '[]');
+        const listDiv = document.getElementById('pendingMatchesList');
+        const noMatchesDiv = document.getElementById('noPendingMatches');
+        
+        if (pendingMatches.length === 0) {
+          listDiv.style.display = 'none';
+          noMatchesDiv.style.display = 'block';
+          return;
+        }
+        
+        noMatchesDiv.style.display = 'none';
+        listDiv.style.display = 'block';
+        
+        listDiv.innerHTML = pendingMatches.map((match, index) => `
+          <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>${match.opponent}</strong>
+                <div style="font-size: 0.875rem; color: #92400e;">
+                  ${match.ourScore}-${match.theirScore} • ${match.result} • ${new Date(match.date).toLocaleDateString('tr-TR')}
+                </div>
+              </div>
+              <button onclick="cancelPendingMatch(${index})" style="background: #ef4444; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer;">
+                İptal
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function cancelPendingMatch(index) {
+        let pendingMatches = JSON.parse(localStorage.getItem('pendingMatches') || '[]');
+        const cancelledMatch = pendingMatches[index];
+        
+        pendingMatches.splice(index, 1);
+        localStorage.setItem('pendingMatches', JSON.stringify(pendingMatches));
+        
+        showToast(`${cancelledMatch.opponent} maçı iptal edildi.`, 'success');
+        updatePendingMatchesDisplay();
+      }
+
+      // Initialize pending matches display on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        updatePendingMatchesDisplay();
+      });
+
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', function(e) {
+        const suggestionsDiv = document.getElementById('teamSuggestions');
+        const inputField = document.getElementById('opponentTeam');
+        
+        if (suggestionsDiv && inputField && !suggestionsDiv.contains(e.target) && e.target !== inputField) {
+          suggestionsDiv.style.display = 'none';
+        }
+      });
+    </script>
   </body>
 </html>

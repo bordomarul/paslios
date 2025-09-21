@@ -3,14 +3,19 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Hesap oluştur">
+    <meta name="description" content="Paslios - Hesap oluştur ve sahada buluş!">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Kayıt Ol</title>
+    <title>Paslios - Kayıt Ol</title>
     <style>
       * {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
+            <p class="already-member">
+            Zaten üye misiniz? 
+            <a href="index.html" class="login-link">Giriş yapın</a>
+          </p>
+        </div>
+      </div> border-box;
       }
       
       body {
@@ -284,14 +289,15 @@
         <!-- Başlık -->
         <div style="text-align: center; margin-bottom: 2rem;">
           <h1>Hesap Oluştur</h1>
-          <p class="subtitle">Goalify ailesine katılın!</p>
+          <p class="subtitle">Paslios ailesine katılın!</p>
         </div>
 
         <!-- Kayıt Formu -->
-        <form onsubmit="event.preventDefault(); window.location.href='home.html';">
+        <form id="registerForm">
           <div class="form-group">
             <input 
               type="text" 
+              id="fullName"
               placeholder="Ad Soyad"
               class="input"
               required
@@ -301,6 +307,7 @@
           <div class="form-group">
             <input 
               type="email" 
+              id="email"
               placeholder="Email"
               class="input"
               required
@@ -310,6 +317,7 @@
           <div class="form-group">
             <input 
               type="tel" 
+              id="phone"
               placeholder="Telefon (0555 123 45 67)"
               class="input"
               required
@@ -319,6 +327,7 @@
           <div class="form-group">
             <input 
               type="password" 
+              id="password"
               placeholder="Şifre"
               class="input"
               required
@@ -328,6 +337,7 @@
           <div class="form-group">
             <input 
               type="password" 
+              id="confirmPassword"
               placeholder="Şifre Tekrar"
               class="input"
               required
@@ -335,18 +345,18 @@
           </div>
 
           <div class="form-group">
-            <select class="select" required>
+            <select id="position" class="select" required>
               <option value="">Pozisyonunuz</option>
-              <option value="kaleci">Kaleci</option>
-              <option value="defans">Defans</option>
-              <option value="orta-saha">Orta Saha</option>
-              <option value="forvet">Forvet</option>
-              <option value="her-pozisyon">Her Pozisyon</option>
+              <option value="Kaleci">Kaleci</option>
+              <option value="Defans">Defans</option>
+              <option value="Orta Saha">Orta Saha</option>
+              <option value="Forvet">Forvet</option>
+              <option value="Her Pozisyon">Her Pozisyon</option>
             </select>
           </div>
 
           <div class="checkbox-group">
-            <input type="checkbox" class="checkbox" required>
+            <input type="checkbox" id="termsAccepted" class="checkbox" required>
             <span class="checkbox-label">
               <a href="terms-of-service.html" class="checkbox-link">Kullanım Koşulları</a>'nı ve 
               <a href="privacy-policy.html" class="checkbox-link">Gizlilik Politikası</a>'nı kabul ediyorum
@@ -365,22 +375,71 @@
             <a href="index.html" class="login-link">Giriş yapın</a>
           </p>
         </div>
-
-        <!-- Demo Linkler -->
-        <div class="demo-section">
-          <p class="demo-text">Demo için sayfaları görüntüle:</p>
-          <div class="demo-links">
-            <a href="home.html" class="demo-link blue">Ana Sayfa</a>
-            <a href="matches.html" class="demo-link green">Maçlar</a>
-            <a href="profile.html" class="demo-link purple">Profil</a>
-            <a href="search.html" class="demo-link orange">Arama</a>
-          </div>
-        </div>
       </div>
 
       <!-- Alt Bilgi -->
       <div class="footer">
-        <p>© 2025 Goalify. Tüm hakları saklıdır.</p>
+        <p>© 2025 Paslios. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
+    <script>
+      document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const position = document.getElementById('position').value;
+        const termsAccepted = document.getElementById('termsAccepted').checked;
+        
+        // Form doğrulaması
+        if (password !== confirmPassword) {
+          alert('Şifreler eşleşmiyor!');
+          return;
+        }
+        
+        if (password.length < 6) {
+          alert('Şifre en az 6 karakter olmalı!');
+          return;
+        }
+        
+        if (!termsAccepted) {
+          alert('Kullanım koşullarını kabul etmelisiniz!');
+          return;
+        }
+        
+        // Kullanıcı kaydı
+        const userData = {
+          name: fullName,
+          email: email,
+          phone: phone,
+          position: position,
+          bio: `${position} pozisyonunda oynayan futbol tutkunu`,
+          location: 'Ankara, Türkiye'
+        };
+        
+        const result = PasliosData.register(userData);
+        
+        if (result.success) {
+          alert(`Hoş geldiniz, ${result.user.name}! Hesabınız başarıyla oluşturuldu.`);
+          window.location.href = 'home.html';
+        } else {
+          alert(result.message || 'Kayıt işlemi başarısız!');
+        }
+      });
+
+      // Sayfa yüklendiğinde oturum kontrolü
+      document.addEventListener('DOMContentLoaded', function() {
+        if (PasliosData.isLoggedIn()) {
+          // Zaten giriş yapmış, home'a yönlendir
+          window.location.href = 'home.html';
+        }
+      });
       </div>
     </div>
   </body>

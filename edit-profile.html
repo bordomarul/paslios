@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profili Düzenle - Goalify</title>
+    <title>Profili Düzenle - Paslios</title>
     <style>
         * {
             margin: 0;
@@ -412,16 +412,16 @@ Haftada 4 gün saha, her gün antrenman! 💪</textarea>
 
         function saveProfile() {
             const profileData = {
-                fullName: document.getElementById('fullName').value,
+                name: document.getElementById('fullName').value,
                 username: document.getElementById('username').value,
                 bio: document.getElementById('bio').value,
-                city: document.getElementById('city').value,
+                location: document.getElementById('city').value,
                 phone: document.getElementById('phone').value,
                 birthDate: document.getElementById('birthDate').value
             };
 
             // Validation
-            if (!profileData.fullName.trim()) {
+            if (!profileData.name.trim()) {
                 showToast('Lütfen adınızı ve soyadınızı girin.', 'error');
                 return;
             }
@@ -431,18 +431,57 @@ Haftada 4 gün saha, her gün antrenman! 💪</textarea>
                 return;
             }
 
-            // Save profile
-            showToast('Profil bilgileriniz başarıyla güncellendi! ✅', 'success');
-            setTimeout(() => {
-                window.location.href = 'settings.html';
-            }, 1500);
+            // Save profile using data management system
+            const success = PasliosData.updateCurrentUser(profileData);
+            
+            if (success) {
+                showToast('Profil bilgileriniz başarıyla güncellendi! ✅', 'success');
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 1500);
+            } else {
+                showToast('Profil güncellenirken hata oluştu!', 'error');
+            }
+        }
+
+        // Sayfa yüklendiğinde kullanıcı verilerini form'a yükle
+        function loadUserData() {
+            if (!PasliosData.isLoggedIn()) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const currentUser = PasliosData.getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Form alanlarını doldur
+            document.getElementById('fullName').value = currentUser.name || '';
+            document.getElementById('username').value = currentUser.username || currentUser.name.toLowerCase().replace(' ', '') || '';
+            document.getElementById('bio').value = currentUser.bio || '';
+            document.getElementById('city').value = currentUser.location || '';
+            document.getElementById('phone').value = currentUser.phone || '';
+            document.getElementById('birthDate').value = currentUser.birthDate || '';
+            
+            // Avatar göster
+            const avatarElement = document.querySelector('.profile-avatar span');
+            if (avatarElement && currentUser.avatar) {
+                avatarElement.textContent = currentUser.avatar;
+            }
+
+            updateCharCounter();
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            updateCharCounter();
+            loadUserData();
         });
     </script>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
 
     <!-- Toast Container -->
     <div id="toastContainer"></div>

@@ -3,9 +3,20 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Halısaha maçları için sosyal platform">
+    <meta name="description" content="Paslios - Türkiye'nin en büyük halısaha ve futbol sosyal platformu. Sahada buluşalım, Paslios'ta tanışalım! Maç organize et, takım kur, oyuncu bul.">
+    <meta name="keywords" content="halısaha, futbol, maç, takım, oyuncu, sosyal platform, spor, Türkiye">
+    <meta name="author" content="Paslios">
+    <meta property="og:title" content="Paslios - Futbol Sosyal Platformu">
+    <meta property="og:description" content="Türkiye'nin en büyük halısaha ve futbol sosyal platformu. Sahada buluşalım, Paslios'ta tanışalım!">
+    <meta property="og:url" content="https://paslios.com">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://paslios.com/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Paslios - Futbol Sosyal Platformu">
+    <meta name="twitter:description" content="Türkiye'nin en büyük halısaha ve futbol sosyal platformu">
+    <link rel="canonical" href="https://paslios.com">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Giriş</title>
+    <title>Paslios - Türkiye'nin Futbol Sosyal Platformu</title>
     <style>
       * {
         margin: 0;
@@ -292,15 +303,16 @@
           <div class="logo">
             <span>⚽</span>
           </div>
-          <h1>Goalify</h1>
-          <p class="subtitle">Halısaha maçları burada başlıyor!</p>
+          <h1>Paslios</h1>
+          <p class="subtitle">Sahada buluşalım, paslios'ta tanışalım!</p>
         </div>
 
         <!-- Giriş Formu -->
-        <form onsubmit="event.preventDefault(); window.location.href='home.html';">
+        <form id="loginForm">
           <div class="form-group">
             <input 
               type="email" 
+              id="email"
               placeholder="Email"
               class="input"
               required
@@ -310,6 +322,7 @@
           <div class="form-group">
             <input 
               type="password" 
+              id="password"
               placeholder="Şifre"
               class="input"
               required
@@ -318,10 +331,10 @@
 
           <div class="checkbox-group">
             <label class="checkbox-label">
-              <input type="checkbox" class="checkbox">
+              <input type="checkbox" id="rememberMe" class="checkbox">
               <span>Beni hatırla</span>
             </label>
-            <a href="#" class="forgot-link">Şifremi unuttum?</a>
+            <a href="forgot-password.html" class="forgot-link">Şifremi unuttum?</a>
           </div>
 
           <button type="submit" class="btn-primary">
@@ -346,23 +359,51 @@
           <button class="btn-facebook">Facebook</button>
           <button class="btn-google">Google</button>
         </div>
-
-        <!-- Demo Linkler -->
-        <div class="demo-section">
-          <p class="demo-text">Demo için sayfaları görüntüle:</p>
-          <div class="demo-links">
-            <a href="home.html" class="demo-link blue">Ana Sayfa</a>
-            <a href="matches.html" class="demo-link green">Maçlar</a>
-            <a href="profile.html" class="demo-link purple">Profil</a>
-            <a href="search.html" class="demo-link orange">Arama</a>
-          </div>
-        </div>
       </div>
 
       <!-- Alt Bilgi -->
       <div class="footer">
-        <p>© 2025 Goalify. Tüm hakları saklıdır.</p>
+        <p>© 2025 Paslios. Tüm hakları saklıdır.</p>
       </div>
     </div>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
+    <script>
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        // Demo için her email/şifre kombinasyonunu kabul et
+        // Gerçek uygulamada password doğrulaması yapılacak
+        const result = PasliosData.login(email, password);
+        
+        if (result.success) {
+          // Remember me seçeneği
+          if (rememberMe) {
+            localStorage.setItem('Paslios_remember', 'true');
+          }
+          
+          // Success message
+          alert(`Hoş geldiniz, ${result.user.name}!`);
+          
+          // Redirect to home
+          window.location.href = 'home.html';
+        } else {
+          alert(result.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
+        }
+      });
+
+      // Sayfa yüklendiğinde oturum kontrolü
+      document.addEventListener('DOMContentLoaded', function() {
+        if (PasliosData.isLoggedIn()) {
+          // Zaten giriş yapmış, home'a yönlendir
+          window.location.href = 'home.html';
+        }
+      });
+    </script>
   </body>
 </html>

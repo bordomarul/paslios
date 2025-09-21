@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Ayarlar">
+    <meta name="description" content="Paslios - Ayarlar">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Ayarlar</title>
+    <title>Paslios - Ayarlar</title>
     <style>
       * {
         margin: 0;
@@ -278,7 +278,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="change-password.html" class="menu-item">
+        <a href="change-password.html" class="menu-item" onclick="changePassword(); return false;">
           <div class="menu-item-left">
             <div class="menu-icon">🔒</div>
             <div>
@@ -289,7 +289,7 @@
           <span class="menu-arrow">→</span>
         </a>
 
-        <a href="change-email.html" class="menu-item">
+        <a href="change-email.html" class="menu-item" onclick="changeEmail(); return false;">
           <div class="menu-item-left">
             <div class="menu-icon">📧</div>
             <div>
@@ -514,8 +514,8 @@
 
       <!-- Version Info -->
       <div class="version-info">
-        <p>Goalify v1.0.0</p>
-        <p>© 2025 Goalify. Tüm hakları saklıdır.</p>
+        <p>Paslios v1.0.0</p>
+        <p>© 2025 Paslios. Tüm hakları saklıdır.</p>
       </div>
     </div>
 
@@ -544,10 +544,87 @@
     <script>
       function toggleSwitch(element) {
         element.classList.toggle('active');
+        
+        // Ayarı kaydet
+        const menuItem = element.closest('.menu-item');
+        const settingName = menuItem.querySelector('.menu-text').textContent;
+        const isActive = element.classList.contains('active');
+        
+        // Ayarları data management sistemine kaydet
+        const settings = PasliosData.getData('settings') || {
+          notifications: {},
+          privacy: {}
+        };
+        
+        switch(settingName) {
+          case 'Push Bildirimleri':
+            settings.notifications.push = isActive;
+            break;
+          case 'Maç Davetleri':
+            settings.notifications.matchInvites = isActive;
+            break;
+          case 'Haftalık Özet':
+            settings.notifications.weeklyReport = isActive;
+            break;
+          case 'Takım Güncellemeleri':
+            settings.notifications.teamUpdates = isActive;
+            break;
+          case 'Profil Görünürlüğü':
+            settings.privacy.profileVisible = isActive;
+            break;
+          case 'İletişim Bilgileri':
+            settings.privacy.contactVisible = isActive;
+            break;
+        }
+        
+        PasliosData.setData('settings', settings);
+        
+        // Toast bildirimi
+        const statusText = isActive ? 'açıldı' : 'kapatıldı';
+        showToast(`${settingName} ${statusText}`, 'info');
+      }
+
+      function changePassword() {
+        const currentPassword = prompt('Mevcut şifrenizi girin:');
+        if (!currentPassword) return;
+        
+        const newPassword = prompt('Yeni şifrenizi girin:');
+        if (!newPassword) return;
+        
+        const confirmPassword = prompt('Yeni şifrenizi tekrar girin:');
+        if (newPassword !== confirmPassword) {
+          alert('Şifreler eşleşmiyor!');
+          return;
+        }
+        
+        if (newPassword.length < 6) {
+          alert('Şifre en az 6 karakter olmalı!');
+          return;
+        }
+        
+        alert('Şifreniz başarıyla değiştirildi! 🔒');
+      }
+
+      function changeEmail() {
+        const newEmail = prompt('Yeni email adresinizi girin:');
+        if (!newEmail) return;
+        
+        if (!newEmail.includes('@')) {
+          alert('Geçerli bir email adresi girin!');
+          return;
+        }
+        
+        const currentUser = PasliosData.getCurrentUser();
+        if (currentUser) {
+          PasliosData.updateCurrentUser({ email: newEmail });
+          alert('Email adresiniz başarıyla değiştirildi! 📧');
+        }
       }
 
       function clearCache() {
         if (confirm('Önbellek temizlensin mi?\n\nBu işlem uygulamayı yeniden başlatabilir.')) {
+          // Cache temizleme simülasyonu
+          localStorage.removeItem('Paslios_cache');
           alert('Önbellek başarıyla temizlendi! 🧹\n\nUygulama performansı artırıldı.');
         }
       }
@@ -555,12 +632,16 @@
       function rateApp() {
         if (confirm('App Store\'a yönlendirilsiniz.\n\nDevam etmek istiyor musunuz?')) {
           alert('App Store\'a yönlendiriliyorsunuz... ⭐\n\nTeşekkürler!');
-          // Real app: window.open('https://apps.apple.com/app/goalify', '_blank');
+          // Real app: window.open('https://apps.apple.com/app/Paslios', '_blank');
         }
       }
 
       function confirmLogout() {
-        return confirm('Çıkış yapmak istediğinize emin misiniz?\n\nTekrar giriş yapmanız gerekecek.');
+        if (confirm('Çıkış yapmak istediğinize emin misiniz?\n\nTekrar giriş yapmanız gerekecek.')) {
+          PasliosData.logout();
+          return true;
+        }
+        return false;
       }
 
       function deleteAccount() {
@@ -568,6 +649,11 @@
         
         if (confirmation === 'SIL') {
           if (confirm('Son kez soruyoruz:\n\nHesabınızı kalıcı olarak silmek istediğinize emin misiniz?\n\n• Tüm verileriniz silinecek\n• Gönderileriniz kaldırılacak\n• Bu işlem geri alınamaz')) {
+            const currentUser = PasliosData.getCurrentUser();
+            if (currentUser) {
+              PasliosData.deleteData('users', currentUser.id);
+              PasliosData.logout();
+            }
             alert('Hesabınız silme işlemi başlatıldı.\n\n24 saat içinde tüm verileriniz kalıcı olarak silinecek.\n\nGoodbye... 👋');
             window.location.href = 'index.html';
           }
@@ -575,6 +661,85 @@
           alert('Yanlış metin girdiniz. Hesap silme işlemi iptal edildi.');
         }
       }
+
+      // Sayfa yüklendiğinde ayarları yükle
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!PasliosData.isLoggedIn()) {
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        loadSettings();
+      });
+
+      function loadSettings() {
+        const settings = PasliosData.getData('settings');
+        if (!settings) return;
+        
+        // Toggle switch'leri ayarla
+        const toggles = document.querySelectorAll('.toggle-switch');
+        toggles.forEach(toggle => {
+          const menuItem = toggle.closest('.menu-item');
+          const settingName = menuItem.querySelector('.menu-text').textContent;
+          let isActive = false;
+          
+          switch(settingName) {
+            case 'Push Bildirimleri':
+              isActive = settings.notifications?.push || false;
+              break;
+            case 'Maç Davetleri':
+              isActive = settings.notifications?.matchInvites || false;
+              break;
+            case 'Haftalık Özet':
+              isActive = settings.notifications?.weeklyReport || false;
+              break;
+            case 'Takım Güncellemeleri':
+              isActive = settings.notifications?.teamUpdates || false;
+              break;
+            case 'Profil Görünürlüğü':
+              isActive = settings.privacy?.profileVisible || false;
+              break;
+            case 'İletişim Bilgileri':
+              isActive = settings.privacy?.contactVisible || false;
+              break;
+          }
+          
+          if (isActive) {
+            toggle.classList.add('active');
+          } else {
+            toggle.classList.remove('active');
+          }
+        });
+      }
+
+      // Toast gösterme fonksiyonu
+      function showToast(message, type = 'info') {
+        // Basit toast implementasyonu
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: ${type === 'info' ? '#10b981' : '#ef4444'};
+          color: white;
+          padding: 10px 20px;
+          border-radius: 8px;
+          z-index: 10000;
+          max-width: 350px;
+          text-align: center;
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.remove();
+        }, 3000);
+      }
+    </script>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
     </script>
   </body>
 </html>

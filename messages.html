@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Goalify - Mesajlar">
+    <meta name="description" content="Paslios - Mesajlar">
     <link href="output.css" rel="stylesheet">
-    <title>Goalify - Mesajlar</title>
+    <title>Paslios - Mesajlar</title>
     <style>
       * {
         margin: 0;
@@ -621,7 +621,7 @@
           <span>⚽</span>
           <span>Maçlar</span>
         </a>
-        <a href="messages.html" class="nav-item">
+        <a href="messages.html" class="nav-item active">
           <span>💌</span>
           <span>Mesajlar</span>
         </a>
@@ -1131,8 +1131,67 @@
             closeCurrentModal();
           }
         });
+
+        // Oturum kontrolü ve mesajları yükle
+        if (!PasliosData.isLoggedIn()) {
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        loadConversations();
       });
+
+      function loadConversations() {
+        const currentUser = PasliosData.getCurrentUser();
+        const allUsers = PasliosData.getData('users');
+        const messages = PasliosData.getData('messages') || [];
+        
+        // Konuşma listesi oluştur (basit yaklaşım)
+        const conversationList = document.querySelector('.conversation-list');
+        const demoConversations = [
+          { userId: 2, name: 'Mehmet Kaya', avatar: 'MK', lastMessage: 'Yarın maçta görüşürüz! 🔥', time: '2 dk', unread: 2, online: true },
+          { userId: 3, name: 'Emre Demir', avatar: 'ED', lastMessage: 'Antalya maçından fotoğraflar geldi!', time: '1 saat', unread: 0, online: false },
+          { userId: 4, name: 'Can Özkan', avatar: 'CÖ', lastMessage: 'Yeni ayakkabılar nasıl?', time: '1 gün', unread: 0, online: false },
+          { userId: 5, name: 'Burak Tunç', avatar: 'BT', lastMessage: 'Saha rezervasyonu yaptım ✅', time: '2 gün', unread: 0, online: true },
+          { userId: 6, name: 'Ali Şen', avatar: 'AS', lastMessage: '👍', time: '1 hafta', unread: 0, online: false }
+        ];
+
+        conversationList.innerHTML = demoConversations.map(conv => `
+          <a href="chat.html?user=${conv.userId}" class="conversation-item ${conv.unread > 0 ? 'unread' : ''}">
+            <div class="user-avatar">
+              ${conv.avatar}
+              ${conv.online ? '<div class="online-status"></div>' : ''}
+            </div>
+            <div class="conversation-info">
+              <div class="conversation-header">
+                <div class="user-name">${conv.name}</div>
+                <div class="message-time">${conv.time}</div>
+              </div>
+              <div class="last-message">${conv.lastMessage}</div>
+            </div>
+            ${conv.unread > 0 ? `<div class="unread-count">${conv.unread}</div>` : ''}
+          </a>
+        `).join('');
+
+        // Team chat ekle
+        conversationList.innerHTML = `
+          <a href="chat.html?team=tigers" class="conversation-item unread">
+            <div class="user-avatar" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">🐅</div>
+            <div class="conversation-info">
+              <div class="conversation-header">
+                <div class="user-name">Çankaya Tigers</div>
+                <div class="message-time">3 saat</div>
+              </div>
+              <div class="last-message">Can: Bu hafta antrenman var mı?</div>
+            </div>
+            <div class="unread-count">5</div>
+          </a>
+        ` + conversationList.innerHTML;
+      }
     </script>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
 
     <!-- Toast Container -->
     <div id="toastContainer"></div>
