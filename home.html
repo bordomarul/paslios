@@ -313,6 +313,35 @@
       .post-likes:hover, .post-comments:hover, .post-shares:hover {
         color: #3b82f6;
       }
+
+      .post-likes.liked {
+        color: #ef4444 !important;
+      }
+
+      .post-author {
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .post-author:hover {
+        color: #10b981;
+        text-decoration: underline;
+      }
+
+      .match-status-waiting {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .match-status-full {
+        background: #fecaca;
+        color: #991b1b;
+      }
+
+      .match-status-confirmed {
+        background: #d1fae5;
+        color: #065f46;
+      }
       
       .bottom-nav {
         position: fixed;
@@ -590,24 +619,8 @@
           <a href="matches.html" class="section-link">Tümünü Gör</a>
         </div>
 
-        <div class="match-card">
-          <div class="match-header">
-            <div class="match-time">Bugün 19:00</div>
-            <div class="match-status">2 Kişi Eksik</div>
-          </div>
-          <div class="match-title">Ankara Spor Halısaha</div>
-          <div class="match-location">📍 Çankaya, Ankara</div>
-          <div class="match-players">8/10 Oyuncu</div>
-        </div>
-
-        <div class="match-card">
-          <div class="match-header">
-            <div class="match-time">Yarın 20:30</div>
-            <div class="match-status">Tam Dolu</div>
-          </div>
-          <div class="match-title">Çimenli Futbol Sahası</div>
-          <div class="match-location">📍 Keçiören, Ankara</div>
-          <div class="match-players">10/10 Oyuncu</div>
+        <div id="upcomingMatches">
+          <!-- Dinamik maç listesi buraya yüklenecek -->
         </div>
       </div>
 
@@ -618,76 +631,8 @@
           <a href="profile.html" class="section-link">Profili Gör</a>
         </div>
 
-        <div class="post-card">
-          <div class="post-header">
-            <div class="post-avatar">MK</div>
-            <div class="post-info">
-              <div class="post-author">Mehmet Kaya</div>
-              <div class="post-time">2 saat önce</div>
-            </div>
-          </div>
-          <div class="post-content">
-            Bugünkü maçta harika bir performans sergiledik! Takım arkadaşlarım çok iyiydi. Bu tempo devam ederse şampiyonluk bizim! 🏆⚽
-          </div>
-          <div class="post-actions">
-            <span class="post-likes">❤️ 24</span>
-            <span class="post-comments">💬 8</span>
-            <span class="post-shares">🔗 3</span>
-          </div>
-        </div>
-
-        <div class="post-card">
-          <div class="post-header">
-            <div class="post-avatar">ED</div>
-            <div class="post-info">
-              <div class="post-author">Emre Demir</div>
-              <div class="post-time">4 saat önce</div>
-            </div>
-          </div>
-          <div class="post-content">
-            Yeni ayakkabılarım geldi! Nike Mercurial Vapor 15. Yarın sahada test edeceğim. Kim durmak ister? 😏⚽
-          </div>
-          <div class="post-actions">
-            <span class="post-likes">❤️ 18</span>
-            <span class="post-comments">💬 12</span>
-            <span class="post-shares">🔗 2</span>
-          </div>
-        </div>
-
-        <div class="post-card">
-          <div class="post-header">
-            <div class="post-avatar">CÖ</div>
-            <div class="post-info">
-              <div class="post-author">Can Özkan</div>
-              <div class="post-time">1 gün önce</div>
-            </div>
-          </div>
-          <div class="post-content">
-            Geçen hafta 5 gol attım! Bu sezonki en iyi performansımdı. Antrenmanlar gerçekten işe yarıyor 💪🔥
-          </div>
-          <div class="post-actions">
-            <span class="post-likes">❤️ 32</span>
-            <span class="post-comments">💬 6</span>
-            <span class="post-shares">🔗 5</span>
-          </div>
-        </div>
-
-        <div class="post-card">
-          <div class="post-header">
-            <div class="post-avatar">BT</div>
-            <div class="post-info">
-              <div class="post-author">Burak Tunç</div>
-              <div class="post-time">2 gün önce</div>
-            </div>
-          </div>
-          <div class="post-content">
-            Yeni saha keşfettim! Çimenli ve çok güzel. Bu hafta sonu orada maç yapacağız. Kimse gelecek? 🌱⚽
-          </div>
-          <div class="post-actions">
-            <span class="post-likes">❤️ 21</span>
-            <span class="post-comments">💬 15</span>
-            <span class="post-shares">🔗 4</span>
-          </div>
+        <div id="socialFeed">
+          <!-- Dinamik sosyal feed buraya yüklenecek -->
         </div>
       </div>
     </div>
@@ -720,162 +665,6 @@
     </div>
 
     <script>
-      // Toast function
-      function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        
-        document.getElementById('toastContainer').appendChild(toast);
-        
-        // Show toast
-        setTimeout(() => toast.classList.add('show'), 100);
-        
-        // Hide and remove toast
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
-      }
-
-      function likePost(element) {
-        const currentLikes = element.textContent.match(/\d+/)[0];
-        const newLikes = parseInt(currentLikes) + 1;
-        element.textContent = `❤️ ${newLikes}`;
-        element.style.color = '#ef4444';
-        
-        // Add animation
-        element.style.transform = 'scale(1.2)';
-        setTimeout(() => {
-          element.style.transform = 'scale(1)';
-        }, 200);
-        
-        showToast('Gönderi beğenildi! ❤️', 'success');
-      }
-
-      // Comment modal functions
-      let currentCommentElement = null;
-      
-      function openCommentModal(element) {
-        currentCommentElement = element;
-        const author = element.closest('.post-card').querySelector('.post-author').textContent;
-        
-        // Set author info in modal
-        document.getElementById('commentAuthorName').textContent = author;
-        document.getElementById('commentAuthorAvatar').textContent = author.charAt(0).toUpperCase();
-        document.getElementById('commentText').value = '';
-        
-        // Show modal
-        const modal = document.getElementById('commentModal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        
-        // Focus textarea
-        setTimeout(() => document.getElementById('commentText').focus(), 100);
-      }
-      
-      function closeCommentModal() {
-        const modal = document.getElementById('commentModal');
-        modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 200);
-        currentCommentElement = null;
-      }
-      
-      function submitComment() {
-        const commentText = document.getElementById('commentText').value.trim();
-        if (!commentText) {
-          showToast('Lütfen bir yorum yazın', 'error');
-          return;
-        }
-        
-        if (currentCommentElement) {
-          const currentComments = currentCommentElement.textContent.match(/\d+/)[0];
-          const newComments = parseInt(currentComments) + 1;
-          currentCommentElement.textContent = `💬 ${newComments}`;
-          
-          showToast(`Yorumunuz eklendi: "${commentText}"`, 'success');
-          closeCommentModal();
-        }
-      }
-
-      function commentPost(element) {
-        openCommentModal(element);
-      }
-
-      function sharePost(element) {
-        const author = element.closest('.post-card').querySelector('.post-author').textContent;
-        const content = element.closest('.post-card').querySelector('.post-content').textContent;
-        
-        if (navigator.share) {
-          navigator.share({
-            title: `${author} - Paslios`,
-            text: content,
-            url: window.location.href
-          });
-        } else {
-          // Fallback for browsers without native sharing
-          const shareText = `${author}: ${content}\n\nPaslios uygulamasından paylaşıldı`;
-          navigator.clipboard.writeText(shareText).then(() => {
-            showToast('Gönderi panoya kopyalandı! 📋', 'info');
-          });
-        }
-        
-        const currentShares = element.textContent.match(/\d+/)[0];
-        const newShares = parseInt(currentShares) + 1;
-        element.textContent = `🔗 ${newShares}`;
-      }
-
-      // Add click events to all post action buttons
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.post-likes').forEach(el => {
-          el.addEventListener('click', () => likePost(el));
-        });
-        
-        document.querySelectorAll('.post-comments').forEach(el => {
-          el.addEventListener('click', () => commentPost(el));
-        });
-        
-        document.querySelectorAll('.post-shares').forEach(el => {
-          el.addEventListener('click', () => sharePost(el));
-        });
-
-        // Make user avatars clickable
-        document.querySelectorAll('.user-avatar').forEach(el => {
-          el.addEventListener('click', () => {
-            window.location.href = 'profile.html';
-          });
-          el.style.cursor = 'pointer';
-        });
-
-        // Make post authors clickable
-        document.querySelectorAll('.post-author').forEach(el => {
-          el.addEventListener('click', () => {
-            window.location.href = 'user-profile.html';
-          });
-          el.style.cursor = 'pointer';
-          el.style.textDecoration = 'underline';
-        });
-
-        // Comment modal events
-        document.getElementById('commentModal').addEventListener('click', function(e) {
-          if (e.target === this) {
-            closeCommentModal();
-          }
-        });
-
-        // Enable/disable submit button based on textarea content
-        document.getElementById('commentText').addEventListener('input', function() {
-          const submitBtn = document.getElementById('submitComment');
-          submitBtn.disabled = !this.value.trim();
-        });
-
-        // Submit comment on Ctrl+Enter
-        document.getElementById('commentText').addEventListener('keydown', function(e) {
-          if (e.ctrlKey && e.key === 'Enter') {
-            submitComment();
-          }
-        });
-      });
     </script>
 
     <!-- Comment Modal -->
@@ -906,6 +695,7 @@
 
     <!-- Data Management Script -->
     <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
     <script>
       // Sayfa yüklendiğinde oturum kontrolü
       document.addEventListener('DOMContentLoaded', function() {
@@ -915,22 +705,303 @@
         }
         
         loadUserInfo();
+        loadUpcomingMatches();
+        loadSocialFeed();
+        setupEventListeners();
       });
 
       function loadUserInfo() {
         const currentUser = PasliosData.getCurrentUser();
         if (currentUser) {
           // Header'daki kullanıcı bilgilerini güncelle
-          const userNameElements = document.querySelectorAll('.user-name');
-          userNameElements.forEach(element => {
-            element.textContent = currentUser.name;
-          });
-          
           const userAvatarElements = document.querySelectorAll('.user-avatar');
           userAvatarElements.forEach(element => {
             element.textContent = currentUser.avatar;
           });
+          
+          // Hoş geldin mesajını güncelle
+          const welcomeTitle = document.querySelector('.welcome-title');
+          if (welcomeTitle) {
+            const firstName = currentUser.name.split(' ')[0];
+            welcomeTitle.textContent = `Selam ${firstName}! 👋`;
+          }
         }
+      }
+
+      function loadUpcomingMatches() {
+        const upcomingMatches = PasliosData.getUpcomingMatches();
+        const matchesContainer = document.querySelector('#upcomingMatches');
+        
+        if (!matchesContainer) return;
+
+        matchesContainer.innerHTML = '';
+
+        if (upcomingMatches.length === 0) {
+          matchesContainer.innerHTML = `
+            <div class="match-card" style="text-align: center; color: #6b7280;">
+              <p>Henüz yaklaşan maç yok</p>
+              <a href="create-post.html" style="color: #10b981; text-decoration: underline;">Maç oluştur</a>
+            </div>
+          `;
+          return;
+        }
+
+        upcomingMatches.slice(0, 3).forEach(match => {
+          const matchCard = createMatchCard(match);
+          matchesContainer.appendChild(matchCard);
+        });
+      }
+
+      function createMatchCard(match) {
+        const matchDate = new Date(`${match.date} ${match.time}`);
+        const now = new Date();
+        const diffTime = matchDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let timeText = '';
+        if (diffDays === 0) {
+          timeText = `Bugün ${match.time}`;
+        } else if (diffDays === 1) {
+          timeText = `Yarın ${match.time}`;
+        } else {
+          timeText = `${diffDays} gün sonra`;
+        }
+
+        let statusText = '';
+        let statusClass = '';
+        if (match.type === 'individual') {
+          const remaining = match.maxPlayers - match.currentPlayers;
+          if (remaining === 0) {
+            statusText = 'Tam Dolu';
+            statusClass = 'match-status-full';
+          } else {
+            statusText = `${remaining} Kişi Eksik`;
+            statusClass = 'match-status-waiting';
+          }
+        } else {
+          statusText = match.status === 'confirmed' ? 'Onaylandı' : 'Beklemede';
+          statusClass = match.status === 'confirmed' ? 'match-status-confirmed' : 'match-status-waiting';
+        }
+
+        const matchCard = document.createElement('div');
+        matchCard.className = 'match-card';
+        matchCard.innerHTML = `
+          <div class="match-header">
+            <div class="match-time">${timeText}</div>
+            <div class="match-status ${statusClass}">${statusText}</div>
+          </div>
+          <div class="match-title">${match.title}</div>
+          <div class="match-location">📍 ${match.location}</div>
+          <div class="match-players">
+            ${match.type === 'individual' 
+              ? `${match.currentPlayers}/${match.maxPlayers} Oyuncu` 
+              : `${match.teamA?.name || 'Takım A'} vs ${match.teamB?.name || 'Takım B'}`
+            }
+          </div>
+        `;
+
+        matchCard.addEventListener('click', () => {
+          window.location.href = `matches.html?id=${match.id}`;
+        });
+
+        return matchCard;
+      }
+
+      function loadSocialFeed() {
+        const posts = PasliosData.getPosts(5);
+        const feedContainer = document.querySelector('#socialFeed');
+        
+        if (!feedContainer) return;
+
+        feedContainer.innerHTML = '';
+
+        if (posts.length === 0) {
+          feedContainer.innerHTML = `
+            <div class="post-card" style="text-align: center; color: #6b7280;">
+              <p>Henüz gönderi yok</p>
+              <a href="create-post.html" style="color: #10b981; text-decoration: underline;">İlk gönderiyi sen oluştur!</a>
+            </div>
+          `;
+          return;
+        }
+
+        posts.forEach(post => {
+          const postCard = createPostCard(post);
+          feedContainer.appendChild(postCard);
+        });
+      }
+
+      function createPostCard(post) {
+        const timeAgo = PasliosData.formatTimeAgo(post.timestamp);
+        const currentUser = PasliosData.getCurrentUser();
+        const isLiked = currentUser && post.likedBy.includes(currentUser.id);
+
+        const postCard = document.createElement('div');
+        postCard.className = 'post-card';
+        postCard.innerHTML = `
+          <div class="post-header">
+            <div class="post-avatar">${post.authorAvatar}</div>
+            <div class="post-info">
+              <div class="post-author" onclick="viewUserProfile(${post.authorId})">${post.authorName}</div>
+              <div class="post-time">${timeAgo}</div>
+            </div>
+          </div>
+          <div class="post-content">${post.content}</div>
+          <div class="post-actions">
+            <span class="post-likes ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id}, this)">
+              ${isLiked ? '❤️' : '🤍'} ${post.likes}
+            </span>
+            <span class="post-comments" onclick="commentPost(${post.id}, this)">💬 ${post.comments}</span>
+            <span class="post-shares" onclick="sharePost(${post.id}, this)">🔗 ${post.shares}</span>
+          </div>
+        `;
+
+        return postCard;
+      }
+
+      function setupEventListeners() {
+        // Make user avatars clickable
+        document.querySelectorAll('.user-avatar').forEach(el => {
+          el.addEventListener('click', () => {
+            window.location.href = 'profile.html';
+          });
+          el.style.cursor = 'pointer';
+        });
+
+        // Comment modal events
+        const commentModal = document.getElementById('commentModal');
+        if (commentModal) {
+          commentModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+              closeCommentModal();
+            }
+          });
+        }
+
+        const commentText = document.getElementById('commentText');
+        if (commentText) {
+          // Enable/disable submit button based on textarea content
+          commentText.addEventListener('input', function() {
+            const submitBtn = document.getElementById('submitComment');
+            if (submitBtn) {
+              submitBtn.disabled = !this.value.trim();
+            }
+          });
+
+          // Submit comment on Ctrl+Enter
+          commentText.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+              submitComment();
+            }
+          });
+        }
+      }
+
+      // Post interaction functions
+      function likePost(postId, element) {
+        const result = PasliosData.likePost(postId);
+        
+        if (result.success) {
+          element.innerHTML = `${result.liked ? '❤️' : '🤍'} ${result.likes}`;
+          element.className = `post-likes ${result.liked ? 'liked' : ''}`;
+          
+          // Add animation
+          element.style.transform = 'scale(1.2)';
+          setTimeout(() => {
+            element.style.transform = 'scale(1)';
+          }, 200);
+          
+          ToastManager.show(
+            result.liked ? 'Gönderi beğenildi! ❤️' : 'Beğeni kaldırıldı',
+            result.liked ? 'success' : 'info'
+          );
+        }
+      }
+
+      // Comment modal functions
+      let currentCommentPostId = null;
+      let currentCommentElement = null;
+      
+      function commentPost(postId, element) {
+        currentCommentPostId = postId;
+        currentCommentElement = element;
+        
+        const posts = PasliosData.getPosts();
+        const post = posts.find(p => p.id === postId);
+        
+        if (post) {
+          // Set author info in modal
+          document.getElementById('commentAuthorName').textContent = post.authorName;
+          document.getElementById('commentAuthorAvatar').textContent = post.authorAvatar;
+          document.getElementById('commentText').value = '';
+          
+          // Show modal
+          const modal = document.getElementById('commentModal');
+          modal.style.display = 'flex';
+          setTimeout(() => modal.classList.add('show'), 10);
+          
+          // Focus textarea
+          setTimeout(() => document.getElementById('commentText').focus(), 100);
+        }
+      }
+      
+      function closeCommentModal() {
+        const modal = document.getElementById('commentModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 200);
+        currentCommentPostId = null;
+        currentCommentElement = null;
+      }
+      
+      function submitComment() {
+        const commentText = document.getElementById('commentText').value.trim();
+        if (!commentText) {
+          ToastManager.show('Lütfen bir yorum yazın', 'error');
+          return;
+        }
+        
+        if (currentCommentPostId && currentCommentElement) {
+          const result = PasliosData.addComment(currentCommentPostId, commentText);
+          
+          if (result.success) {
+            currentCommentElement.textContent = `💬 ${result.comments}`;
+            ToastManager.show(`Yorumunuz eklendi: "${commentText}"`, 'success');
+            closeCommentModal();
+          } else {
+            ToastManager.show(result.message, 'error');
+          }
+        }
+      }
+
+      function sharePost(postId, element) {
+        const posts = PasliosData.getPosts();
+        const post = posts.find(p => p.id === postId);
+        
+        if (post) {
+          const result = PasliosData.sharePost(postId);
+          
+          if (result.success) {
+            element.textContent = `🔗 ${result.shares}`;
+            
+            if (navigator.share) {
+              navigator.share({
+                title: `${post.authorName} - Paslios`,
+                text: post.content,
+                url: window.location.href
+              });
+            } else {
+              // Fallback for browsers without native sharing
+              const shareText = `${post.authorName}: ${post.content}\n\nPaslios uygulamasından paylaşıldı`;
+              navigator.clipboard.writeText(shareText).then(() => {
+                ToastManager.show('Gönderi panoya kopyalandı! 📋', 'info');
+              });
+            }
+          }
+        }
+      }
+
+      function viewUserProfile(userId) {
+        window.location.href = `user-profile.html?id=${userId}`;
       }
     </script>
   </body>

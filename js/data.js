@@ -88,26 +88,48 @@ class pasliosData {
 
     // Maç verileri
     if (!localStorage.getItem('paslios_matches')) {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dayAfterTomorrow = new Date(today);
+      dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
       const defaultMatches = [
         {
           id: 1,
           type: 'individual',
-          title: 'Keçiören Sports Center',
-          date: '2025-09-20',
+          title: 'Ankara Spor Halısaha',
+          date: today.toISOString().split('T')[0],
           time: '19:00',
-          location: 'Keçiören, Ankara',
-          players: ['Ahmet Y.', 'Mehmet K.', 'Ali D.', 'Can S.'],
+          location: 'Çankaya, Ankara',
+          players: ['Ahmet Y.', 'Mehmet K.', 'Ali D.', 'Can S.', 'Emre T.', 'Burak A.', 'Cem K.', 'Oğuz M.'],
           maxPlayers: 10,
-          currentPlayers: 4,
+          currentPlayers: 8,
           price: 25,
           status: 'waiting',
-          organizer: 'Ahmet Yılmaz'
+          organizer: 'Ahmet Yılmaz',
+          organizerId: 1
         },
         {
           id: 2,
+          type: 'individual',
+          title: 'Çimenli Futbol Sahası',
+          date: tomorrow.toISOString().split('T')[0],
+          time: '20:30',
+          location: 'Keçiören, Ankara',
+          players: ['Mehmet K.', 'Ali D.', 'Can S.', 'Emre T.', 'Burak A.', 'Cem K.', 'Oğuz M.', 'Serkan Y.', 'Tolga B.', 'Murat K.'],
+          maxPlayers: 10,
+          currentPlayers: 10,
+          price: 30,
+          status: 'full',
+          organizer: 'Mehmet Kaya',
+          organizerId: 2
+        },
+        {
+          id: 3,
           type: 'team',
           title: 'Çankaya Tigers vs Mamak Yıldızları',
-          date: '2025-09-22',
+          date: dayAfterTomorrow.toISOString().split('T')[0],
           time: '15:00',
           location: 'Mamak Sports Complex',
           teamA: { id: 1, name: 'Çankaya Tigers' },
@@ -165,6 +187,65 @@ class pasliosData {
         }
       ];
       this.setData('notifications', defaultNotifications);
+    }
+
+    // Sosyal gönderi verileri
+    if (!localStorage.getItem('paslios_posts')) {
+      const defaultPosts = [
+        {
+          id: 1,
+          authorId: 2,
+          authorName: 'Mehmet Kaya',
+          authorAvatar: 'MK',
+          content: 'Bugünkü maçta harika bir performans sergiledik! Takım arkadaşlarım çok iyiydi. Bu tempo devam ederse şampiyonluk bizim! 🏆⚽',
+          timestamp: Date.now() - 7200000, // 2 saat önce
+          likes: 24,
+          comments: 8,
+          shares: 3,
+          likedBy: [1, 3, 4, 5],
+          type: 'match_result'
+        },
+        {
+          id: 2,
+          authorId: 3,
+          authorName: 'Emre Demir',
+          authorAvatar: 'ED',
+          content: 'Yeni ayakkabılarım geldi! Nike Mercurial Vapor 15. Yarın sahada test edeceğim. Kim durmak ister? 😏⚽',
+          timestamp: Date.now() - 14400000, // 4 saat önce
+          likes: 18,
+          comments: 12,
+          shares: 2,
+          likedBy: [1, 2, 6],
+          type: 'equipment'
+        },
+        {
+          id: 3,
+          authorId: 4,
+          authorName: 'Can Özkan',
+          authorAvatar: 'CÖ',
+          content: 'Geçen hafta 5 gol attım! Bu sezonki en iyi performansımdı. Antrenmanlar gerçekten işe yarıyor 💪🔥',
+          timestamp: Date.now() - 86400000, // 1 gün önce
+          likes: 32,
+          comments: 6,
+          shares: 5,
+          likedBy: [1, 2, 3, 7, 8],
+          type: 'achievement'
+        },
+        {
+          id: 4,
+          authorId: 5,
+          authorName: 'Burak Tunç',
+          authorAvatar: 'BT',
+          content: 'Yeni saha keşfettim! Çimenli ve çok güzel. Bu hafta sonu orada maç yapacağız. Kimse gelecek? 🌱⚽',
+          timestamp: Date.now() - 172800000, // 2 gün önce
+          likes: 21,
+          comments: 15,
+          shares: 4,
+          likedBy: [1, 2, 9, 10],
+          type: 'venue_discovery'
+        }
+      ];
+      this.setData('posts', defaultPosts);
     }
 
     // Ayarlar
@@ -364,6 +445,100 @@ class pasliosData {
       rating: user.rating || 0,
       winRate: user.matchesPlayed > 0 ? ((user.wins || 0) / user.matchesPlayed * 100).toFixed(1) : 0
     };
+  }
+
+  // Sosyal gönderi yönetimi
+  getPosts(limit = 10) {
+    const posts = this.getData('posts') || [];
+    return posts
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, limit);
+  }
+
+  createPost(content, type = 'general') {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
+
+    const newPost = {
+      authorId: currentUser.id,
+      authorName: currentUser.name,
+      authorAvatar: currentUser.avatar,
+      content: content,
+      timestamp: Date.now(),
+      likes: 0,
+      comments: 0,
+      shares: 0,
+      likedBy: [],
+      type: type
+    };
+
+    const addedPost = this.addData('posts', newPost);
+    return { success: true, post: addedPost };
+  }
+
+  likePost(postId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
+
+    const posts = this.getData('posts');
+    const postIndex = posts.findIndex(p => p.id === postId);
+    
+    if (postIndex === -1) return { success: false, message: 'Gönderi bulunamadı' };
+
+    const post = posts[postIndex];
+    const userLikedIndex = post.likedBy.indexOf(currentUser.id);
+
+    if (userLikedIndex === -1) {
+      // Beğeni ekle
+      post.likedBy.push(currentUser.id);
+      post.likes++;
+    } else {
+      // Beğeniyi kaldır
+      post.likedBy.splice(userLikedIndex, 1);
+      post.likes--;
+    }
+
+    this.setData('posts', posts);
+    return { success: true, liked: userLikedIndex === -1, likes: post.likes };
+  }
+
+  sharePost(postId) {
+    const posts = this.getData('posts');
+    const postIndex = posts.findIndex(p => p.id === postId);
+    
+    if (postIndex === -1) return { success: false, message: 'Gönderi bulunamadı' };
+
+    posts[postIndex].shares++;
+    this.setData('posts', posts);
+    return { success: true, shares: posts[postIndex].shares };
+  }
+
+  addComment(postId, comment) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
+
+    const posts = this.getData('posts');
+    const postIndex = posts.findIndex(p => p.id === postId);
+    
+    if (postIndex === -1) return { success: false, message: 'Gönderi bulunamadı' };
+
+    posts[postIndex].comments++;
+    this.setData('posts', posts);
+
+    // Yorumu ayrı olarak da saklayabiliriz (gelecekte detaylı yorum sistemi için)
+    return { success: true, comments: posts[postIndex].comments };
+  }
+
+  formatTimeAgo(timestamp) {
+    const now = Date.now();
+    const diffInSeconds = Math.floor((now - timestamp) / 1000);
+    
+    if (diffInSeconds < 60) return 'Az önce';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} dakika önce`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} saat önce`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} gün önce`;
+    
+    return new Date(timestamp).toLocaleDateString('tr-TR');
   }
 }
 
