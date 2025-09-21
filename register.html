@@ -383,67 +383,93 @@
     <script src="js/toast.js"></script>
     <script src="js/data.js"></script>
     <script>
+      // Basit kayıt sistemi
       document.addEventListener('DOMContentLoaded', function() {
-        // Debug: Sayfa yüklendiğinde kontrol
-        console.log('DOM yüklendi, PasliosData:', typeof PasliosData);
+        // Zaten giriş yapılmış mı kontrol et
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          window.location.href = 'home.html';
+          return;
+        }
         
         document.getElementById('registerForm').addEventListener('submit', function(e) {
           e.preventDefault();
           
-          const fullName = document.getElementById('fullName').value;
-          const email = document.getElementById('email').value;
-          const phone = document.getElementById('phone').value;
+          const fullName = document.getElementById('fullName').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const phone = document.getElementById('phone').value.trim();
           const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const position = document.getElementById('position').value;
-        const termsAccepted = document.getElementById('termsAccepted').checked;
-        
-        // Form doğrulaması
-        if (password !== confirmPassword) {
-          toastManager.error('Şifreler eşleşmiyor! Lütfen şifrelerinizi kontrol edin.');
-          return;
-        }
-        
-        if (password.length < 6) {
-          toastManager.error('Şifre en az 6 karakter olmalıdır!');
-          return;
-        }
-        
-        if (!termsAccepted) {
-          toastManager.warning('Kullanım koşullarını ve gizlilik politikasını kabul etmelisiniz!');
-          return;
-        }
-        
-        // Kullanıcı kaydı
-        const userData = {
-          name: fullName,
-          email: email,
-          phone: phone,
-          password: password,
-          position: position,
-          bio: `${position} pozisyonunda oynayan futbol tutkunu`,
-          location: 'Ankara, Türkiye'
-        };
-        
-        const result = PasliosData.register(userData);
-        
-        if (result.success) {
-          toastManager.success(`Hoş geldiniz, ${result.user.name}! Hesabınız başarıyla oluşturuldu.`, 'Kayıt Başarılı!');
-          setTimeout(() => {
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          const position = document.getElementById('position').value;
+          const termsAccepted = document.getElementById('termsAccepted').checked;
+          
+          // Form kontrolü
+          if (!fullName || !email || !phone || !password || !position) {
+            alert('Lütfen tüm alanları doldurun!');
+            return;
+          }
+          
+          if (password !== confirmPassword) {
+            alert('Şifreler eşleşmiyor!');
+            return;
+          }
+          
+          if (password.length < 6) {
+            alert('Şifre en az 6 karakter olmalıdır!');
+            return;
+          }
+          
+          if (!termsAccepted) {
+            alert('Kullanım koşullarını kabul etmelisiniz!');
+            return;
+          }
+          
+          // Yeni kullanıcı oluştur
+          const newUser = {
+            id: Date.now(),
+            name: fullName,
+            email: email,
+            phone: phone,
+            position: position,
+            bio: position + ' pozisyonunda oynayan futbol tutkunu',
+            location: 'Ankara, Türkiye',
+            rating: 4.0,
+            matchesPlayed: 0,
+            matchesWon: 0,
+            goals: 0,
+            assists: 0,
+            cleanSheets: 0,
+            mvpAwards: 0,
+            joinDate: new Date().toISOString(),
+            lastLoginDate: new Date().toISOString(),
+            teamId: null,
+            friendIds: [],
+            stats: {
+              totalPoints: 0,
+              weeklyPoints: 0,
+              monthlyPoints: 0,
+              level: 1,
+              xp: 0,
+              badgeIds: [1]
+            }
+          };
+          
+          // LocalStorage'a kaydet
+          localStorage.setItem('currentUser', JSON.stringify(newUser));
+          
+          // Başarı mesajı
+          if (window.ToastManager) {
+            ToastManager.show('Hesabınız başarıyla oluşturuldu!', 'success');
+          } else {
+            alert('✅ Hesabınız başarıyla oluşturuldu!');
+          }
+          
+          // Ana sayfaya yönlendir
+          setTimeout(function() {
             window.location.href = 'home.html';
-          }, 2000);
-        } else {
-          toastManager.error(result.message || 'Kayıt işlemi başarısız! Lütfen tekrar deneyin.');
-        }
+          }, 1500);
+        });
       });
-
-      // Sayfa yüklendiğinde oturum kontrolü
-      if (PasliosData && PasliosData.isLoggedIn()) {
-        // Zaten giriş yapmış, home'a yönlendir
-        window.location.href = 'home.html';
-      }
-      
-      }); // DOMContentLoaded kapanış
     </script>
   </body>
 </html>

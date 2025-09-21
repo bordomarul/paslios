@@ -377,36 +377,72 @@
         
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const rememberMe = document.getElementById('rememberMe').checked;
+    <script src="js/toast.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+      // Basit giriş sistemi
+      document.addEventListener('DOMContentLoaded', function() {
+        // Zaten giriş yapılmış mı kontrol et
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          window.location.href = 'home.html';
+          return;
+        }
         
-        // Demo için her email/şifre kombinasyonunu kabul et
-        // Gerçek uygulamada password doğrulaması yapılacak
-        const result = PasliosData.login(email, password);
-        
-        if (result.success) {
-          // Remember me seçeneği
-          if (rememberMe) {
-            localStorage.setItem('Paslios_remember', 'true');
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value;
+          
+          if (!email || !password) {
+            alert('Lütfen email ve şifrenizi girin!');
+            return;
           }
           
-          // Success message
-          toastManager.success(`Hoş geldiniz, ${result.user.name}!`, 'Giriş Başarılı!');
+          // Test kullanıcısı oluştur
+          const testUser = {
+            id: 1,
+            name: 'Test Kullanıcı',
+            email: email,
+            phone: '0555 123 45 67',
+            position: 'Forvet',
+            rating: 4.5,
+            location: 'Ankara/Çankaya',
+            bio: 'Test kullanıcısı',
+            matchesPlayed: 10,
+            matchesWon: 7,
+            goals: 5,
+            assists: 3,
+            cleanSheets: 0,
+            mvpAwards: 2,
+            joinDate: new Date().toISOString(),
+            lastLoginDate: new Date().toISOString(),
+            teamId: null,
+            friendIds: [],
+            stats: {
+              totalPoints: 250,
+              weeklyPoints: 50,
+              monthlyPoints: 150,
+              level: 5,
+              xp: 450,
+              badgeIds: [1, 2]
+            }
+          };
           
-          // Redirect to home
-          setTimeout(() => {
+          // Başarılı giriş simüle et
+          localStorage.setItem('currentUser', JSON.stringify(testUser));
+          
+          if (window.ToastManager) {
+            ToastManager.show('Giriş başarılı! Hoş geldiniz!', 'success');
+          } else {
+            alert('✅ Giriş başarılı! Hoş geldiniz!');
+          }
+          
+          setTimeout(function() {
             window.location.href = 'home.html';
           }, 1500);
-        } else {
-          toastManager.error(result.message || 'E-posta veya şifre hatalı. Lütfen tekrar deneyin.', 'Giriş Hatası');
-        }
-      });
-
-      // Sayfa yüklendiğinde oturum kontrolü
-      document.addEventListener('DOMContentLoaded', function() {
-        if (PasliosData.isLoggedIn()) {
-          // Zaten giriş yapmış, home'a yönlendir
-          window.location.href = 'home.html';
-        }
+        });
       });
     </script>
   </body>
