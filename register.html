@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paslios - Hesap oluştur ve sahada buluş!">
     <link href="output.css" rel="stylesheet">
+    <link href="css/toast.css" rel="stylesheet">
     <title>Paslios - Kayıt Ol</title>
     <style>
       * {
@@ -384,6 +385,7 @@
     </div>
 
     <!-- Data Management Script -->
+    <script src="js/toast.js"></script>
     <script src="js/data.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -403,17 +405,17 @@
         
         // Form doğrulaması
         if (password !== confirmPassword) {
-          alert('Şifreler eşleşmiyor!');
+          toastManager.error('Şifreler eşleşmiyor! Lütfen şifrelerinizi kontrol edin.');
           return;
         }
         
         if (password.length < 6) {
-          alert('Şifre en az 6 karakter olmalı!');
+          toastManager.error('Şifre en az 6 karakter olmalıdır!');
           return;
         }
         
         if (!termsAccepted) {
-          alert('Kullanım koşullarını kabul etmelisiniz!');
+          toastManager.warning('Kullanım koşullarını ve gizlilik politikasını kabul etmelisiniz!');
           return;
         }
         
@@ -431,10 +433,12 @@
         const result = PasliosData.register(userData);
         
         if (result.success) {
-          alert(`Hoş geldiniz, ${result.user.name}! Hesabınız başarıyla oluşturuldu.`);
-          window.location.href = 'home.html';
+          toastManager.success(`Hoş geldiniz, ${result.user.name}! Hesabınız başarıyla oluşturuldu.`, 'Kayıt Başarılı!');
+          setTimeout(() => {
+            window.location.href = 'home.html';
+          }, 2000);
         } else {
-          alert(result.message || 'Kayıt işlemi başarısız!');
+          toastManager.error(result.message || 'Kayıt işlemi başarısız! Lütfen tekrar deneyin.');
         }
       });
 

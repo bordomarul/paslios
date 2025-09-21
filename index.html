@@ -16,6 +16,7 @@
     <meta name="twitter:description" content="Türkiye'nin en büyük halısaha ve futbol sosyal platformu">
     <link rel="canonical" href="https://paslios.com">
     <link href="output.css" rel="stylesheet">
+    <link href="css/toast.css" rel="stylesheet">
     <title>Paslios - Türkiye'nin Futbol Sosyal Platformu</title>
     <style>
       * {
@@ -368,6 +369,7 @@
     </div>
 
     <!-- Data Management Script -->
+    <script src="js/toast.js"></script>
     <script src="js/data.js"></script>
     <script>
       document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -388,12 +390,14 @@
           }
           
           // Success message
-          alert(`Hoş geldiniz, ${result.user.name}!`);
+          toastManager.success(`Hoş geldiniz, ${result.user.name}!`, 'Giriş Başarılı!');
           
           // Redirect to home
-          window.location.href = 'home.html';
+          setTimeout(() => {
+            window.location.href = 'home.html';
+          }, 1500);
         } else {
-          alert(result.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
+          toastManager.error(result.message || 'E-posta veya şifre hatalı. Lütfen tekrar deneyin.', 'Giriş Hatası');
         }
       });
 
