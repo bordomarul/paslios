@@ -248,6 +248,29 @@ class pasliosData {
       this.setData('posts', defaultPosts);
     }
 
+    // Rezervasyon verileri
+    if (!localStorage.getItem('paslios_bookings')) {
+      const defaultBookings = [
+        {
+          id: 1,
+          userId: 1,
+          userName: 'Ahmet Yılmaz',
+          userPhone: '0555 123 45 67',
+          venueName: 'Spor A Halısaha',
+          venuePrice: 150,
+          date: new Date().toISOString().split('T')[0],
+          time: '19:00',
+          playerCount: 10,
+          totalPrice: 150,
+          status: 'confirmed',
+          bookingDate: Date.now() - 86400000, // 1 gün önce
+          paymentMethod: 'credit_card',
+          notes: 'Çankaya bölgesindeki arkadaşlarla maç'
+        }
+      ];
+      this.setData('bookings', defaultBookings);
+    }
+
     // Ayarlar
     if (!localStorage.getItem('paslios_settings')) {
       const defaultSettings = {
@@ -539,6 +562,105 @@ class pasliosData {
     if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} gün önce`;
     
     return new Date(timestamp).toLocaleDateString('tr-TR');
+  }
+
+  // Rezervasyon yönetimi
+  getBookings(userId = null) {
+    const bookings = this.getData('bookings') || [];
+    if (userId) {
+      return bookings.filter(booking => booking.userId === userId);
+    }
+    return bookings;
+  }
+
+  createBooking(bookingData) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
+
+    const newBooking = {
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userPhone: currentUser.phone || '',
+      venueName: bookingData.venueName,
+      venuePrice: bookingData.venuePrice,
+      date: bookingData.date,
+      time: bookingData.time,
+      playerCount: bookingData.playerCount,
+      totalPrice: bookingData.totalPrice,
+      status: 'confirmed',
+      bookingDate: Date.now(),
+      paymentMethod: bookingData.paymentMethod || 'credit_card',
+      notes: bookingData.notes || ''
+    };
+
+    const addedBooking = this.addData('bookings', newBooking);
+    return { success: true, booking: addedBooking };
+  }
+
+  cancelBooking(bookingId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'Giriş yapmalısınız' };
+
+    const bookings = this.getData('bookings');
+    const bookingIndex = bookings.findIndex(b => b.id === bookingId && b.userId === currentUser.id);
+    
+    if (bookingIndex === -1) return { success: false, message: 'Rezervasyon bulunamadı' };
+
+    bookings[bookingIndex].status = 'cancelled';
+    this.setData('bookings', bookings);
+    return { success: true };
+  }
+
+  // Saha keşfedelme fonksiyonları
+  getVenues() {
+    return this.getData('venues') || this.getDefaultVenues();
+  }
+
+  getDefaultVenues() {
+    const defaultVenues = [
+      {
+        id: 1,
+        name: 'Spor A Halısaha',
+        location: 'Çankaya, Ankara',
+        distance: '1.2 km',
+        price: 150,
+        rating: 4.8,
+        reviewCount: 156,
+        type: 'Halı Saha',
+        features: ['Duş', 'Soyunma Odası', 'Otopark', 'Kafe', 'WiFi'],
+        availableSlots: ['17:00', '18:00', '19:00', '20:00', '22:00'],
+        image: '🏟️'
+      },
+      {
+        id: 2,
+        name: 'Champions Halısaha',
+        location: 'Keçiören, Ankara',
+        distance: '2.8 km',
+        price: 180,
+        rating: 4.6,
+        reviewCount: 89,
+        type: 'Halı Saha',
+        features: ['Duş', 'Soyunma Odası', 'Otopark', 'Tribün'],
+        availableSlots: ['16:00', '17:00', '18:00', '19:00', '20:00', '21:00'],
+        image: '🏟️'
+      },
+      {
+        id: 3,
+        name: 'Elite Football Center',
+        location: 'Kızılay, Ankara',
+        distance: '3.5 km',
+        price: 200,
+        rating: 4.9,
+        reviewCount: 234,
+        type: 'Çim Saha',
+        features: ['Duş', 'Soyunma Odası', 'Otopark', 'Kafe', 'Klima', 'Ses Sistemi'],
+        availableSlots: ['15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'],
+        image: '🌱'
+      }
+    ];
+    
+    this.setData('venues', defaultVenues);
+    return defaultVenues;
   }
 }
 

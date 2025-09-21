@@ -1114,26 +1114,8 @@
       let selectedPrice = 0;
       let playerCount = 10;
 
-      // Toast Notification System
-      function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-          toast.classList.add('show');
-        }, 100);
-
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => {
-            if (document.body.contains(toast)) {
-              document.body.removeChild(toast);
-            }
-          }, 300);
-        }, 4000);
-      }
+      // Toast Notification System - Use centralized ToastManager
+      // Removed showToast function - now using ToastManager.show() from js/toast.js
 
       // Booking Confirmation Modal
       function showBookingModal(venueData) {
@@ -1189,26 +1171,46 @@
       }
 
       function confirmBooking() {
-        closeBookingModal();
-        showToast('🎉 Rezervasyon başarılı! Ödeme işlemi tamamlandı.', 'success');
+        // Rezervasyon verilerini hazırla
+        const bookingData = {
+          venueName: selectedVenue.name,
+          venuePrice: selectedVenue.price,
+          date: document.getElementById('booking-date').value,
+          time: selectedSlot,
+          playerCount: playerCount,
+          totalPrice: selectedVenue.price,
+          paymentMethod: 'credit_card',
+          notes: `${playerCount} kişi ile ${selectedVenue.name} rezervasyonu`
+        };
+
+        // Rezervasyonu kaydet
+        const result = PasliosData.createBooking(bookingData);
         
-        // Reset form after successful booking
-        setTimeout(() => {
-          selectedVenue = null;
-          selectedSlot = null;
-          document.querySelectorAll('.venue-card').forEach(card => {
-            card.classList.remove('selected');
-          });
-          document.querySelectorAll('.slot-btn').forEach(btn => {
-            btn.classList.remove('selected');
-          });
-          updateBookingButton();
-          showToast('📱 Rezervasyon onayı bildirimlerinize gönderildi.', 'info');
-        }, 2000);
+        closeBookingModal();
+        
+        if (result.success) {
+          ToastManager.show('🎉 Rezervasyon başarılı! Ödeme işlemi tamamlandı.', 'success');
+          
+          // Reset form after successful booking
+          setTimeout(() => {
+            selectedVenue = null;
+            selectedSlot = null;
+            document.querySelectorAll('.venue-card').forEach(card => {
+              card.classList.remove('selected');
+            });
+            document.querySelectorAll('.slot-btn').forEach(btn => {
+              btn.classList.remove('selected');
+            });
+            updateBookingButton();
+            ToastManager.show('📱 Rezervasyon onayı bildirimlerinize gönderildi.', 'info');
+          }, 2000);
+        } else {
+          ToastManager.show(`❌ Rezervasyon hatası: ${result.message}`, 'error');
+        }
       }
 
       function initMap() {
-        showToast('🗺️ Demo modunda çalışıyorsunuz. Google Maps entegrasyonu yakında!', 'warning');
+        ToastManager.show('🗺️ Demo modunda çalışıyorsunuz. Google Maps entegrasyonu yakında!', 'warning');
       }
 
       function changePlayerCount(change) {
@@ -1220,16 +1222,16 @@
           
           // Show info toast
           if (change > 0) {
-            showToast(`👥 Oyuncu sayısı ${playerCount} olarak güncellendi`, 'info');
+            ToastManager.show(`👥 Oyuncu sayısı ${playerCount} olarak güncellendi`, 'info');
           } else {
-            showToast(`👥 Oyuncu sayısı ${playerCount} olarak güncellendi`, 'info');
+            ToastManager.show(`👥 Oyuncu sayısı ${playerCount} olarak güncellendi`, 'info');
           }
         } else {
           // Show warning for invalid counts
           if (newCount < 2) {
-            showToast('⚠️ Minimum 2 oyuncu gereklidir!', 'warning');
+            ToastManager.show('⚠️ Minimum 2 oyuncu gereklidir!', 'warning');
           } else {
-            showToast('⚠️ Maksimum 22 oyuncu olabilir!', 'warning');
+            ToastManager.show('⚠️ Maksimum 22 oyuncu olabilir!', 'warning');
           }
         }
         
@@ -1256,14 +1258,14 @@
         selectedSlot = null; // Reset slot selection
         
         // Show success toast
-        showToast(`⚽ ${venueName} seçildi! Şimdi saat seçimi yapabilirsiniz.`, 'success');
+        ToastManager.show(`⚽ ${venueName} seçildi! Şimdi saat seçimi yapabilirsiniz.`, 'success');
         
         updateBookingButton();
       }
 
       function selectSlot(element, time) {
         if (!selectedVenue) {
-          showToast('⚠️ Önce bir saha seçmelisiniz!', 'warning');
+          ToastManager.show('⚠️ Önce bir saha seçmelisiniz!', 'warning');
           return;
         }
         
@@ -1277,7 +1279,7 @@
         selectedSlot = time;
         
         // Show success toast
-        showToast(`🕐 ${time} saati seçildi! Rezervasyon yapmaya hazırsınız.`, 'success');
+        ToastManager.show(`🕐 ${time} saati seçildi! Rezervasyon yapmaya hazırsınız.`, 'success');
         
         updateSummary();
       }
@@ -1317,7 +1319,7 @@
 
       function makeBooking() {
         if (!PasliosData.isLoggedIn()) {
-          showToast('⚠️ Rezervasyon yapmak için giriş yapmalısınız!', 'warning');
+          ToastManager.show('⚠️ Rezervasyon yapmak için giriş yapmalısınız!', 'warning');
           setTimeout(() => {
             window.location.href = 'index.html';
           }, 2000);
@@ -1354,60 +1356,10 @@
           
           showBookingModal(bookingData);
         } else {
-          showToast('⚠️ Lütfen saha ve saat seçimi yapınız!', 'warning');
+          ToastManager.show('⚠️ Lütfen saha ve saat seçimi yapınız!', 'warning');
         }
       }
 
-      function confirmBooking() {
-        closeBookingModal();
-        showToast('🎉 Rezervasyon başarılı! Ödeme işlemi tamamlandı.', 'success');
-        
-        // Bildirim ekle
-        const currentUser = PasliosData.getCurrentUser();
-        const notification = {
-          id: Date.now(),
-          userId: currentUser.id,
-          type: 'booking_confirmed',
-          title: 'Rezervasyon Onaylandı',
-          message: `${selectedVenue} sahası için ${selectedSlot} saatindeki rezervasyonunuz onaylandı`,
-          timestamp: Date.now(),
-          read: false
-        };
-
-        let notifications = PasliosData.getData('notifications') || [];
-        notifications.unshift(notification);
-        PasliosData.setData('notifications', notifications);
-        
-        // Reset form after successful booking
-        setTimeout(() => {
-          selectedVenue = null;
-          selectedSlot = null;
-          document.querySelectorAll('.venue-card').forEach(card => {
-            card.classList.remove('selected');
-          });
-          document.querySelectorAll('.slot-btn').forEach(btn => {
-            btn.classList.remove('selected');
-          });
-          updateBookingButton();
-          showToast('📱 Rezervasyon onayı bildirimlerinize gönderildi.', 'info');
-        }, 2000);
-      }
-
-      // Sayfa yüklendiğinde
-      document.addEventListener('DOMContentLoaded', function() {
-        if (!PasliosData.isLoggedIn()) {
-          showToast('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!', 'warning');
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 2000);
-          return;
-        }
-      });
-
-      // Initialize button states
-      document.getElementById('decrease-btn').disabled = playerCount <= 2;
-      document.getElementById('increase-btn').disabled = playerCount >= 22;
-      
       // Venue details data
       const venueData = {
         venue1: {
@@ -1540,43 +1492,7 @@
       
       function selectVenueFromPopup() {
         closeVenuePopup();
-        showToast('⚽ Lütfen saha listesinden rezervasyon yapmak istediğiniz sahayı seçin', 'info');
-      }
-    </script>
-
-    <!-- Data Management Script -->
-    <script src="js/data.js"></script>
-  </body>
-</html>
-                <div class="features-list"></div>
-              </div>
-              
-              <div class="price-section">
-                <span class="price-label">Saatlik Ücret</span>
-                <span class="price-value"></span>
-              </div>
-              
-              <div class="popup-actions">
-                <button class="action-btn btn-secondary" onclick="closeVenuePopup()">Kapat</button>
-                <button class="action-btn btn-primary" onclick="selectVenueFromPopup()">Rezervasyon Yap</button>
-              </div>
-            </div>
-          </div>
-        `;
-        
-        document.body.appendChild(overlay);
-        return overlay.querySelector('.venue-popup');
-      }
-      
-      function closeVenuePopup() {
-        const overlay = document.getElementById('venuePopupOverlay');
-        if (overlay) {
-          overlay.style.display = 'none';
-        }
-      }
-      
-      function selectVenueFromPopup() {
-        closeVenuePopup();
+        ToastManager.show('⚽ Lütfen saha listesinden rezervasyon yapmak istediğiniz sahayı seçin', 'info');
         // Sayfa aşağı kaydır ve venue seçimini vurgula
         document.querySelector('.venue-list').scrollIntoView({ behavior: 'smooth' });
       }
@@ -1604,10 +1520,10 @@
             });
             
             if (selectedDate < today.setHours(0,0,0,0)) {
-              showToast('⚠️ Geçmiş tarih seçilemez!', 'warning');
+              ToastManager.show('⚠️ Geçmiş tarih seçilemez!', 'warning');
               this.value = new Date().toISOString().split('T')[0];
             } else {
-              showToast(`📅 ${formattedDate} tarihi seçildi`, 'info');
+              ToastManager.show(`📅 ${formattedDate} tarihi seçildi`, 'info');
               updateSummary();
             }
           });
@@ -1618,6 +1534,40 @@
         document.getElementById('increase-btn').disabled = playerCount >= 22;
         updateBookingButton();
       });
+    </script>
+
+    <!-- Data Management Script -->
+    <script src="js/data.js"></script>
+    <!-- Toast Notifications -->
+    <script src="js/toast.js"></script>
+    
+    <script>
+      // Sayfa yüklendiğinde oturum kontrolü
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!PasliosData.isLoggedIn()) {
+          ToastManager.show('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!', 'warning');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+          return;
+        }
+        
+        // Initialize booking page
+        initializeBookingPage();
+      });
+
+      function initializeBookingPage() {
+        // Initialize button states
+        const decreaseBtn = document.getElementById('decrease-btn');
+        const increaseBtn = document.getElementById('increase-btn');
+        
+        if (decreaseBtn && increaseBtn) {
+          decreaseBtn.disabled = playerCount <= 2;
+          increaseBtn.disabled = playerCount >= 22;
+        }
+        
+        updateBookingButton();
+      }
     </script>
   </body>
 </html>
