@@ -1544,7 +1544,27 @@
     <script>
       // Sayfa yüklendiğinde oturum kontrolü
       document.addEventListener('DOMContentLoaded', function() {
-        if (!PasliosData.isLoggedIn()) {
+        console.log('DOMContentLoaded fired');
+        console.log('PasliosData:', typeof PasliosData);
+        
+        // PasliosData'nın yüklenmesini bekle
+        if (typeof PasliosData === 'undefined') {
+          console.log('PasliosData not loaded yet, waiting...');
+          setTimeout(() => {
+            checkLogin();
+          }, 100);
+        } else {
+          checkLogin();
+        }
+      });
+
+      function checkLogin() {
+        console.log('Checking login status...');
+        const isLoggedIn = PasliosData.isLoggedIn();
+        console.log('Is logged in:', isLoggedIn);
+        
+        if (!isLoggedIn) {
+          console.log('User not logged in, redirecting...');
           ToastManager.show('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!', 'warning');
           setTimeout(() => {
             window.location.href = 'index.html';
@@ -1552,9 +1572,10 @@
           return;
         }
         
+        console.log('User is logged in, initializing page...');
         // Initialize booking page
         initializeBookingPage();
-      });
+      }
 
       function initializeBookingPage() {
         // Initialize button states
