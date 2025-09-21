@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kullanıcı Profili - Paslios</title>
+    <link href="css/toast.css" rel="stylesheet">
+    <script>
+        // Check authentication immediately
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -614,110 +621,322 @@
             }
         }
 
-        function toggleFollow() {
-            const followBtn = document.getElementById('followBtn');
-            const followersCount = document.getElementById('followersCount');
-            let currentCount = parseInt(followersCount.textContent.replace('K', '')) * 1000;
-            
-            if (isFollowing) {
-                isFollowing = false;
-                followBtn.textContent = 'Takip Et';
-                followBtn.classList.remove('following');
-                currentCount -= 1;
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
+    <script>
+        let currentTab = 'posts';
+        let isFollowing = false;
+        let currentUser = null;
+        let viewedUser = null;
+        let PasliosData = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Get current user
+                const userData = localStorage.getItem('currentUser');
+                if (!userData) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                currentUser = JSON.parse(userData);
+                
+                // Initialize data system
+                PasliosData = new window.PasliosData();
+                
+                // Load viewed user profile
+                await loadUserProfile();
+                switchTab('posts');
+                
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                showToast('❌ Profil yüklenirken hata oluştu', 'error');
+            }
+        });
+
+        // Toast function
+        function showToast(message, type = 'info') {
+            if (window.ToastManager) {
+                ToastManager.show(message, type);
             } else {
-                isFollowing = true;
-                followBtn.textContent = 'Takip Ediliyor';
-                followBtn.classList.add('following');
-                currentCount += 1;
+                // Fallback toast
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.classList.add('show'), 100);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick*="${tab}"]`).classList.add('active');
+
+            // Show/hide sections
+            if (tab === 'posts') {
+                document.getElementById('postsSection').style.display = 'block';
+                document.getElementById('matchesSection').style.display = 'none';
+                loadUserPosts();
+            } else {
+                document.getElementById('postsSection').style.display = 'none';
+                document.getElementById('matchesSection').style.display = 'block';
+                loadUserMatches();
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                // Get user ID from URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const userId = urlParams.get('id');
+                
+                if (!userId) {
+                    showToast('❌ Kullanıcı ID\'si bulunamadı', 'error');
+                    setTimeout(() => window.history.back(), 2000);
+                    return;
+                }
+
+                // Get user data
+                const users = PasliosData.getAllUsers();
+                viewedUser = users.find(u => u.id == userId);
+                
+                if (!viewedUser) {
+                    showToast('❌ Kullanıcı bulunamadı', 'error');
+                    setTimeout(() => window.history.back(), 2000);
+                    return;
+                }
+
+                // Check if viewing own profile
+                if (viewedUser.id === currentUser.id) {
+                    window.location.href = 'profile.html';
+                    return;
+                }
+
+                // Update UI with user data
+                updateProfileUI();
+                checkFriendshipStatus();
+                
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                showToast('❌ Profil bilgileri yüklenemedi', 'error');
+            }
+        }
+
+        function updateProfileUI() {
+            if (!viewedUser) return;
+
+            // Update basic info
+            document.getElementById('pageTitle').textContent = viewedUser.name;
+            document.getElementById('profileName').textContent = viewedUser.name;
+            document.getElementById('profileUsername').textContent = `@${viewedUser.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+            
+            // Update avatar
+            const avatarElement = document.getElementById('profileAvatar');
+            if (viewedUser.avatar) {
+                avatarElement.innerHTML = `<img src="${viewedUser.avatar}" alt="${viewedUser.name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(viewedUser.name)}&background=10b981&color=fff&size=80`;
+                avatarElement.innerHTML = `<img src="${avatarUrl}" alt="${viewedUser.name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
             }
             
-            // Update follower count
-            followersCount.textContent = currentCount >= 1000 ? 
-                (Math.round(currentCount / 100) / 10) + 'K' : 
-                currentCount.toString();
+            // Update bio
+            const bio = createUserBio(viewedUser);
+            document.getElementById('profileBio').innerHTML = bio;
+            
+            // Update stats
+            updateUserStats();
+        }
+
+        function createUserBio(user) {
+            const stats = PasliosData.getUserStats(user.id);
+            const position = user.position || 'Oyuncu';
+            const location = user.location || 'Bilinmiyor';
+            const rating = user.rating || 0;
+            
+            return `
+                ${position} ⚽ | ${rating.toFixed(1)} ⭐ | 📍 ${location}<br>
+                ${user.bio || 'Paslios\'ta futbol tutkunu!'}<br>
+                ${stats.matchesPlayed || 0} maç | ${stats.goals || 0} gol | ${stats.assists || 0} asist
+            `;
+        }
+
+        function updateUserStats() {
+            if (!viewedUser) return;
+            
+            const posts = PasliosData.getUserPosts(viewedUser.id);
+            const friends = viewedUser.friendIds || [];
+            
+            document.getElementById('postsCount').textContent = posts.length || 0;
+            document.getElementById('followersCount').textContent = friends.length || 0;
+            document.getElementById('followingCount').textContent = friends.length || 0;
+        }
+
+        function checkFriendshipStatus() {
+            if (!viewedUser || !currentUser) return;
+            
+            const currentUserFriends = currentUser.friendIds || [];
+            isFollowing = currentUserFriends.includes(viewedUser.id);
+            
+            const followBtn = document.getElementById('followBtn');
+            if (isFollowing) {
+                followBtn.textContent = 'Arkadaş';
+                followBtn.classList.add('following');
+                followBtn.style.background = '#6b7280';
+            } else {
+                followBtn.textContent = 'Arkadaş Ekle';
+                followBtn.classList.remove('following');
+                followBtn.style.background = '#10b981';
+            }
+        }
+
+        function toggleFollow() {
+            if (!viewedUser || !currentUser) return;
+            
+            try {
+                if (isFollowing) {
+                    // Unfollow
+                    PasliosData.removeFriend(currentUser.id, viewedUser.id);
+                    isFollowing = false;
+                    showToast(`❌ ${viewedUser.name} arkadaşlıktan çıkarıldı`, 'info');
+                } else {
+                    // Send friend request
+                    PasliosData.createNotification({
+                        userId: viewedUser.id,
+                        type: 'friend_request',
+                        title: 'Yeni Arkadaşlık İsteği',
+                        message: `${currentUser.name} arkadaş olmak istiyor.`,
+                        senderId: currentUser.id,
+                        senderName: currentUser.name,
+                        read: false,
+                        responded: false
+                    });
+                    
+                    showToast(`📤 ${viewedUser.name} kişisine arkadaşlık isteği gönderildi!`, 'success');
+                }
+                
+                checkFriendshipStatus();
+                updateUserStats();
+                
+            } catch (error) {
+                console.error('Error toggling follow:', error);
+                showToast('❌ İşlem gerçekleştirilemedi', 'error');
+            }
         }
 
         function sendMessage() {
-            window.location.href = 'messages.html';
-        }
-
-        function showMenu() {
-            const actions = [
-                { text: 'Engelle', action: () => { 
-                    showToast('🚫 Kullanıcı engellendi', 'warning');
-                }},
-                { text: 'Şikayet Et', action: () => { 
-                    showToast('⚠️ Şikayet gönderildi', 'info');
-                }},
-                { text: 'Paylaş', action: () => { 
-                    if (navigator.share) {
-                        navigator.share({
-                            title: 'Paslios Profil',
-                            text: 'Bu kullanıcının profilini incele!',
-                            url: window.location.href
-                        });
-                    } else {
-                        showToast('🔗 Profil linki kopyalandı!', 'success');
-                    }
-                }}
-            ];
-
-            // Basit menu gösterimi için alert yerine toast kullan
-            showToast('📋 Menü seçenekleri: Engelle, Şikayet Et, Paylaş', 'info');
+            if (!viewedUser) return;
             
-            // Demo için ilk eylemi çalıştır
+            showToast(`💬 ${viewedUser.name} ile sohbet başlatılıyor...`, 'info');
             setTimeout(() => {
-                actions[2].action(); // Paylaş eylemini çalıştır
-            }, 1500);
+                window.location.href = `chat.html?userId=${viewedUser.id}`;
+            }, 1000);
         }
 
-        // URL'den kullanıcı bilgilerini al
-        function loadUserProfile() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const username = urlParams.get('user');
+        function loadUserPosts() {
+            if (!viewedUser) return;
             
-            if (username) {
-                // Burada gerçek uygulamada API'den kullanıcı bilgileri alınır
-                const userProfiles = {
-                    'ahmetyilmaz': {
-                        name: 'Ahmet Yılmaz',
-                        username: '@ahmetyilmaz',
-                        avatar: 'AY',
-                        bio: '⚽ Futsal tutkunu | 🏆 3 kez şampiyon | 📍 İstanbul<br>Haftada 3 gün saha, her gün antrenman! 💪',
-                        posts: 156,
-                        followers: '1.2K',
-                        following: 234
-                    },
-                    'fatmaturan': {
-                        name: 'Fatma Turan',
-                        username: '@fatmaturan',
-                        avatar: 'FT',
-                        bio: '🥅 Kaleci | 🏆 Şampiyon | 📍 Ankara<br>Futsal sevdalısı, her maçta sahadayım! ⚽',
-                        posts: 89,
-                        followers: '845',
-                        following: 156
-                    }
-                };
+            try {
+                const posts = PasliosData.getUserPosts(viewedUser.id);
+                const postsGrid = document.querySelector('.posts-grid');
                 
-                const user = userProfiles[username];
-                if (user) {
-                    document.getElementById('pageTitle').textContent = user.name;
-                    document.getElementById('profileName').textContent = user.name;
-                    document.getElementById('profileUsername').textContent = user.username;
-                    document.getElementById('profileAvatar').textContent = user.avatar;
-                    document.getElementById('profileBio').innerHTML = user.bio;
-                    document.getElementById('postsCount').textContent = user.posts;
-                    document.getElementById('followersCount').textContent = user.followers;
-                    document.getElementById('followingCount').textContent = user.following;
+                if (posts.length === 0) {
+                    postsGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #6b7280;">
+                            <p>📝 Henüz gönderi yok</p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Bu kullanıcı henüz gönderi paylaşmamış.</p>
+                        </div>
+                    `;
+                    return;
                 }
+                
+                postsGrid.innerHTML = posts.map((post, index) => `
+                    <div class="post-item" onclick="viewPost('${post.id}')">
+                        <div class="post-placeholder" style="background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            ${['⚽', '🏆', '🥅', '🏃', '💪', '🎯'][index % 6]}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                showToast('❌ Gönderiler yüklenemedi', 'error');
             }
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUserProfile();
-            switchTab('posts');
-        });
+        function loadUserMatches() {
+            if (!viewedUser) return;
+            
+            try {
+                const allMatches = PasliosData.getAllMatches();
+                const userMatches = allMatches.filter(match => 
+                    match.players && match.players.includes(viewedUser.id)
+                );
+                
+                const matchesContainer = document.getElementById('matchesSection');
+                
+                if (userMatches.length === 0) {
+                    matchesContainer.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: #6b7280; background: white; border-radius: 16px;">
+                            <p>⚽ Henüz maç kaydı yok</p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Bu kullanıcı henüz maça katılmamış.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                matchesContainer.innerHTML = userMatches.map(match => `
+                    <div class="match-item">
+                        <div class="match-info">
+                            <div class="match-date">${formatDate(match.date)}</div>
+                            <div class="match-teams">${match.title}</div>
+                            <div class="match-venue">${match.venue || match.location}</div>
+                        </div>
+                        <div class="match-score">${getMatchStatus(match.status)}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading matches:', error);
+                showToast('❌ Maç geçmişi yüklenemedi', 'error');
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long'
+            });
+        }
+
+        function getMatchStatus(status) {
+            const statusMap = {
+                'waiting': 'Bekliyor',
+                'confirmed': 'Onaylandı',
+                'full': 'Dolu',
+                'completed': 'Tamamlandı'
+            };
+            return statusMap[status] || status;
+        }
+
+        function viewPost(postId) {
+            showToast('📱 Gönderi görüntüleniyor...', 'info');
+        }
+
+        function showMenu() {
+            showToast('📋 Menü: Engelle • Şikayet Et • Paylaş', 'info');
+        }
     </script>
 </body>
 </html>
