@@ -6,6 +6,33 @@
     <meta name="description" content="Paslios - Saha Rezervasyonu">
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Saha Rezervasyonu</title>
+    
+    <!-- Immediate Authentication Check -->
+    <script>
+      // Sayfa yüklenmeden önce authentication kontrolü
+      (function() {
+        try {
+          const session = localStorage.getItem('paslios_session');
+          let isLoggedIn = false;
+          
+          if (session) {
+            const sessionData = JSON.parse(session);
+            isLoggedIn = sessionData && sessionData.isLoggedIn;
+          }
+          
+          if (!isLoggedIn) {
+            // Hemen redirect et
+            window.location.href = 'index.html';
+            return;
+          }
+        } catch (e) {
+          // Hata durumunda da redirect et
+          window.location.href = 'index.html';
+          return;
+        }
+      })();
+    </script>
+    
     <style>
       * {
         margin: 0;
@@ -1542,7 +1569,7 @@
     <script src="js/toast.js"></script>
     
     <script>
-      // Sayfa yüklendiğinde oturum kontrolü
+      // Sayfa yüklendiğinde oturum kontrolü (ikincil kontrol)
       document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded fired');
         console.log('PasliosData:', typeof PasliosData);
@@ -1559,43 +1586,14 @@
       });
 
       function checkLogin() {
-        console.log('Checking login status...');
-        
-        // Test session'larını temizle (sadece userId: 1 olan test session'ları)
-        const session = localStorage.getItem('paslios_session');
-        if (session) {
-          try {
-            const sessionData = JSON.parse(session);
-            if (sessionData.userId === 1 && sessionData.loginTime) {
-              // Bu bir test session'ı, temizle
-              console.log('Removing test session...');
-              localStorage.removeItem('paslios_session');
-            }
-          } catch (e) {
-            console.log('Invalid session data, removing...');
-            localStorage.removeItem('paslios_session');
-          }
-        }
-        
-        console.log('Session data:', localStorage.getItem('paslios_session'));
+        console.log('Secondary login check...');
         
         const isLoggedIn = PasliosData.isLoggedIn();
         console.log('Is logged in:', isLoggedIn);
         
         if (!isLoggedIn) {
           console.log('User not logged in, redirecting...');
-          
-          // ToastManager check
-          if (typeof ToastManager !== 'undefined') {
-            ToastManager.show('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!', 'warning');
-          } else {
-            console.log('ToastManager not available, using alert');
-            alert('⚠️ Bu sayfaya erişmek için giriş yapmalısınız!');
-          }
-          
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 1000);
+          window.location.href = 'index.html';
           return;
         }
         
