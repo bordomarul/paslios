@@ -6,6 +6,12 @@
     <meta name="description" content="Paslios - Mesajlar">
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Mesajlar</title>
+    <script>
+        // Authentication check - redirect if not logged in
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+    </script>
     <style>
       * {
         margin: 0;
@@ -635,22 +641,29 @@
     <script>
       let conversations = [];
 
-      // Toast function
-      function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        
-        document.getElementById('toastContainer').appendChild(toast);
-        
-        // Show toast
-        setTimeout(() => toast.classList.add('show'), 100);
-        
-        // Hide and remove toast
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
+      // Load required scripts
+      const loadScript = (src) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      // Initialize the page
+      async function initializePage() {
+        try {
+          await Promise.all([
+            loadScript('js/data.js'),
+            loadScript('js/toast.js')
+          ]);
+          console.log('Scripts loaded successfully');
+          loadConversations();
+        } catch (error) {
+          console.error('Error loading scripts:', error);
+        }
       }
 
       function initializeConversations() {
@@ -843,13 +856,17 @@
         
         if (contact) {
           closeCurrentModal();
-          showToast(`${contact} ile yeni sohbet başlatılıyor... 💬`, 'success');
+          if (window.ToastManager) {
+            ToastManager.show(`${contact} ile yeni sohbet başlatılıyor... 💬`, 'success');
+          }
           
           setTimeout(() => {
             window.location.href = `chat.html?user=${encodeURIComponent(contact)}`;
           }, 1500);
         } else {
-          showToast('⚠️ Lütfen bir kullanıcı adı girin!', 'error');
+          if (window.ToastManager) {
+            ToastManager.show('⚠️ Lütfen bir kullanıcı adı girin!', 'error');
+          }
         }
       }
 
@@ -931,7 +948,9 @@
         switch(actionText) {
           case 'Okundu olarak işaretle':
             markAsRead(element);
-            showToast('Sohbet okundu olarak işaretlendi ✓', 'success');
+            if (window.ToastManager) {
+              ToastManager.show('Sohbet okundu olarak işaretlendi ✓', 'success');
+            }
             break;
           case 'Sohbeti sil':
             deleteConversation(element, userName);
@@ -979,7 +998,9 @@
         
         element.style.animation = 'fadeOut 0.3s ease-in-out';
         setTimeout(() => element.remove(), 300);
-        showToast(`${userName} sohbeti silindi 🗑️`, 'info');
+        if (window.ToastManager) {
+          ToastManager.show(`${userName} sohbeti silindi 🗑️`, 'info');
+        }
         
         closeCurrentModal();
       }
@@ -1017,7 +1038,9 @@
         const element = window.elementToBlock;
         const userName = window.userToBlock;
         
-        showToast(`${userName} engellendi 🚫`, 'error');
+        if (window.ToastManager) {
+          ToastManager.show(`${userName} engellendi 🚫`, 'error');
+        }
         element.style.opacity = '0.5';
         element.style.pointerEvents = 'none';
         
@@ -1025,7 +1048,9 @@
       }
 
       function viewProfile(userName) {
-        showToast(`${userName} profiline yönlendiriliyor... 👤`, 'info');
+        if (window.ToastManager) {
+          ToastManager.show(`${userName} profiline yönlendiriliyor... 👤`, 'info');
+        }
         setTimeout(() => {
           window.location.href = `user-profile.html?user=${encodeURIComponent(userName)}`;
         }, 1500);
@@ -1033,6 +1058,7 @@
 
       // Add event listeners
       document.addEventListener('DOMContentLoaded', function() {
+        initializePage();
         initializeConversations();
 
         // Search functionality
@@ -1094,7 +1120,9 @@
                   markAsRead(item);
                   // Navigate to chat page
                   const userName = item.querySelector('.user-name').textContent;
-                  showToast(`${userName} ile sohbet açılıyor... 💬`, 'success');
+                  if (window.ToastManager) {
+                    ToastManager.show(`${userName} ile sohbet açılıyor... 💬`, 'success');
+                  }
                 }
               }, 200);
             }
@@ -1133,67 +1161,71 @@
         });
 
         // Oturum kontrolü ve mesajları yükle
-        if (!PasliosData.isLoggedIn()) {
+        if (!localStorage.getItem('currentUser')) {
           window.location.href = 'index.html';
           return;
         }
-        
-        loadConversations();
       });
 
       function loadConversations() {
-        const currentUser = PasliosData.getCurrentUser();
-        const allUsers = PasliosData.getData('users');
-        const messages = PasliosData.getData('messages') || [];
-        
-        // Konuşma listesi oluştur (basit yaklaşım)
-        const conversationList = document.querySelector('.conversation-list');
-        const demoConversations = [
-          { userId: 2, name: 'Mehmet Kaya', avatar: 'MK', lastMessage: 'Yarın maçta görüşürüz! 🔥', time: '2 dk', unread: 2, online: true },
-          { userId: 3, name: 'Emre Demir', avatar: 'ED', lastMessage: 'Antalya maçından fotoğraflar geldi!', time: '1 saat', unread: 0, online: false },
-          { userId: 4, name: 'Can Özkan', avatar: 'CÖ', lastMessage: 'Yeni ayakkabılar nasıl?', time: '1 gün', unread: 0, online: false },
-          { userId: 5, name: 'Burak Tunç', avatar: 'BT', lastMessage: 'Saha rezervasyonu yaptım ✅', time: '2 gün', unread: 0, online: true },
-          { userId: 6, name: 'Ali Şen', avatar: 'AS', lastMessage: '👍', time: '1 hafta', unread: 0, online: false }
-        ];
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+          if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+          }
 
-        conversationList.innerHTML = demoConversations.map(conv => `
-          <a href="chat.html?user=${conv.userId}" class="conversation-item ${conv.unread > 0 ? 'unread' : ''}">
-            <div class="user-avatar">
-              ${conv.avatar}
-              ${conv.online ? '<div class="online-status"></div>' : ''}
-            </div>
-            <div class="conversation-info">
-              <div class="conversation-header">
-                <div class="user-name">${conv.name}</div>
-                <div class="message-time">${conv.time}</div>
-              </div>
-              <div class="last-message">${conv.lastMessage}</div>
-            </div>
-            ${conv.unread > 0 ? `<div class="unread-count">${conv.unread}</div>` : ''}
-          </a>
-        `).join('');
+          // Demo conversations with more realistic data
+          const demoConversations = [
+            { userId: 2, name: 'Mehmet Kaya', avatar: 'MK', lastMessage: 'Yarın maçta görüşürüz! 🔥', time: '2 dk', unread: 2, online: true },
+            { userId: 3, name: 'Emre Demir', avatar: 'ED', lastMessage: 'Antalya maçından fotoğraflar geldi!', time: '1 saat', unread: 0, online: false },
+            { userId: 4, name: 'Can Özkan', avatar: 'CÖ', lastMessage: 'Yeni ayakkabılar nasıl?', time: '1 gün', unread: 0, online: false },
+            { userId: 5, name: 'Burak Tunç', avatar: 'BT', lastMessage: 'Saha rezervasyonu yaptım ✅', time: '2 gün', unread: 0, online: true },
+            { userId: 6, name: 'Ali Şen', avatar: 'AS', lastMessage: '👍', time: '1 hafta', unread: 0, online: false }
+          ];
 
-        // Team chat ekle
-        conversationList.innerHTML = `
-          <a href="chat.html?team=tigers" class="conversation-item unread">
-            <div class="user-avatar" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">🐅</div>
-            <div class="conversation-info">
-              <div class="conversation-header">
-                <div class="user-name">Çankaya Tigers</div>
-                <div class="message-time">3 saat</div>
+          const conversationList = document.querySelector('.conversation-list');
+          conversationList.innerHTML = demoConversations.map(conv => `
+            <a href="chat.html?user=${conv.userId}" class="conversation-item ${conv.unread > 0 ? 'unread' : ''}">
+              <div class="user-avatar">
+                ${conv.avatar}
+                ${conv.online ? '<div class="online-status"></div>' : ''}
               </div>
-              <div class="last-message">Can: Bu hafta antrenman var mı?</div>
-            </div>
-            <div class="unread-count">5</div>
-          </a>
-        ` + conversationList.innerHTML;
+              <div class="conversation-info">
+                <div class="conversation-header">
+                  <div class="user-name">${conv.name}</div>
+                  <div class="message-time">${conv.time}</div>
+                </div>
+                <div class="last-message">${conv.lastMessage}</div>
+              </div>
+              ${conv.unread > 0 ? `<div class="unread-count">${conv.unread}</div>` : ''}
+            </a>
+          `).join('');
+
+          // Team chat ekle
+          conversationList.innerHTML = `
+            <a href="chat.html?team=tigers" class="conversation-item unread">
+              <div class="user-avatar" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">🐅</div>
+              <div class="conversation-info">
+                <div class="conversation-header">
+                  <div class="user-name">Çankaya Tigers</div>
+                  <div class="message-time">3 saat</div>
+                </div>
+                <div class="last-message">Can: Bu hafta antrenman var mı?</div>
+              </div>
+              <div class="unread-count">5</div>
+            </a>
+          ` + conversationList.innerHTML;
+
+          // Re-initialize conversations after loading
+          initializeConversations();
+        } catch (error) {
+          console.error('Error loading conversations:', error);
+          if (window.ToastManager) {
+            ToastManager.show('Konuşmalar yüklenirken hata oluştu.', 'error');
+          }
+        }
       }
     </script>
-
-    <!-- Data Management Script -->
-    <script src="js/data.js"></script>
-
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
-  </body>
+</body>
 </html>

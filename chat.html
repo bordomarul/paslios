@@ -6,6 +6,12 @@
     <meta name="description" content="Paslios - Sohbet">
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Sohbet</title>
+    <script>
+        // Authentication check - redirect if not logged in
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+    </script>
     <style>
       * {
         margin: 0;
@@ -518,6 +524,32 @@
     </div>
 
     <script>
+      // Load required scripts
+      const loadScript = (src) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      // Initialize the page
+      async function initializePage() {
+        try {
+          await Promise.all([
+            loadScript('js/data.js'),
+            loadScript('js/toast.js')
+          ]);
+          console.log('Scripts loaded successfully');
+          updateChatHeader();
+          loadChatMessages();
+        } catch (error) {
+          console.error('Error loading scripts:', error);
+        }
+      }
+
       // URL parametrelerini oku
       const urlParams = new URLSearchParams(window.location.search);
       const userId = urlParams.get('user');
@@ -674,20 +706,25 @@
         updateSendButton();
         
         // Data management sistemine kaydet (basit yaklaşım)
-        const currentUser = PasliosData.getCurrentUser();
-        if (currentUser) {
-          const newMessage = {
-            id: Date.now(),
-            senderId: currentUser.id,
-            receiverId: new URLSearchParams(window.location.search).get('user') || 'group',
-            message: message,
-            timestamp: Date.now(),
-            read: false
-          };
-          
-          let messages = PasliosData.getData('messages') || [];
-          messages.push(newMessage);
-          PasliosData.setData('messages', messages);
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+          if (currentUser) {
+            const newMessage = {
+              id: Date.now(),
+              senderId: currentUser.id,
+              receiverId: userId || teamId || 'group',
+              message: message,
+              timestamp: Date.now(),
+              read: false
+            };
+            
+            // Store message (simple approach - could be enhanced with PasliosData)
+            let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+            messages.push(newMessage);
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+          }
+        } catch (error) {
+          console.error('Error saving message:', error);
         }
         
         // Simüle edilmiş cevap (demo için)
@@ -725,28 +762,97 @@
 
       // Ek dosya ekleme
       function openAttachments() {
-        alert('Dosya ekleme özelliği yakında gelecek!');
+        if (window.ToastManager) {
+          ToastManager.show('Dosya ekleme özelliği yakında gelecek! 📎', 'info');
+        }
       }
 
       // Bildirim sessize alma
       function toggleMute() {
-        alert('Bildirimler sessize alındı!');
+        if (window.ToastManager) {
+          ToastManager.show('Bildirimler sessize alındı! 🔕', 'success');
+        }
+      }
+
+      function loadChatMessages() {
+        const messagesArea = document.getElementById('messages');
+        
+        // Demo messages based on chat type
+        let demoMessages = [];
+        
+        if (userId === '2' || userId === 'mehmet') {
+          demoMessages = [
+            { type: 'received', text: 'Selamlar! Bugün maça geliyor musun?', time: '14:30', avatar: 'MK' },
+            { type: 'sent', text: 'Evet, kesinlikle gelirim! Saat kaçta?', time: '14:32' },
+            { type: 'received', text: 'Saat 16:00\'da başlıyor. Sahada buluşalım!', time: '14:33', avatar: 'MK' },
+            { type: 'sent', text: 'Tamam, görüşürüz! 🔥', time: '14:35' },
+            { type: 'received', text: 'Yarın maçta görüşürüz! 🔥', time: '16:42', avatar: 'MK' }
+          ];
+        } else if (teamId === 'tigers') {
+          demoMessages = [
+            { type: 'system', text: 'Can Özkan gruba katıldı', time: '10:00' },
+            { type: 'received', text: 'Bu hafta antrenman var mı?', time: '10:15', avatar: 'CÖ', sender: 'Can' },
+            { type: 'received', text: 'Evet, Çarşamba 19:00\'da', time: '10:16', avatar: 'MK', sender: 'Mehmet' },
+            { type: 'received', text: 'Harika! Ben de geleceğim', time: '10:18', avatar: 'ED', sender: 'Emre' },
+            { type: 'sent', text: 'Ben de varım! 💪', time: '10:20' }
+          ];
+        } else {
+          demoMessages = [
+            { type: 'received', text: 'Merhaba! Nasılsın?', time: '10:00', avatar: 'XX' },
+            { type: 'sent', text: 'İyiyim, teşekkürler! Sen nasılsın?', time: '10:05' }
+          ];
+        }
+
+        messagesArea.innerHTML = demoMessages.map(msg => {
+          if (msg.type === 'system') {
+            return `
+              <div class="system-message" style="text-align: center; margin: 1rem 0; padding: 0.5rem; background: rgba(107, 114, 128, 0.1); border-radius: 8px; font-size: 0.875rem; color: #6b7280;">
+                <span class="system-text">${msg.text}</span>
+                <span class="system-time" style="margin-left: 0.5rem; font-size: 0.75rem;">${msg.time}</span>
+              </div>
+            `;
+          } else if (msg.type === 'received') {
+            return `
+              <div class="message received">
+                <div class="message-avatar">${msg.avatar}</div>
+                <div class="message-content">
+                  ${msg.sender ? `<div class="sender-name" style="font-size: 0.75rem; color: #10b981; font-weight: 600; margin-bottom: 0.25rem;">${msg.sender}</div>` : ''}
+                  <div class="message-text">${msg.text}</div>
+                  <div class="message-time">${msg.time}</div>
+                </div>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="message sent">
+                <div class="message-content">
+                  <div class="message-text">${msg.text}</div>
+                  <div class="message-time">${msg.time}</div>
+                </div>
+              </div>
+            `;
+          }
+        }).join('');
+
+        // Scroll to bottom
+        setTimeout(() => {
+          messagesArea.scrollTop = messagesArea.scrollHeight;
+        }, 100);
       }
 
       // Mesajları en alta kaydır
       document.addEventListener('DOMContentLoaded', function() {
-        // Oturum kontrolü
-        if (!PasliosData.isLoggedIn()) {
+        // Authentication check
+        if (!localStorage.getItem('currentUser')) {
           window.location.href = 'index.html';
           return;
         }
+        
+        initializePage();
         
         const messagesArea = document.getElementById('messages');
         messagesArea.scrollTop = messagesArea.scrollHeight;
       });
     </script>
-
-    <!-- Data Management Script -->
-    <script src="js/data.js"></script>
   </body>
 </html>

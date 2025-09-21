@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yeni Gönderi - Paslios</title>
+    <script>
+        // Authentication check - redirect if not logged in
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -535,23 +541,32 @@
         let selectedLocation = null;
         let selectedPrivacy = 'public';
         
-        // Toast function
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            
-            document.getElementById('toastContainer').appendChild(toast);
-            
-            // Show toast
-            setTimeout(() => toast.classList.add('show'), 100);
-            
-            // Hide and remove toast
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+        // Load required scripts
+        const loadScript = (src) => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        };
+
+        // Initialize the page
+        async function initializePage() {
+            try {
+                await Promise.all([
+                    loadScript('js/data.js'),
+                    loadScript('js/toast.js')
+                ]);
+                console.log('Scripts loaded successfully');
+            } catch (error) {
+                console.error('Error loading scripts:', error);
+            }
         }
+
+        // Call initialization when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializePage);
         
         function goBack() {
             window.history.back();
@@ -656,7 +671,9 @@
             const postBtn = document.getElementById('postBtn');
             
             if (text.length === 0 && !hasMedia) {
-                showToast('Lütfen bir metin yazın veya medya ekleyin.', 'error');
+                if (window.ToastManager) {
+                    ToastManager.show('Lütfen bir metin yazın veya medya ekleyin.', 'error');
+                }
                 return;
             }
             
@@ -664,33 +681,58 @@
             postBtn.disabled = true;
             postBtn.textContent = 'Paylaşılıyor...';
             
-            const postData = {
-                text: text,
-                personTags: personTags,
-                location: selectedLocation,
-                tags: tags,
-                privacy: selectedPrivacy,
-                hasMedia: hasMedia,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Simulate upload delay
-            setTimeout(() => {
-                showToast('Gönderiniz başarıyla paylaşıldı! 🎉', 'success');
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
                 
-                // Wait for toast to show, then redirect
+                const postData = {
+                    id: Date.now().toString(),
+                    userId: currentUser.id,
+                    username: currentUser.username,
+                    userAvatar: currentUser.avatar || '👤',
+                    text: text,
+                    personTags: personTags,
+                    location: selectedLocation,
+                    tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                    privacy: selectedPrivacy,
+                    hasMedia: hasMedia,
+                    mediaType: hasMedia ? (document.getElementById('previewImg').style.display === 'block' ? 'image' : 'video') : null,
+                    likes: 0,
+                    comments: 0,
+                    shares: 0,
+                    timestamp: new Date().toISOString(),
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Add post using PasliosData
+                if (window.PasliosData) {
+                    PasliosData.addPost(postData);
+                }
+                
+                // Simulate upload delay
                 setTimeout(() => {
-                    window.location.href = 'home.html';
-                }, 1500);
-            }, 800);
+                    if (window.ToastManager) {
+                        ToastManager.show('Gönderiniz başarıyla paylaşıldı! 🎉', 'success');
+                    }
+                    
+                    // Wait for toast to show, then redirect
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1500);
+                }, 800);
+                
+            } catch (error) {
+                console.error('Error creating post:', error);
+                if (window.ToastManager) {
+                    ToastManager.show('Gönderi paylaşılırken bir hata oluştu.', 'error');
+                }
+                postBtn.disabled = false;
+                postBtn.textContent = 'Paylaş';
+            }
         }
         
         document.addEventListener('DOMContentLoaded', function() {
             validateForm();
         });
     </script>
-
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
 </body>
 </html>
