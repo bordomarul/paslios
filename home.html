@@ -711,12 +711,20 @@
       });
 
       function loadUserInfo() {
-        const currentUser = PasliosData.getCurrentUser();
-        if (currentUser) {
+        // localStorage'dan gerçek kullanıcı verilerini oku
+        const currentUserData = localStorage.getItem('currentUser');
+        if (currentUserData) {
+          const currentUser = JSON.parse(currentUserData);
+          
           // Header'daki kullanıcı bilgilerini güncelle
           const userAvatarElements = document.querySelectorAll('.user-avatar');
           userAvatarElements.forEach(element => {
-            element.textContent = currentUser.avatar;
+            // İlk harfleri avatar olarak kullan
+            const nameParts = currentUser.name.split(' ');
+            const initials = nameParts.length > 1 ? 
+              nameParts[0][0] + nameParts[1][0] : 
+              nameParts[0][0] + nameParts[0][1] || nameParts[0][0];
+            element.textContent = initials.toUpperCase();
           });
           
           // Hoş geldin mesajını güncelle
@@ -725,7 +733,43 @@
             const firstName = currentUser.name.split(' ')[0];
             welcomeTitle.textContent = `Selam ${firstName}! 👋`;
           }
+          
+          // Kullanıcı istatistiklerini güncelle
+          updateUserStats(currentUser);
+        } else {
+          // Giriş yapılmamışsa login sayfasına yönlendir
+          window.location.href = 'index.html';
         }
+      }
+
+      function updateUserStats(currentUser) {
+        // Kullanıcı istatistiklerini sayfada göster
+        const statElements = {
+          matchesPlayed: document.querySelector('[data-stat="matches-played"]'),
+          matchesWon: document.querySelector('[data-stat="matches-won"]'),
+          goals: document.querySelector('[data-stat="goals"]'),
+          assists: document.querySelector('[data-stat="assists"]'),
+          rating: document.querySelector('[data-stat="rating"]'),
+          totalPoints: document.querySelector('[data-stat="total-points"]'),
+          level: document.querySelector('[data-stat="level"]')
+        };
+        
+        // İstatistikleri güncelle
+        if (statElements.matchesPlayed) statElements.matchesPlayed.textContent = currentUser.matchesPlayed || 0;
+        if (statElements.matchesWon) statElements.matchesWon.textContent = currentUser.matchesWon || 0;
+        if (statElements.goals) statElements.goals.textContent = currentUser.goals || 0;
+        if (statElements.assists) statElements.assists.textContent = currentUser.assists || 0;
+        if (statElements.rating) statElements.rating.textContent = (currentUser.rating || 0).toFixed(1);
+        if (statElements.totalPoints) statElements.totalPoints.textContent = currentUser.stats?.totalPoints || 0;
+        if (statElements.level) statElements.level.textContent = currentUser.stats?.level || 1;
+        
+        // Pozisyonu güncelle
+        const positionElement = document.querySelector('[data-info="position"]');
+        if (positionElement) positionElement.textContent = currentUser.position || 'Belirsiz';
+        
+        // Konum bilgisini güncelle
+        const locationElement = document.querySelector('[data-info="location"]');
+        if (locationElement) locationElement.textContent = currentUser.location || 'Belirsiz';
       }
 
       function loadUpcomingMatches() {
@@ -833,7 +877,10 @@
 
       function createPostCard(post) {
         const timeAgo = PasliosData.formatTimeAgo(post.timestamp);
-        const currentUser = PasliosData.getCurrentUser();
+        
+        // localStorage'dan gerçek kullanıcı verilerini oku
+        const currentUserData = localStorage.getItem('currentUser');
+        const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
         const isLiked = currentUser && post.likedBy.includes(currentUser.id);
 
         const postCard = document.createElement('div');

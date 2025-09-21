@@ -12,15 +12,9 @@
       // Sayfa yüklenmeden önce authentication kontrolü
       (function() {
         try {
-          const session = localStorage.getItem('paslios_session');
-          let isLoggedIn = false;
+          const currentUser = localStorage.getItem('currentUser');
           
-          if (session) {
-            const sessionData = JSON.parse(session);
-            isLoggedIn = sessionData && sessionData.isLoggedIn;
-          }
-          
-          if (!isLoggedIn) {
+          if (!currentUser) {
             window.location.href = 'index.html';
             return;
           }
@@ -925,14 +919,23 @@
       });
 
       function loadUserProfile() {
-        const currentUser = PasliosData.getCurrentUser();
-        if (!currentUser) {
+        // localStorage'dan gerçek kullanıcı verilerini oku
+        const currentUserData = localStorage.getItem('currentUser');
+        if (!currentUserData) {
           window.location.href = 'index.html';
           return;
         }
+        
+        const currentUser = JSON.parse(currentUserData);
+
+        // Avatar için ilk harfleri kullan
+        const nameParts = currentUser.name.split(' ');
+        const initials = nameParts.length > 1 ? 
+          nameParts[0][0] + nameParts[1][0] : 
+          nameParts[0][0] + (nameParts[0][1] || '');
 
         // Profil bilgilerini güncelle
-        document.getElementById('profile-avatar').textContent = currentUser.avatar;
+        document.getElementById('profile-avatar').textContent = initials.toUpperCase();
         document.getElementById('profile-name').textContent = currentUser.name;
         document.getElementById('profile-position').textContent = currentUser.position + ' Oyuncusu';
         document.getElementById('profile-location').textContent = '📍 ' + currentUser.location;
@@ -962,7 +965,11 @@
       }
 
       function loadUserPosts() {
-        const currentUser = PasliosData.getCurrentUser();
+        // localStorage'dan gerçek kullanıcı verilerini oku
+        const currentUserData = localStorage.getItem('currentUser');
+        if (!currentUserData) return;
+        
+        const currentUser = JSON.parse(currentUserData);
         const allPosts = PasliosData.getPosts();
         const userPosts = allPosts.filter(post => post.authorId === currentUser.id);
         
@@ -1007,7 +1014,11 @@
       }
 
       function loadUserActivities() {
-        const currentUser = PasliosData.getCurrentUser();
+        // localStorage'dan gerçek kullanıcı verilerini oku
+        const currentUserData = localStorage.getItem('currentUser');
+        if (!currentUserData) return;
+        
+        const currentUser = JSON.parse(currentUserData);
         const bookings = PasliosData.getBookings(currentUser.id);
         
         const activitiesContainer = document.getElementById('user-activities');

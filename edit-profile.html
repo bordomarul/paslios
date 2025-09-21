@@ -451,11 +451,14 @@ Haftada 4 gün saha, her gün antrenman! 💪</textarea>
                 return;
             }
 
-            const currentUser = PasliosData.getCurrentUser();
-            if (!currentUser) {
+            // localStorage'dan gerçek kullanıcı verilerini oku
+            const currentUserData = localStorage.getItem('currentUser');
+            if (!currentUserData) {
                 window.location.href = 'index.html';
                 return;
             }
+            
+            const currentUser = JSON.parse(currentUserData);
 
             // Form alanlarını doldur
             document.getElementById('fullName').value = currentUser.name || '';
@@ -465,9 +468,15 @@ Haftada 4 gün saha, her gün antrenman! 💪</textarea>
             document.getElementById('phone').value = currentUser.phone || '';
             document.getElementById('birthDate').value = currentUser.birthDate || '';
             
-            // Avatar göster
+            // Avatar için ilk harfleri kullan
             const avatarElement = document.querySelector('.profile-avatar span');
-            if (avatarElement && currentUser.avatar) {
+            if (avatarElement) {
+                const nameParts = currentUser.name.split(' ');
+                const initials = nameParts.length > 1 ? 
+                  nameParts[0][0] + nameParts[1][0] : 
+                  nameParts[0][0] + (nameParts[0][1] || '');
+                avatarElement.textContent = initials.toUpperCase();
+            }
                 avatarElement.textContent = currentUser.avatar;
             }
 

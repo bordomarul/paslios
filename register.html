@@ -383,8 +383,13 @@
     <script src="js/toast.js"></script>
     <script src="js/data.js"></script>
     <script>
-      // Basit kayıt sistemi
+      // Toast manager başlat
+      let toastManager;
+      
       document.addEventListener('DOMContentLoaded', function() {
+        // ToastManager'ı başlat
+        toastManager = new ToastManager();
+        
         // Zaten giriş yapılmış mı kontrol et
         const currentUser = localStorage.getItem('currentUser');
         if (currentUser) {
@@ -405,22 +410,22 @@
           
           // Form kontrolü
           if (!fullName || !email || !phone || !password || !position) {
-            alert('Lütfen tüm alanları doldurun!');
+            toastManager.show('Lütfen tüm alanları doldurun!', 'warning', 'Eksik Bilgi');
             return;
           }
           
           if (password !== confirmPassword) {
-            alert('Şifreler eşleşmiyor!');
+            toastManager.show('Şifreler eşleşmiyor!', 'error', 'Hata');
             return;
           }
           
           if (password.length < 6) {
-            alert('Şifre en az 6 karakter olmalıdır!');
+            toastManager.show('Şifre en az 6 karakter olmalıdır!', 'warning', 'Uyarı');
             return;
           }
           
           if (!termsAccepted) {
-            alert('Kullanım koşullarını kabul etmelisiniz!');
+            toastManager.show('Kullanım koşullarını kabul etmelisiniz!', 'warning', 'Dikkat');
             return;
           }
           
@@ -457,17 +462,13 @@
           // LocalStorage'a kaydet
           localStorage.setItem('currentUser', JSON.stringify(newUser));
           
-          // Başarı mesajı
-          if (window.ToastManager) {
-            ToastManager.show('Hesabınız başarıyla oluşturuldu!', 'success');
-          } else {
-            alert('✅ Hesabınız başarıyla oluşturuldu!');
-          }
+          // Başarı mesajı - Güzel toast bildirimi
+          toastManager.show('Hesabınız başarıyla oluşturuldu! Hoş geldiniz ' + fullName + '!', 'success', '🎉 Tebrikler');
           
           // Ana sayfaya yönlendir
           setTimeout(function() {
             window.location.href = 'home.html';
-          }, 1500);
+          }, 2000);
         });
       });
     </script>

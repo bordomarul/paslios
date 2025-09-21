@@ -380,8 +380,13 @@
     <script src="js/toast.js"></script>
     <script src="js/data.js"></script>
     <script>
-      // Basit giriş sistemi
+      // Toast manager başlat
+      let toastManager;
+      
       document.addEventListener('DOMContentLoaded', function() {
+        // ToastManager'ı başlat
+        toastManager = new ToastManager();
+        
         // Zaten giriş yapılmış mı kontrol et
         const currentUser = localStorage.getItem('currentUser');
         if (currentUser) {
@@ -396,7 +401,7 @@
           const password = document.getElementById('password').value;
           
           if (!email || !password) {
-            alert('Lütfen email ve şifrenizi girin!');
+            toastManager.show('Lütfen email ve şifrenizi girin!', 'warning', 'Eksik Bilgi');
             return;
           }
           
@@ -433,15 +438,12 @@
           // Başarılı giriş simüle et
           localStorage.setItem('currentUser', JSON.stringify(testUser));
           
-          if (window.ToastManager) {
-            ToastManager.show('Giriş başarılı! Hoş geldiniz!', 'success');
-          } else {
-            alert('✅ Giriş başarılı! Hoş geldiniz!');
-          }
+          // Güzel toast bildirimi
+          toastManager.show('Giriş başarılı! Hoş geldiniz ' + testUser.name + '!', 'success', '🎉 Hoş Geldiniz');
           
           setTimeout(function() {
             window.location.href = 'home.html';
-          }, 1500);
+          }, 2000);
         });
       });
     </script>
