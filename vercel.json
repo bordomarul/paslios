@@ -1,10 +1,5 @@
 {
-  "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/index.html"
-    },
     {
       "source": "/home",
       "destination": "/home.html"
@@ -36,10 +31,16 @@
     {
       "source": "/settings",
       "destination": "/settings.html"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
