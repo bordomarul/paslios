@@ -395,7 +395,7 @@
         // Zaten giriş yapılmış mı kontrol et
         const currentUser = localStorage.getItem('currentUser');
         if (currentUser) {
-          window.location.href = 'home.html';
+          window.location.href = '/home';
           return;
         }
         
@@ -454,7 +454,7 @@
             
             // Ana sayfaya yönlendir
             setTimeout(function() {
-              window.location.href = 'home.html';
+              window.location.href = '/home';
             }, 2000);
           } else {
             // Hata mesajı

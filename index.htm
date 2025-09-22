@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Paslios - Türkiye'nin en büyük halısaha ve futbol sosyal platformu. Sahada buluşalım, Paslios'ta tanışalım! Maç organize et, takım kur, oyuncu bul.">
+    <meta name="keywords" content="halısaha, futbol, maç, takım, oyuncu, sosyal platform, spor, Türkiye">
+    <meta name="author" content="Paslios">
+    <meta property="og:title" content="Paslios - Futbol Sosyal Platformu">
+    <meta property="og:description" content="Türkiye'nin en büyük halısaha ve futbol sosyal platformu. Sahada buluşalım, Paslios'ta tanışalım!">
+    <meta property="og:url" content="https://paslios.com">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://paslios.com/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Paslios - Futbol Sosyal Platformu">
+    <meta name="twitter:description" content="Türkiye'nin en büyük halısaha ve futbol sosyal platformu">
+    <link rel="canonical" href="https://paslios.com">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Paslios">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/10b981/white?text=⚽">
+    
+    <link href="output.css" rel="stylesheet">
+    <link href="css/toast.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
+    <title>Paslios - Türkiye'nin Futbol Sosyal Platformu</title>
+    
+    <!-- Security Utils -->
+    <script src="js/security.js"></script>
+    <script src="js/enhanced-security.js"></script>
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      
+      .container {
+        width: 100%;
+        max-width: 400px;
+      }
+      
+      .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        padding: 2rem;
+      }
+      
+      .logo {
+        width: 4rem;
+        height: 4rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      
+      .logo span {
+        font-size: 2rem;
+        color: white;
+      }
+      
+      h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1f2937;
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+      
+      .subtitle {
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+      
+      .input {
+        width: 100%;
+        padding: 1rem;
+        background: #f9fafb;
+        border: none;
+        border-radius: 16px;
+        font-size: 1rem;
+        color: #1f2937;
+        transition: all 0.2s;
+      }
+      
+      .input:focus {
+        outline: none;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        margin-bottom: 1.25rem;
+      }
+      
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        color: #6b7280;
+      }
+      
+      .checkbox {
+        margin-right: 0.5rem;
+      }
+      
+      .forgot-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      
+      .forgot-link:hover {
+        color: #2563eb;
+      }
+      
+      .btn-primary {
+        width: 100%;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+        border-radius: 16px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      }
+      
+      .signup-section {
+        margin-top: 2rem;
+        text-align: center;
+      }
+      
+      .signup-text {
+        color: #6b7280;
+        margin-bottom: 1rem;
+      }
+      
+      .btn-secondary {
+        display: block;
+        width: 100%;
+        background: #f3f4f6;
+        color: #1f2937;
+        font-weight: 500;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 16px;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.2s;
+      }
+      
+      .btn-secondary:hover {
+        background: #e5e7eb;
+      }
+      
+      .divider {
+        position: relative;
+        margin: 1.5rem 0;
+      }
+      
+      .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #d1d5db;
+      }
+      
+      .divider span {
+        background: white;
+        padding: 0 1rem;
+        color: #6b7280;
+        font-size: 0.875rem;
+        position: relative;
+        display: block;
+        text-align: center;
+      }
+      
+      .social-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      
+      .btn-facebook {
+        background: #1877f2;
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .btn-google {
+        background: #dc2626;
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .btn-facebook:hover, .btn-google:hover {
+        opacity: 0.9;
+      }
+      
+      .demo-section {
+        margin-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1.5rem;
+      }
+      
+      .demo-text {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 0.75rem;
+      }
+      
+      .demo-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      
+      .demo-link {
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      
+      .demo-link.blue {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+      
+      .demo-link.green {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      
+      .demo-link.purple {
+        background: #f3e8ff;
+        color: #9333ea;
+      }
+      
+      .demo-link.orange {
+        background: #fed7aa;
+        color: #ea580c;
+      }
+      
+      .demo-link:hover {
+        opacity: 0.8;
+      }
+      
+      .footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: white;
+        font-size: 0.875rem;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Giriş Kartı -->
+      <div class="card">
+        <!-- Logo ve Başlık -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div class="logo">
+            <span>⚽</span>
+          </div>
+          <h1>Paslios</h1>
+          <p class="subtitle">Sahada buluşalım, paslios'ta tanışalım!</p>
+        </div>
+
+        <!-- Giriş Formu -->
+        <form id="loginForm">
+          <div class="form-group">
+            <input 
+              type="email" 
+              id="email"
+              placeholder="Email"
+              class="input"
+              required
+            />
+          </div>
+          
+          <div class="form-group">
+            <input 
+              type="password" 
+              id="password"
+              placeholder="Şifre"
+              class="input"
+              required
+            />
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="rememberMe" class="checkbox">
+              <span>Beni hatırla</span>
+            </label>
+            <a href="forgot-password.html" class="forgot-link">Şifremi unuttum?</a>
+          </div>
+
+          <button type="submit" class="btn-primary">
+            Giriş Yap
+          </button>
+        </form>
+
+        <!-- Kayıt Ol -->
+        <div class="signup-section">
+          <p class="signup-text">Hesabınız yok mu?</p>
+          <a href="register.html" class="btn-secondary">
+            Kayıt Ol
+          </a>
+        </div>
+
+        <!-- Sosyal Giriş -->
+        <div class="divider">
+          <span>veya</span>
+        </div>
+
+        <div class="social-buttons">
+          <button class="btn-facebook">Facebook</button>
+          <button class="btn-google">Google</button>
+        </div>
+      </div>
+
+      <!-- Alt Bilgi -->
+      <div class="footer">
+        <p>© 2025 Paslios. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+
+    <!-- Data Management Script -->
+    <script src="js/toast.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/mobile-ux.js"></script>
+    <script src="js/ux-enhancer.js"></script>
+    <script>
+      // Toast manager başlat
+      let toastManager;
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        // ToastManager'ı başlat
+        toastManager = new ToastManager();
+        
+        // Zaten giriş yapılmış mı kontrol et
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          window.location.href = '/home';
+          return;
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // CSRF Token kontrolü
+          const csrfInput = this.querySelector('input[name="csrf_token"]');
+          const formId = csrfInput ? csrfInput.getAttribute('data-form-id') : null;
+          
+          if (!csrfInput || !EnhancedSecurity.validateCSRFToken(formId, csrfInput.value)) {
+            toastManager.show('Güvenlik hatası! Sayfa yenilenecek.', 'error', 'Güvenlik');
+            setTimeout(() => location.reload(), 2000);
+            return;
+          }
+          
+          const email = EnhancedSecurity.strictSanitize(document.getElementById('email').value.trim());
+          const password = document.getElementById('password').value;
+          
+          if (!email || !password) {
+            toastManager.show('Lütfen email ve şifrenizi girin!', 'warning', 'Eksik Bilgi');
+            return;
+          }
+          
+          // Email format kontrolü
+          if (!window.SecurityUtils.isValidEmail(email)) {
+            toastManager.show('Geçerli bir email adresi girin!', 'error', 'Hata');
+            return;
+          }
+          
+          // Yeni giriş sistemi ile kullanıcı doğrula
+          const result = pasliosData.loginUser(email, password);
+          
+          if (result.success) {
+            // Session oluştur - production ready
+            const sessionData = {
+              isLoggedIn: true,
+              userId: result.user.id,
+              user: result.user,
+              loginTime: new Date().getTime(),
+              expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 saat
+            };
+            
+            localStorage.setItem('paslios_session', JSON.stringify(sessionData));
+            localStorage.setItem('currentUserId', result.user.id);
+            
+            // Güzel toast bildirimi
+            toastManager.show('Giriş başarılı! Hoş geldiniz ' + result.user.name + '!', 'success', '🎉 Hoş Geldiniz');
+            
+            // Redirect URL'ini kontrol et
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+            
+            setTimeout(function() {
+              if (redirectUrl && redirectUrl !== 'index.html') {
+                // Güvenlik kontrolü - sadece kendi domain'imizdeki sayfalara redirect
+                if (redirectUrl.startsWith('/') || !redirectUrl.includes('://')) {
+                  window.location.href = redirectUrl;
+                } else {
+                  window.location.href = '/home';
+                }
+              } else {
+                window.location.href = '/home';
+              }
+            }, 1500);
+          } else {
+            // Hata mesajı
+            toastManager.show(result.message, 'error', 'Giriş Hatası');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

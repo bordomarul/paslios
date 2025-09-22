@@ -10,10 +10,6 @@
       "destination": "/home.html"
     },
     {
-      "source": "/home.html",
-      "destination": "/home.html"
-    },
-    {
       "source": "/matches", 
       "destination": "/matches.html"
     },
