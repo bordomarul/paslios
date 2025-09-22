@@ -1,0 +1,76 @@
+{
+  "name": "Paslios - Futbol Sosyal Medya",
+  "short_name": "Paslios",
+  "description": "Futbol severlerin buluşma noktası - maç organizasyonu, oyuncu bulma ve sosyal etkileşim platformu",
+  "version": "1.0.0",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "tr-TR",
+  "categories": ["sports", "social"],
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/10b981/white?text=⚽",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/10b981/white?text=⚽",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/390x844/10b981/white?text=Paslios+Screenshot",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Maç Bul",
+      "short_name": "Maçlar",
+      "description": "Yakındaki maçları bul ve katıl",
+      "url": "/matches.html",
+      "icons": [
+        {
+          "src": "https://via.placeholder.com/96x96/10b981/white?text=⚽",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Mesajlar",
+      "short_name": "Chat",
+      "description": "Arkadaşlarınla konuş",
+      "url": "/messages.html",
+      "icons": [
+        {
+          "src": "https://via.placeholder.com/96x96/10b981/white?text=💬",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Profil",
+      "short_name": "Profil",
+      "description": "Profilini görüntüle ve düzenle",
+      "url": "/profile.html",
+      "icons": [
+        {
+          "src": "https://via.placeholder.com/96x96/10b981/white?text=👤",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

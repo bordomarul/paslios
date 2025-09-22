@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paslios - Takım Oluştur">
-    <link href="output.css" rel="stylesheet">
+    <link href="output.css" rel="stylesheet">`n    <link href="css/responsive.css" rel="stylesheet">
     <title>Paslios - Takım Oluştur</title>
     <script>
         // Authentication check - redirect if not logged in
@@ -598,6 +598,16 @@
         updateSelectedColor();
         updateSelectedPrivacy();
       }
+
+      // Toast notification helper function
+      function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add('show');
         }, 100);
 
         setTimeout(() => {

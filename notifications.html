@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paslios - Bildirimler">
     <link href="output.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
     <link href="css/toast.css" rel="stylesheet">
     <title>Paslios - Bildirimler</title>
     <script>
       // Check authentication immediately
-      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-      if (!currentUser) {
+      const authUser = JSON.parse(localStorage.getItem('currentUser'));
+      if (!authUser) {
         window.location.href = 'index.html';
       }
     </script>
@@ -529,385 +530,212 @@
       document.addEventListener('DOMContentLoaded', initializePage);
 
       function loadNotifications() {
-        const notifications = PasliosData.getNotifications(currentUser.id);
-        renderNotifications(notifications);
+        const result = pasliosData.getNotifications();
+        if (result.success) {
+          renderNotifications(result.notifications);
+          updateNotificationCount();
+        } else {
+          console.error('Bildirimler yüklenemedi:', result.message);
+        }
       }
 
       function renderNotifications(notifications) {
-        const newSection = document.querySelector('[data-section="new"]');
-        const previousSection = document.querySelector('[data-section="previous"]');
+        const notificationContainer = document.querySelector('.main-content');
         
-        // Clear existing notifications
-        if (newSection) newSection.innerHTML = '';
-        if (previousSection) previousSection.innerHTML = '';
+        if (!notifications || notifications.length === 0) {
+          notificationContainer.innerHTML = `
+            <div style="text-align: center; padding: 3rem; color: #6b7280;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
+              <h3 style="margin-bottom: 0.5rem; color: #374151;">Henüz bildiriminiz yok</h3>
+              <p>Aktiviteleriniz hakkında bilgiler burada görünecek!</p>
+            </div>
+          `;
+          return;
+        }
 
-        // Separate new and old notifications
-        const newNotifications = notifications.filter(n => !n.read && isRecent(n.createdAt));
-        const previousNotifications = notifications.filter(n => n.read || !isRecent(n.createdAt));
+        // Bildirimleri yeni ve eski olarak ayır
+        const newNotifications = notifications.filter(n => !n.read);
+        const oldNotifications = notifications.filter(n => n.read);
 
-        // Render new notifications
+        let html = '';
+
+        // Yeni bildirimler
         if (newNotifications.length > 0) {
+          html += '<div class="section-title">Yeni</div>';
           newNotifications.forEach(notification => {
-            const element = createNotificationElement(notification, true);
-            if (newSection) {
-              newSection.appendChild(element);
-            } else {
-              // Add to main content if section doesn't exist
-              const mainContent = document.querySelector('.main-content');
-              if (!document.querySelector('.section-title')) {
-                const sectionTitle = document.createElement('div');
-                sectionTitle.className = 'section-title';
-                sectionTitle.textContent = 'Yeni';
-                mainContent.appendChild(sectionTitle);
-              }
-              mainContent.appendChild(element);
-            }
+            html += createNotificationHTML(notification, true);
           });
         }
 
-        // Render previous notifications
-        if (previousNotifications.length > 0) {
-          if (!document.querySelector('[data-section="previous-title"]')) {
-            const sectionTitle = document.createElement('div');
-            sectionTitle.className = 'section-title';
-            sectionTitle.textContent = 'Önceki';
-            sectionTitle.style.marginTop = '2rem';
-            sectionTitle.setAttribute('data-section', 'previous-title');
-            document.querySelector('.main-content').appendChild(sectionTitle);
-          }
-
-          previousNotifications.forEach(notification => {
-            const element = createNotificationElement(notification, false);
-            if (previousSection) {
-              previousSection.appendChild(element);
-            } else {
-              document.querySelector('.main-content').appendChild(element);
-            }
+        // Eski bildirimler
+        if (oldNotifications.length > 0) {
+          html += '<div class="section-title" style="margin-top: 2rem;">Önceki</div>';
+          oldNotifications.forEach(notification => {
+            html += createNotificationHTML(notification, false);
           });
         }
 
-        // Show empty state if no notifications
-        if (notifications.length === 0) {
-          showEmptyState();
-        }
+        notificationContainer.innerHTML = html;
 
-        // Update mark all button visibility
-        updateMarkAllButtonVisibility();
+        // Event listeners ekle
+        setupNotificationEventListeners();
       }
 
-      function createNotificationElement(notification, isUnread) {
-        const div = document.createElement('div');
-        div.className = `notification-item${isUnread ? ' unread' : ''}`;
-        div.setAttribute('data-notification-id', notification.id);
-
+      function createNotificationHTML(notification, isUnread) {
         const iconClass = getNotificationIcon(notification.type);
         const timeText = formatNotificationTime(notification.createdAt);
-        const actions = getNotificationActions(notification);
-
-        div.innerHTML = `
-          <div class="notification-header">
-            <div class="notification-icon ${notification.type}">${iconClass}</div>
-            <div class="notification-content">
-              <div class="notification-title">${notification.title}</div>
-              <div class="notification-message">${notification.message}</div>
-              <div class="notification-time">${timeText}</div>
-              ${actions}
+        const unreadClass = isUnread ? ' unread' : '';
+        
+        return `
+          <div class="notification-item${unreadClass}" data-notification-id="${notification.id}">
+            <div class="notification-header">
+              <div class="notification-icon ${notification.type}">${iconClass}</div>
+              <div class="notification-content">
+                <div class="notification-title">${notification.title || notification.message}</div>
+                <div class="notification-message">${notification.message}</div>
+                <div class="notification-time">${timeText}</div>
+              </div>
+              <div class="notification-actions">
+                ${isUnread ? '<button class="mark-read-btn" onclick="markAsRead(\'' + notification.id + '\')">Okundu İşaretle</button>' : ''}
+                <button class="delete-btn" onclick="deleteNotification(\'' + notification.id + '\')">×</button>
+              </div>
             </div>
           </div>
         `;
+      }
 
-        // Add click handlers
-        setupNotificationClickHandlers(div, notification);
-
-        return div;
+      function setupNotificationEventListeners() {
+        // Bildirim üzerine tıklandığında okundu işaretle
+        document.addEventListener('click', function(e) {
+          const notificationItem = e.target.closest('.notification-item');
+          if (notificationItem && notificationItem.classList.contains('unread')) {
+            const notificationId = notificationItem.getAttribute('data-notification-id');
+            markAsRead(notificationId);
+          }
+        });
       }
 
       function getNotificationIcon(type) {
         const icons = {
-          match: '⚽',
-          friend: '👥',
-          achievement: '🏆',
-          system: '🏟️',
+          like: '❤️',
+          comment: '💬', 
+          follow: '👥',
           message: '💌',
           team: '👥',
+          match: '⚽',
+          achievement: '🏆',
+          system: '🏟️',
           rating: '⭐'
         };
         return icons[type] || '📱';
       }
 
-      function getNotificationActions(notification) {
-        if (notification.type === 'match_invitation' && !notification.responded) {
-          return `
-            <div class="notification-actions">
-              <button class="btn-accept" data-action="accept">Katıl</button>
-              <button class="btn-decline" data-action="decline">Reddet</button>
-            </div>
-          `;
-        } else if (notification.type === 'friend_request' && !notification.responded) {
-          return `
-            <div class="notification-actions">
-              <button class="btn-accept" data-action="accept">Kabul Et</button>
-              <button class="btn-decline" data-action="decline">Reddet</button>
-            </div>
-          `;
-        }
-        return '';
+      function formatNotificationTime(timestamp) {
+        const now = new Date();
+        const notificationDate = new Date(timestamp);
+        const diffMs = now - notificationDate;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Şimdi';
+        if (diffMins < 60) return `${diffMins} dakika önce`;
+        if (diffHours < 24) return `${diffHours} saat önce`;
+        if (diffDays < 7) return `${diffDays} gün önce`;
+        
+        return notificationDate.toLocaleDateString('tr-TR');
       }
 
-      function setupNotificationClickHandlers(element, notification) {
-        // Accept button
-        const acceptBtn = element.querySelector('[data-action="accept"]');
-        if (acceptBtn) {
-          acceptBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleNotificationAction(notification, 'accept');
-          });
-        }
-
-        // Decline button
-        const declineBtn = element.querySelector('[data-action="decline"]');
-        if (declineBtn) {
-          declineBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleNotificationAction(notification, 'decline');
-          });
-        }
-
-        // Main notification click
-        element.addEventListener('click', function() {
-          handleNotificationClick(notification);
-        });
-      }
-
-      function handleNotificationAction(notification, action) {
-        if (notification.type === 'match_invitation') {
-          handleMatchInvitation(notification, action);
-        } else if (notification.type === 'friend_request') {
-          handleFriendRequest(notification, action);
-        }
-      }
-
-      function handleMatchInvitation(notification, action) {
-        const title = action === 'accept' ? 'Maç Davetini Kabul Et' : 'Maç Davetini Reddet';
-        const message = action === 'accept' 
-          ? `${notification.senderName} tarafından gönderilen maç davetini kabul etmek istediğinizden emin misiniz?`
-          : `${notification.senderName} tarafından gönderilen maç davetini reddetmek istediğinizden emin misiniz?`;
-
-        showModal(title, message, () => {
-          if (action === 'accept') {
-            // Add user to match
-            PasliosData.joinMatch(notification.matchId, currentUser.id);
+      // Bildirim işlem fonksiyonları
+      async function markAsRead(notificationId) {
+        try {
+          const result = await pasliosData.markNotificationAsRead(notificationId);
+          if (result.success) {
+            // UI'da okundu olarak işaretle
+            const notificationElement = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            if (notificationElement) {
+              notificationElement.classList.remove('unread');
+              const markReadBtn = notificationElement.querySelector('.mark-read-btn');
+              if (markReadBtn) markReadBtn.remove();
+            }
             
-            // Update notification
-            PasliosData.updateNotification(notification.id, { 
-              responded: true, 
-              response: 'accepted',
-              read: true
-            });
-
-            showToast(`Tebrikler! Maça katıldınız! ⚽`, 'success');
-          } else {
-            // Update notification
-            PasliosData.updateNotification(notification.id, { 
-              responded: true, 
-              response: 'declined',
-              read: true
-            });
-
-            showToast('Maç daveti reddedildi.', 'info');
+            // Bildirim sayısını güncelle
+            updateNotificationCount();
           }
-
-          // Reload notifications
-          loadNotifications();
-        });
+        } catch (error) {
+          console.error('Bildirim okundu olarak işaretlenirken hata:', error);
+        }
       }
 
-      function handleFriendRequest(notification, action) {
-        const title = action === 'accept' ? 'Arkadaşlık İsteğini Kabul Et' : 'Arkadaşlık İsteğini Reddet';
-        const message = action === 'accept'
-          ? `${notification.senderName} ile arkadaş olmak istediğinizden emin misiniz?`
-          : `${notification.senderName} tarafından gönderilen arkadaşlık isteğini reddetmek istediğinizden emin misiniz?`;
-
-        showModal(title, message, () => {
-          if (action === 'accept') {
-            // Add friend relationship
-            PasliosData.addFriend(currentUser.id, notification.senderId);
+      async function deleteNotification(notificationId) {
+        if (!confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) return;
+        
+        try {
+          const result = await pasliosData.deleteNotification(notificationId);
+          if (result.success) {
+            // UI'dan kaldır
+            const notificationElement = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            if (notificationElement) {
+              notificationElement.remove();
+            }
             
-            // Update notification
-            PasliosData.updateNotification(notification.id, { 
-              responded: true, 
-              response: 'accepted',
-              read: true
-            });
-
-            showToast(`Harika! ${notification.senderName} ile artık arkadaşsınız! 👥`, 'success');
-          } else {
-            // Update notification
-            PasliosData.updateNotification(notification.id, { 
-              responded: true, 
-              response: 'declined',
-              read: true
-            });
-
-            showToast('Arkadaşlık isteği reddedildi.', 'info');
+            // Eğer bildirim kalmadıysa boş durum göster
+            const remainingNotifications = document.querySelectorAll('.notification-item');
+            if (remainingNotifications.length === 0) {
+              loadNotifications(); // Sayfayı yenile
+            }
+            
+            updateNotificationCount();
           }
-
-          // Reload notifications
-          loadNotifications();
-        });
-      }
-
-      function handleNotificationClick(notification) {
-        // Mark as read
-        if (!notification.read) {
-          PasliosData.updateNotification(notification.id, { read: true });
-          updateNotificationCount();
-        }
-
-        // Navigate based on notification type
-        if (notification.type === 'match' && notification.matchId) {
-          window.location.href = `match-detail.html?id=${notification.matchId}`;
-        } else if (notification.type === 'rating' && notification.matchId) {
-          window.location.href = `rating.html?matchId=${notification.matchId}`;
-        } else if (notification.type === 'message' && notification.chatId) {
-          window.location.href = `chat.html?id=${notification.chatId}`;
-        } else if (notification.type === 'team' && notification.teamId) {
-          window.location.href = `team.html?id=${notification.teamId}`;
+        } catch (error) {
+          console.error('Bildirim silinirken hata:', error);
         }
       }
 
-      function markAllAsRead() {
-        const unreadNotifications = PasliosData.getNotifications(currentUser.id).filter(n => !n.read);
-        
-        unreadNotifications.forEach(notification => {
-          PasliosData.updateNotification(notification.id, { read: true });
-        });
-
-        // Reload notifications
-        loadNotifications();
-        updateNotificationCount();
-        
-        showToast('Tüm bildirimler okundu olarak işaretlendi!', 'success');
-      }
-
-      function updateMarkAllButtonVisibility() {
-        const markAllBtn = document.querySelector('.mark-all-btn');
-        const unreadCount = document.querySelectorAll('.notification-item.unread').length;
-        
-        if (markAllBtn) {
-          markAllBtn.style.display = unreadCount > 0 ? 'block' : 'none';
+      async function markAllAsRead() {
+        try {
+          const result = await pasliosData.markAllNotificationsAsRead();
+          if (result.success) {
+            // Tüm bildirimleri okundu olarak işaretle
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+              item.classList.remove('unread');
+              const markReadBtn = item.querySelector('.mark-read-btn');
+              if (markReadBtn) markReadBtn.remove();
+            });
+            
+            updateNotificationCount();
+          }
+        } catch (error) {
+          console.error('Tüm bildirimler okundu olarak işaretlenirken hata:', error);
         }
       }
 
       function updateNotificationCount() {
-        // Update notification badge if it exists in navigation
+        // Navbar'daki bildirim sayısını güncelle (varsa)
         const notificationBadge = document.querySelector('.notification-badge');
-        const unreadCount = PasliosData.getNotifications(currentUser.id).filter(n => !n.read).length;
-        
         if (notificationBadge) {
+          const unreadCount = document.querySelectorAll('.notification-item.unread').length;
           if (unreadCount > 0) {
             notificationBadge.textContent = unreadCount;
-            notificationBadge.style.display = 'inline';
+            notificationBadge.style.display = 'block';
           } else {
             notificationBadge.style.display = 'none';
           }
         }
       }
 
-      function showEmptyState() {
-        const mainContent = document.querySelector('.main-content');
-        mainContent.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📱</div>
-            <div class="empty-state-text">Henüz bildiriminiz yok</div>
-          </div>
-        `;
-      }
-
-      function isRecent(dateString) {
-        const notificationDate = new Date(dateString);
-        const now = new Date();
-        const diffHours = (now - notificationDate) / (1000 * 60 * 60);
-        return diffHours < 24; // Consider notifications from last 24 hours as recent
-      }
-
-      function formatNotificationTime(dateString) {
-        const notificationDate = new Date(dateString);
-        const now = new Date();
-        const diffMs = now - notificationDate;
-        const diffMins = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffMins < 1) return 'Az önce';
-        if (diffMins < 60) return `${diffMins} dakika önce`;
-        if (diffHours < 24) return `${diffHours} saat önce`;
-        if (diffDays === 1) return 'Dün';
-        if (diffDays < 7) return `${diffDays} gün önce`;
-        return `${Math.floor(diffDays / 7)} hafta önce`;
-      }
-
-      function setupEventListeners() {
-        // Mark all button
-        const markAllBtn = document.querySelector('.mark-all-btn');
-        if (markAllBtn) {
-          markAllBtn.addEventListener('click', markAllAsRead);
-        }
-
-        // Modal events
-        document.getElementById('confirmationModal').addEventListener('click', function(e) {
-          if (e.target === this) {
-            closeModal();
+      // Sayfa yüklendiğinde bildirimleri yükle
+      document.addEventListener('DOMContentLoaded', function() {
+        loadNotifications();
+        
+        // Gerçek zamanlı bildirim dinleyici
+        window.addEventListener('storage', function(e) {
+          if (e.key === 'paslios_notification_event') {
+            loadNotifications(); // Yeni bildirim geldiğinde sayfayı güncelle
           }
         });
-      }
-
-      // Toast functions using ToastManager
-      function showToast(message, type = 'success') {
-        if (window.ToastManager) {
-          ToastManager.show(message, type);
-        } else {
-          // Fallback
-          console.log(`Toast: ${message} (${type})`);
-        }
-      }
-      
-      // Modal functions
-      function showModal(title, message, onConfirm) {
-        const modal = document.getElementById('confirmationModal');
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalMessage').textContent = message;
-        
-        const confirmBtn = document.getElementById('confirmBtn');
-        confirmBtn.onclick = () => {
-          onConfirm();
-          closeModal();
-        };
-        
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-      }
-      
-      function closeModal() {
-        const modal = document.getElementById('confirmationModal');
-        modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 200);
-      }
-
-      // Initialize notifications system
-      function initializeNotifications() {
-        // Simply load existing notifications without creating sample data
-        loadNotifications();
-      }
-
-      // Initialize notifications when page loads
-      document.addEventListener('DOMContentLoaded', function() {
-        // Add delay to ensure data is loaded
-        setTimeout(() => {
-          initializeNotifications();
-          loadNotifications();
-        }, 100);
       });
+
     </script>
   </body>
 </html>

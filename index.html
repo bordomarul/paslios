@@ -15,12 +15,23 @@
     <meta name="twitter:title" content="Paslios - Futbol Sosyal Platformu">
     <meta name="twitter:description" content="Türkiye'nin en büyük halısaha ve futbol sosyal platformu">
     <link rel="canonical" href="https://paslios.com">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Paslios">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/10b981/white?text=⚽">
+    
     <link href="output.css" rel="stylesheet">
     <link href="css/toast.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
     <title>Paslios - Türkiye'nin Futbol Sosyal Platformu</title>
     
     <!-- Security Utils -->
     <script src="js/security.js"></script>
+    <script src="js/enhanced-security.js"></script>
     
     <style>
       * {
@@ -375,14 +386,10 @@
     <!-- Data Management Script -->
     <script src="js/toast.js"></script>
     <script src="js/data.js"></script>
-    <script>
-      document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
     <script src="js/toast.js"></script>
     <script src="js/data.js"></script>
+    <script src="js/mobile-ux.js"></script>
+    <script src="js/ux-enhancer.js"></script>
     <script>
       // Toast manager başlat
       let toastManager;
@@ -401,7 +408,17 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
           e.preventDefault();
           
-          const email = document.getElementById('email').value.trim();
+          // CSRF Token kontrolü
+          const csrfInput = this.querySelector('input[name="csrf_token"]');
+          const formId = csrfInput ? csrfInput.getAttribute('data-form-id') : null;
+          
+          if (!csrfInput || !EnhancedSecurity.validateCSRFToken(formId, csrfInput.value)) {
+            toastManager.show('Güvenlik hatası! Sayfa yenilenecek.', 'error', 'Güvenlik');
+            setTimeout(() => location.reload(), 2000);
+            return;
+          }
+          
+          const email = EnhancedSecurity.strictSanitize(document.getElementById('email').value.trim());
           const password = document.getElementById('password').value;
           
           if (!email || !password) {

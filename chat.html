@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paslios - Sohbet">
-    <link href="output.css" rel="stylesheet">
+    <link href="output.css" rel="stylesheet">`n    <link href="css/responsive.css" rel="stylesheet">
     <title>Paslios - Sohbet</title>
     <script>
         // Authentication check - redirect if not logged in
@@ -952,6 +952,47 @@
         }
         
         initializePage();
+        
+        // Real-time message listener
+        window.addEventListener('pasliosMessage', (event) => {
+          const { type, data } = event.detail;
+          
+          if (type === 'newMessage') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const partnerId = parseInt(urlParams.get('partner'));
+            const currentConversationId = currentUser.id < partnerId ? 
+              `${currentUser.id}_${partnerId}` : `${partnerId}_${currentUser.id}`;
+            
+            // Eğer bu konuşmaya ait mesaj ise, mesajları yenile
+            if (data.conversationId === currentConversationId) {
+              loadMessages();
+            }
+          }
+        });
+        
+        // LocalStorage cross-tab communication for real-time messaging
+        window.addEventListener('storage', (event) => {
+          if (event.key === 'paslios_message_event') {
+            const messageEvent = JSON.parse(event.newValue || '{}');
+            if (messageEvent.type === 'newMessage') {
+              const urlParams = new URLSearchParams(window.location.search);
+              const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+              const partnerId = parseInt(urlParams.get('partner'));
+              const currentConversationId = currentUser.id < partnerId ? 
+                `${currentUser.id}_${partnerId}` : `${partnerId}_${currentUser.id}`;
+              
+              if (messageEvent.data.conversationId === currentConversationId) {
+                loadMessages();
+              }
+            }
+          }
+        });
+        
+        // Auto-refresh messages every 3 seconds for real-time effect
+        setInterval(() => {
+          loadMessages();
+        }, 3000);
         
         const messagesArea = document.getElementById('messages');
         messagesArea.scrollTop = messagesArea.scrollHeight;

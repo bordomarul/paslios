@@ -43,6 +43,11 @@ class PasliosData {
       localStorage.setItem('paslios_conversations', JSON.stringify([]));
     }
     
+    // Bildirimler - başlangıçta boş
+    if (!localStorage.getItem('paslios_notifications')) {
+      localStorage.setItem('paslios_notifications', JSON.stringify([]));
+    }
+    
     // Sahalar - demo sahalar
     if (!localStorage.getItem('paslios_venues')) {
       const venues = [
@@ -577,6 +582,19 @@ class PasliosData {
     likeCount = post.likedBy.length;
     this.setData('posts', posts);
     
+    // Beğeni bildirimi oluştur (sadece beğeni eklendiğinde)
+    if (isLiked) {
+      this.createNotification(post.authorId, {
+        type: 'like',
+        title: 'Gönderin beğenildi',
+        message: `${currentUser.name} gönderinizi beğendi`,
+        data: {
+          postId: postId,
+          postContent: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '')
+        }
+      });
+    }
+    
     return { 
       success: true, 
       isLiked: isLiked, 
@@ -700,6 +718,21 @@ class PasliosData {
     const allComments = this.getAllComments().filter(c => c.authorId === currentUser.id);
     if (allComments.length === 1) {
       this.awardBadge(currentUser.id, 5); // İlk yorum rozeti (ID: 5)
+    }
+    
+    // Yorum bildirimi oluştur (kendi gönderisine yorum yapmadıysa)
+    if (post.authorId !== currentUser.id) {
+      this.createNotification(post.authorId, {
+        type: 'comment',
+        title: 'Gönderine yorum yapıldı',
+        message: `${currentUser.name} gönderinize yorum yaptı: "${sanitizedComment.substring(0, 30)}${sanitizedComment.length > 30 ? '...' : ''}"`,
+        data: {
+          postId: postId,
+          commentId: newComment.id,
+          postContent: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : ''),
+          commentContent: sanitizedComment
+        }
+      });
     }
     
     return { success: true, comment: newComment };
@@ -964,7 +997,7 @@ class PasliosData {
   
   // Tüm verileri temizle (geliştirme amaçlı)
   clearAllData() {
-    const keys = ['users', 'posts', 'teams', 'matches', 'bookings', 'messages', 'conversations'];
+    const keys = ['users', 'posts', 'teams', 'matches', 'bookings', 'messages', 'conversations', 'notifications'];
     keys.forEach(key => localStorage.removeItem(`paslios_${key}`));
     localStorage.removeItem('currentUser');
     this.initializeDatabase();
@@ -1290,6 +1323,18 @@ class PasliosData {
     follows.push(newFollow);
     this.setData('follows', follows);
     
+    // Takip bildirimi oluştur
+    this.createNotification(targetUserId, {
+      type: 'follow',
+      title: 'Yeni takipçin var',
+      message: `${currentUser.name} seni takip etmeye başladı`,
+      data: {
+        followerId: currentUser.id,
+        followerName: currentUser.name,
+        followerAvatar: currentUser.avatar
+      }
+    });
+    
     return { 
       success: true, 
       message: `${targetUser.name} takip edildi!`,
@@ -1487,6 +1532,20 @@ class PasliosData {
       senderId: currentUser.id,
       receiverId: receiverId,
       conversationId: conversationId
+    });
+    
+    // Mesaj bildirimi oluştur
+    this.createNotification(receiverId, {
+      type: 'message',
+      title: 'Yeni mesaj',
+      message: `${currentUser.name} size mesaj gönderdi: "${sanitizedText.substring(0, 30)}${sanitizedText.length > 30 ? '...' : ''}"`,
+      data: {
+        messageId: newMessage.id,
+        conversationId: conversationId,
+        senderId: currentUser.id,
+        senderName: currentUser.name,
+        messagePreview: sanitizedText.substring(0, 100)
+      }
     });
     
     return { 
@@ -1798,6 +1857,313 @@ class PasliosData {
       count: results.length,
       query: sanitizedQuery
     };
+  }
+
+  // BİLDİRİM SİSTEMİ
+  
+  // Bildirim oluştur
+  createNotification(receiverId, notificationData) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Bildirim oluşturmak için giriş yapmalısınız!' };
+    }
+    
+    // Kendine bildirim gönderme engelleme
+    if (currentUser.id === receiverId) {
+      return { success: false, message: 'Kendinize bildirim gönderemezsiniz!' };
+    }
+    
+    // Input validation
+    if (!receiverId || typeof receiverId !== 'number') {
+      return { success: false, message: 'Geçersiz alıcı ID!' };
+    }
+    
+    if (!notificationData || typeof notificationData !== 'object') {
+      return { success: false, message: 'Geçersiz bildirim verisi!' };
+    }
+    
+    // Alıcı kullanıcı var mı kontrol et
+    const users = this.getData('users');
+    const receiver = users.find(u => u.id === receiverId);
+    
+    if (!receiver) {
+      return { success: false, message: 'Alıcı kullanıcı bulunamadı!' };
+    }
+    
+    // Type validation
+    const validTypes = ['like', 'comment', 'follow', 'message', 'match', 'team', 'system'];
+    if (!notificationData.type || !validTypes.includes(notificationData.type)) {
+      return { success: false, message: 'Geçersiz bildirim tipi!' };
+    }
+    
+    // Content sanitization
+    const sanitizedTitle = notificationData.title ? 
+      this.sanitizeContent(notificationData.title) : this.generateNotificationTitle(notificationData.type, currentUser.name);
+    const sanitizedMessage = notificationData.message ? 
+      this.sanitizeContent(notificationData.message) : this.generateNotificationMessage(notificationData.type, currentUser.name);
+    
+    // Spam kontrolü - aynı bildirim kontrolü (son 5 dakika)
+    const spamCheck = this.checkNotificationSpam(currentUser.id, receiverId, notificationData.type);
+    if (!spamCheck.allowed) {
+      return { success: false, message: spamCheck.message };
+    }
+    
+    // Yeni bildirim oluştur
+    const newNotification = {
+      id: Date.now(),
+      receiverId: receiverId,
+      senderId: currentUser.id,
+      senderName: this.sanitizeContent(currentUser.name),
+      senderAvatar: currentUser.avatar || '👤',
+      type: notificationData.type,
+      title: sanitizedTitle,
+      message: sanitizedMessage,
+      data: notificationData.data || {},
+      read: false,
+      createdAt: new Date().toISOString(),
+      timestamp: Date.now()
+    };
+    
+    // Bildirim kaydet
+    const notifications = this.getData('notifications');
+    notifications.push(newNotification);
+    this.setData('notifications', notifications);
+    
+    // Real-time event trigger
+    this.triggerNotificationEvent('newNotification', {
+      notification: newNotification,
+      receiverId: receiverId
+    });
+    
+    return { 
+      success: true, 
+      message: 'Bildirim oluşturuldu!',
+      notificationId: newNotification.id
+    };
+  }
+  
+  // Bildirim spam kontrolü
+  checkNotificationSpam(senderId, receiverId, type) {
+    const notifications = this.getData('notifications');
+    
+    // Son 5 dakikadaki aynı tip bildirimleri kontrol et
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentSimilar = notifications.filter(n => 
+      n.senderId === senderId && 
+      n.receiverId === receiverId && 
+      n.type === type &&
+      new Date(n.createdAt) > fiveMinutesAgo
+    );
+    
+    // Aynı tip bildirim sayısı kontrolü
+    if (recentSimilar.length >= 3) {
+      return {
+        allowed: false,
+        message: 'Çok sık aynı tip bildirim gönderiyorsunuz! Lütfen bekleyin.'
+      };
+    }
+    
+    // Genel bildirim sayısı kontrolü (son 1 dakika)
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const recentAll = notifications.filter(n => 
+      n.senderId === senderId && 
+      new Date(n.createdAt) > oneMinuteAgo
+    );
+    
+    if (recentAll.length >= 10) {
+      return {
+        allowed: false,
+        message: 'Çok hızlı bildirim gönderiyorsunuz! Lütfen bekleyin.'
+      };
+    }
+    
+    return { allowed: true };
+  }
+  
+  // Bildirim başlığı oluştur
+  generateNotificationTitle(type, senderName) {
+    const titles = {
+      'like': 'Gönderin beğenildi',
+      'comment': 'Gönderine yorum yapıldı',
+      'follow': 'Seni takip ediyor',
+      'message': 'Yeni mesaj',
+      'match': 'Maç bildirimi',
+      'team': 'Takım bildirimi',
+      'system': 'Sistem bildirimi'
+    };
+    
+    return titles[type] || 'Bildirim';
+  }
+  
+  // Bildirim mesajı oluştur
+  generateNotificationMessage(type, senderName) {
+    const messages = {
+      'like': `${senderName} gönderinizi beğendi`,
+      'comment': `${senderName} gönderinize yorum yaptı`,
+      'follow': `${senderName} sizi takip etmeye başladı`,
+      'message': `${senderName} size mesaj gönderdi`,
+      'match': `${senderName} maç düzenledi`,
+      'team': `${senderName} takım etkinliği`,
+      'system': 'Sistem bildirimi'
+    };
+    
+    return messages[type] || 'Yeni bildirim';
+  }
+  
+  // Kullanıcının bildirimlerini getir
+  getNotifications(userId = null, limit = null) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Bildirimleri görüntülemek için giriş yapmalısınız!' };
+    }
+    
+    const targetUserId = userId || currentUser.id;
+    
+    // Sadece kendi bildirimlerini görebilir
+    if (currentUser.id !== targetUserId) {
+      return { success: false, message: 'Başkasının bildirimlerini görüntüleyemezsiniz!' };
+    }
+    
+    const notifications = this.getData('notifications');
+    const userNotifications = notifications
+      .filter(n => n.receiverId === targetUserId)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    const result = limit ? userNotifications.slice(0, limit) : userNotifications;
+    
+    return { 
+      success: true, 
+      notifications: result,
+      count: userNotifications.length,
+      unreadCount: userNotifications.filter(n => !n.read).length
+    };
+  }
+  
+  // Bildirimi okundu olarak işaretle
+  markNotificationAsRead(notificationId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'İşlem için giriş yapmalısınız!' };
+    }
+    
+    if (!notificationId || typeof notificationId !== 'number') {
+      return { success: false, message: 'Geçersiz bildirim ID!' };
+    }
+    
+    const notifications = this.getData('notifications');
+    const notificationIndex = notifications.findIndex(n => n.id === notificationId);
+    
+    if (notificationIndex === -1) {
+      return { success: false, message: 'Bildirim bulunamadı!' };
+    }
+    
+    const notification = notifications[notificationIndex];
+    
+    // Sadece alıcı bildirimi okundu olarak işaretleyebilir
+    if (notification.receiverId !== currentUser.id) {
+      return { success: false, message: 'Bu bildirimi okundu olarak işaretleme yetkiniz yok!' };
+    }
+    
+    if (notification.read) {
+      return { success: false, message: 'Bildirim zaten okundu!' };
+    }
+    
+    notifications[notificationIndex].read = true;
+    notifications[notificationIndex].readAt = new Date().toISOString();
+    this.setData('notifications', notifications);
+    
+    return { success: true, message: 'Bildirim okundu olarak işaretlendi!' };
+  }
+  
+  // Tüm bildirimleri okundu olarak işaretle
+  markAllNotificationsAsRead(userId = null) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'İşlem için giriş yapmalısınız!' };
+    }
+    
+    const targetUserId = userId || currentUser.id;
+    
+    if (currentUser.id !== targetUserId) {
+      return { success: false, message: 'Sadece kendi bildirimlerinizi işaretleyebilirsiniz!' };
+    }
+    
+    const notifications = this.getData('notifications');
+    let markedCount = 0;
+    
+    notifications.forEach((notification, index) => {
+      if (notification.receiverId === targetUserId && !notification.read) {
+        notifications[index].read = true;
+        notifications[index].readAt = new Date().toISOString();
+        markedCount++;
+      }
+    });
+    
+    this.setData('notifications', notifications);
+    
+    return { 
+      success: true, 
+      message: `${markedCount} bildirim okundu olarak işaretlendi!`,
+      markedCount: markedCount
+    };
+  }
+  
+  // Okunmamış bildirim sayısını getir
+  getUnreadNotificationCount(userId = null) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return 0;
+    
+    const targetUserId = userId || currentUser.id;
+    
+    const notifications = this.getData('notifications');
+    return notifications.filter(n => 
+      n.receiverId === targetUserId && !n.read
+    ).length;
+  }
+  
+  // Bildirimi sil
+  deleteNotification(notificationId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'İşlem için giriş yapmalısınız!' };
+    }
+    
+    const notifications = this.getData('notifications');
+    const notificationIndex = notifications.findIndex(n => n.id === notificationId);
+    
+    if (notificationIndex === -1) {
+      return { success: false, message: 'Bildirim bulunamadı!' };
+    }
+    
+    const notification = notifications[notificationIndex];
+    
+    // Sadece alıcı bildirimi silebilir
+    if (notification.receiverId !== currentUser.id) {
+      return { success: false, message: 'Bu bildirimi silme yetkiniz yok!' };
+    }
+    
+    notifications.splice(notificationIndex, 1);
+    this.setData('notifications', notifications);
+    
+    return { success: true, message: 'Bildirim silindi!' };
+  }
+  
+  // Real-time bildirim event'i trigger et
+  triggerNotificationEvent(eventType, data) {
+    // Custom event oluştur
+    const event = new CustomEvent('pasliosNotification', {
+      detail: { type: eventType, data: data }
+    });
+    
+    // LocalStorage event ile diğer tab/pencereler bilgilendir
+    localStorage.setItem('paslios_notification_event', JSON.stringify({
+      type: eventType,
+      data: data,
+      timestamp: Date.now()
+    }));
+    
+    // Event'i trigger et
+    window.dispatchEvent(event);
   }
 }
 

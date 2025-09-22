@@ -1,0 +1,325 @@
+/* Paslios Responsive Design - Mobile-First Approach */
+
+/* Base mobile styles - already optimized for 400px max-width */
+
+/* Small mobile devices (320px - 480px) */
+@media (max-width: 480px) {
+  /* Ana sayfa (index.html) iyileştirmeleri */
+  .container {
+    max-width: 320px;
+    padding: 0.75rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  .input {
+    padding: 0.875rem;
+    font-size: 0.9375rem;
+  }
+  
+  .btn-primary {
+    padding: 0.875rem;
+    font-size: 0.9375rem;
+  }
+  
+  /* Header iyileştirmeleri */
+  .header {
+    padding: 2.5rem 0.75rem 1.5rem 0.75rem;
+  }
+  
+  .nav-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
+  }
+  
+  .user-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  
+  /* Bottom navigation iyileştirmeleri */
+  .bottom-nav {
+    padding: 0.75rem;
+  }
+  
+  .nav-item {
+    font-size: 0.75rem;
+    gap: 0.25rem;
+  }
+  
+  /* Floating button iyileştirmeleri */
+  .floating-btn {
+    width: 3rem;
+    height: 3rem;
+    bottom: 4.5rem;
+    right: 0.75rem;
+  }
+  
+  /* Card iyileştirmeleri */
+  .match-card, .post-card {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 14px;
+  }
+  
+  /* Typography iyileştirmeleri */
+  .match-title {
+    font-size: 1rem;
+  }
+  
+  .post-content {
+    font-size: 0.875rem;
+  }
+  
+  /* Profile sayfası iyileştirmeleri */
+  .profile-avatar {
+    width: 4rem;
+    height: 4rem;
+  }
+  
+  .profile-stats {
+    gap: 1rem;
+  }
+  
+  .stat-item {
+    font-size: 0.875rem;
+  }
+}
+
+/* Medium mobile devices (481px - 600px) */
+@media (min-width: 481px) and (max-width: 600px) {
+  .container {
+    max-width: 480px;
+  }
+  
+  .header {
+    padding: 3.5rem 1rem 2.5rem 1rem;
+  }
+  
+  .card {
+    padding: 2.5rem;
+  }
+  
+  /* Daha büyük butonlar için */
+  .nav-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  
+  .floating-btn {
+    width: 4rem;
+    height: 4rem;
+  }
+}
+
+/* Tablet portrait (601px - 768px) */
+@media (min-width: 601px) and (max-width: 768px) {
+  body {
+    max-width: 600px;
+  }
+  
+  .container {
+    max-width: 500px;
+  }
+  
+  .header-container {
+    max-width: 600px;
+  }
+  
+  .nav-items {
+    max-width: 600px;
+  }
+  
+  /* Grid layout for larger screens */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .match-card, .post-card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Tablet landscape and small desktop (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  body {
+    max-width: 800px;
+    padding-bottom: 0; /* Desktop navigation yerine */
+  }
+  
+  .bottom-nav {
+    display: none; /* Desktop navigation kullan */
+  }
+  
+  .floating-btn {
+    bottom: 2rem;
+  }
+  
+  .header {
+    padding: 2rem 1rem;
+    position: relative;
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  /* Horizontal navigation for desktop */
+  .desktop-nav {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem 0;
+  }
+  
+  .content-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+  body {
+    max-width: 1000px;
+    padding-bottom: 0;
+  }
+  
+  .container {
+    max-width: 600px;
+  }
+  
+  .header-container {
+    max-width: 1000px;
+  }
+  
+  /* Full desktop layout */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr 250px;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .sidebar {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+  }
+  
+  .content-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Mobil dokunmatik cihazlar için */
+  .nav-btn, .nav-item, .floating-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  button, .btn-primary, .btn-secondary {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+  
+  .input {
+    min-height: 48px;
+    font-size: 16px; /* iOS zoom önleme */
+  }
+  
+  /* Hover efektlerini kaldır */
+  .nav-btn:hover, .floating-btn:hover, .btn-primary:hover {
+    transform: none;
+  }
+}
+
+/* Landscape orientation optimizations */
+@media (orientation: landscape) and (max-height: 600px) {
+  .header {
+    padding: 1.5rem 1rem 1rem 1rem;
+  }
+  
+  .welcome-text {
+    margin-bottom: 1rem;
+  }
+  
+  .floating-btn {
+    bottom: 1rem;
+  }
+  
+  .bottom-nav {
+    padding: 0.5rem;
+  }
+}
+
+/* High-DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .logo, .user-avatar, .post-avatar {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1f2937;
+    --bg-secondary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --border-color: #4b5563;
+  }
+  
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  
+  .card, .match-card, .post-card {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+  }
+  
+  .bottom-nav {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .header, .bottom-nav, .floating-btn, .nav-btn {
+    display: none;
+  }
+  
+  body {
+    background: white;
+    color: black;
+    max-width: none;
+  }
+  
+  .card, .match-card, .post-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
