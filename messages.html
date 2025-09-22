@@ -7,7 +7,7 @@
     <link href="output.css" rel="stylesheet">
     <title>Paslios - Mesajlar</title>
     <script>
-        // Soft authentication check - show demo data even without login
+        // Initialize messages page
         console.log('Messages page loading...');
     </script>
     <style>
@@ -1161,11 +1161,12 @@
         // Oturum kontrolü ve mesajları yükle
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser) {
-          console.log('No current user found, but staying on messages page');
-          // Don't redirect, just show empty state or demo data
+          console.log('No current user found, redirecting to login');
+          window.location.href = 'index.html';
+          return;
         }
         
-        // Load conversations regardless of auth status for demo
+        // Load user conversations
         loadConversations();
       });
 

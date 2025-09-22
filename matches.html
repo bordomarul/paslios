@@ -803,31 +803,22 @@
           return;
         }
 
-        // Demo team matches data
-        const demoTeamMatches = [
-          {
-            id: 1,
-            type: 'team',
-            homeTeam: 'Çankaya Tigers',
-            awayTeam: 'Bahçelievler Sharks',
-            location: 'Arena Spor Kompleksi',
-            date: '2025-09-25',
-            time: '19:00',
-            status: 'upcoming'
-          },
-          {
-            id: 2,
-            type: 'team',
-            homeTeam: 'Çankaya Tigers',
-            awayTeam: 'Kızılay Eagles',
-            location: 'Champions League Sahası',
-            date: '2025-09-28',
-            time: '20:00',
-            status: 'upcoming'
-          }
-        ];
+        // Load team matches from localStorage or PasliosData
+        const teamMatches = PasliosData.getTeamMatches() || [];
 
-        demoTeamMatches.forEach(match => {
+        if (teamMatches.length === 0) {
+          const noMatches = document.createElement('div');
+          noMatches.className = 'text-center py-8 text-gray-500';
+          noMatches.innerHTML = `
+            <div class="mb-4">⚽</div>
+            <p>Henüz takım maçınız bulunmuyor.</p>
+            <p class="text-sm mt-2">Takımınızla maç oluşturun veya mevcut maçlara katılın!</p>
+          `;
+          container.appendChild(noMatches);
+          return;
+        }
+
+        teamMatches.forEach(match => {
           const matchCard = createTeamMatchCard(match);
           container.appendChild(matchCard);
         });

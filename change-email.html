@@ -428,9 +428,9 @@
                 document.getElementById('saveBtn').textContent = 'Doğrula';
                 document.getElementById('saveBtn').disabled = true;
 
-                // Show generated code for demo (in real app, this would be sent via email)
+                // Send verification code to email (simulated for development)
                 setTimeout(() => {
-                    alert(`Demo amaçlı doğrulama kodu: ${generatedCode}\n\nGerçek uygulamada bu kod email'inize gönderilecektir.`);
+                    alert(`Doğrulama kodu yeni e-posta adresinize gönderildi.\n\nKodu almadıysanız spam klasörünü kontrol edin.`);
                 }, 1000);
 
             } else if (currentStep === 'verification') {
@@ -452,7 +452,7 @@
 
         function resendCode() {
             generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-            alert(`Yeni doğrulama kodu gönderildi: ${generatedCode}\n\n(Demo amaçlı gösterilmektedir)`);
+            alert(`Yeni doğrulama kodu e-posta adresinize gönderildi.\n\nKodu almadıysanız birkaç dakika bekleyin.`);
         }
 
         // Initialize

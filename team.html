@@ -664,21 +664,15 @@
         try {
           currentUser = JSON.parse(localStorage.getItem('currentUser'));
           
-          // Demo team data
-          currentTeam = {
-            id: 1,
-            name: 'Çankaya Tigers',
-            logo: '🐅',
-            founded: 'Ağustos 2024',
-            location: 'Çankaya, Ankara',
-            description: 'Çankaya bölgesinin en aktif futbol takımı',
-            memberCount: 6,
-            totalMatches: 23,
-            averageRating: 4.5,
-            wins: 15,
-            draws: 5,
-            losses: 3
-          };
+          // Load real team data from localStorage
+          currentTeam = PasliosData.getCurrentUserTeam();
+          
+          if (!currentTeam) {
+            // Redirect to create team page if no team found
+            window.location.href = 'create-team.html';
+            return;
+          }
+          
         } catch (error) {
           console.error('Error loading team data:', error);
         }
@@ -706,30 +700,36 @@
       }
 
       function loadTeamMembers() {
-        // Demo team members data
-        const demoMembers = [
-          { id: 1, name: 'Mehmet Kaya', position: 'Kaleci', avatar: 'MK', rating: 4.8, matches: 15, captain: true },
-          { id: 2, name: 'Emre Demir', position: 'Defans', avatar: 'ED', rating: 4.2, matches: 12, captain: false },
-          { id: 3, name: 'Can Özkan', position: 'Orta Saha', avatar: 'CÖ', rating: 4.5, matches: 18, captain: false },
-          { id: 4, name: 'Burak Tunç', position: 'Forvet', avatar: 'BT', rating: 4.7, matches: 20, captain: false },
-          { id: 5, name: 'Ali Şen', position: 'Kanat', avatar: 'AS', rating: 4.0, matches: 8, captain: false }
-        ];
+        // Load team members from localStorage
+        const currentTeam = PasliosData.getCurrentUserTeam();
+        const teamMembers = currentTeam ? (currentTeam.members || []) : [];
 
         const membersContainer = document.querySelector('.team-members');
         if (membersContainer) {
-          membersContainer.innerHTML = demoMembers.map(member => `
+          if (teamMembers.length === 0) {
+            membersContainer.innerHTML = `
+              <div class="text-center py-8 text-gray-500">
+                <div class="mb-4">👥</div>
+                <p>Henüz takım üyeniz bulunmuyor.</p>
+                <p class="text-sm mt-2">Arkadaşlarınızı takıma davet edin!</p>
+              </div>
+            `;
+            return;
+          }
+
+          membersContainer.innerHTML = teamMembers.map(member => `
             <div class="member-card">
-              <div class="member-avatar">${member.avatar}</div>
+              <div class="member-avatar">${member.avatar || member.name.charAt(0).toUpperCase()}</div>
               <div class="member-info">
                 <div class="member-name">
                   ${member.name}
                   ${member.captain ? '<span class="captain-badge">👑</span>' : ''}
                 </div>
-                <div class="member-position">${member.position}</div>
-                <div class="member-rating">⭐ ${member.rating} puan</div>
+                <div class="member-position">${member.position || 'Oyuncu'}</div>
+                <div class="member-rating">⭐ ${member.rating || 4.0} puan</div>
               </div>
               <div class="member-stats">
-                <div class="member-matches">${member.matches}</div>
+                <div class="member-matches">${member.matches || 0}</div>
                 <div class="member-matches-label">maç</div>
               </div>
             </div>

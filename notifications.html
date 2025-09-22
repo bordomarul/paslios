@@ -894,69 +894,17 @@
         setTimeout(() => modal.style.display = 'none', 200);
       }
 
-      // Add some sample notifications for demo
-      function createSampleNotifications() {
-        const users = PasliosData.getAllUsers();
-        const matches = PasliosData.getAllMatches();
-        
-        if (users.length > 1 && matches.length > 0) {
-          const otherUser = users.find(u => u.id !== currentUser.id);
-          const match = matches[0];
-          
-          // Create sample notifications if none exist
-          const existingNotifications = PasliosData.getNotifications(currentUser.id);
-          if (existingNotifications.length === 0) {
-            // Match invitation
-            PasliosData.createNotification({
-              userId: currentUser.id,
-              type: 'match_invitation',
-              title: 'Maç Daveti',
-              message: `${otherUser.name} sizi bugün 20:30'da ${match.venue}'daki maça davet etti.`,
-              senderId: otherUser.id,
-              senderName: otherUser.name,
-              matchId: match.id,
-              read: false,
-              responded: false
-            });
-
-            // Friend request
-            PasliosData.createNotification({
-              userId: currentUser.id,
-              type: 'friend_request',
-              title: 'Arkadaşlık İsteği',
-              message: `${otherUser.name} arkadaş olmak istiyor.`,
-              senderId: otherUser.id,
-              senderName: otherUser.name,
-              read: false,
-              responded: false
-            });
-
-            // Achievement
-            PasliosData.createNotification({
-              userId: currentUser.id,
-              type: 'achievement',
-              title: 'Yeni Başarı!',
-              message: '"İlk Maç" rozetini kazandın! İlk maçını tamamladın.',
-              read: false
-            });
-
-            // System notification
-            PasliosData.createNotification({
-              userId: currentUser.id,
-              type: 'system',
-              title: 'Profil Güncellemesi',
-              message: 'Profilinizi güncelleyerek daha fazla maç daveti alabilirsiniz.',
-              read: true
-            });
-          }
-        }
+      // Initialize notifications system
+      function initializeNotifications() {
+        // Simply load existing notifications without creating sample data
+        loadNotifications();
       }
 
-      // Create sample notifications when page loads
+      // Initialize notifications when page loads
       document.addEventListener('DOMContentLoaded', function() {
         // Add delay to ensure data is loaded
         setTimeout(() => {
-          createSampleNotifications();
+          initializeNotifications();
           loadNotifications();
         }, 100);
       });

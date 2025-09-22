@@ -727,30 +727,8 @@
           console.error('Error saving message:', error);
         }
         
-        // Simüle edilmiş cevap (demo için)
-        setTimeout(() => {
-          const responses = [
-            'Anladım! 👍',
-            'Tamam, görüştük!',
-            'Harika! 🔥',
-            'Evet, kesinlikle!',
-            'İyi fikir! ⚽'
-          ];
-          
-          const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-          const responseElement = document.createElement('div');
-          responseElement.className = 'message received';
-          responseElement.innerHTML = `
-            <div class="message-avatar">MK</div>
-            <div class="message-content">
-              <div class="message-text">${randomResponse}</div>
-              <div class="message-time">${new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}</div>
-            </div>
-          `;
-          
-          messagesArea.appendChild(responseElement);
-          messagesArea.scrollTop = messagesArea.scrollHeight;
-        }, 1000 + Math.random() * 2000);
+        // Real-time messaging (no auto-reply simulation)
+        // Messages will be real-time when other users reply
       }
 
       // Gönder butonu durumunu güncelle

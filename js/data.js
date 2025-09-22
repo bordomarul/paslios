@@ -757,6 +757,41 @@ class PasliosData {
       return 'Az önce';
     }
   }
+
+  // Team maçları getir
+  getTeamMatches() {
+    try {
+      const currentUser = this.getCurrentUser();
+      if (!currentUser) return [];
+      
+      const userTeam = this.getCurrentUserTeam();
+      if (!userTeam) return [];
+      
+      const allMatches = JSON.parse(localStorage.getItem('paslios_matches') || '[]');
+      return allMatches.filter(match => 
+        match.type === 'team' && 
+        (match.homeTeam === userTeam.name || match.awayTeam === userTeam.name)
+      );
+    } catch (error) {
+      console.error('Error getting team matches:', error);
+      return [];
+    }
+  }
+
+  // Kullanıcının takımını getir
+  getCurrentUserTeam() {
+    try {
+      const currentUser = this.getCurrentUser();
+      if (!currentUser) return null;
+      
+      const teams = JSON.parse(localStorage.getItem('paslios_teams') || '[]');
+      return teams.find(team => team.ownerId === currentUser.id || 
+                              (team.members && team.members.some(member => member.id === currentUser.id)));
+    } catch (error) {
+      console.error('Error getting current user team:', error);
+      return null;
+    }
+  }
 }
 
 // Global instance
