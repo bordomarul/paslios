@@ -733,53 +733,32 @@
       }
 
       function loadIndividualMatches() {
-        // Demo individual matches data
-        const demoMatches = [
-          {
-            id: 1,
-            type: 'individual',
-            title: '5vs5 Futsal',
-            location: 'Arena Spor Kompleksi',
-            date: '2025-09-22',
-            time: '19:00',
-            players: '8/10',
-            skill: 'Orta',
-            price: '25₺',
-            description: 'Eğlenceli futsal maçı arıyoruz!',
-            organizer: 'Mehmet Kaya',
-            status: 'active'
-          },
-          {
-            id: 2,
-            type: 'individual',
-            title: '7vs7 Halısaha',
-            location: 'Champions League Sahası',
-            date: '2025-09-23',
-            time: '20:30',
-            players: '12/14',
-            skill: 'İleri',
-            price: '35₺',
-            description: 'Rekabetçi maç, iyi seviye oyuncular arıyoruz.',
-            organizer: 'Emre Demir',
-            status: 'active'
-          },
-          {
-            id: 3,
-            type: 'individual',
-            title: '6vs6 Gece Maçı',
-            location: 'Goal Futsal Center',
-            date: '2025-09-24',
-            time: '21:00',
-            players: '10/12',
-            skill: 'Başlangıç',
-            price: '20₺',
-            description: 'Yeni başlayanlar için ideal!',
-            organizer: 'Can Özkan',
-            status: 'active'
-          }
-        ];
+        // Gerçek maç verilerini yükle
+        const currentUser = PasliosData.getCurrentUser();
+        const allMatches = PasliosData.getMatches() || [];
+        
+        // Sadece aktif maçları göster
+        const activeMatches = allMatches.filter(match => 
+          match.status === 'active' && 
+          match.type === 'individual' &&
+          new Date(match.date + ' ' + match.time) > new Date()
+        );
 
-        const filteredMatches = demoMatches.filter(match => filterMatch(match));
+        if (activeMatches.length === 0) {
+          document.querySelector('.match-card-list').innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">⚽</div>
+              <h3 style="margin-bottom: 0.5rem; color: #374151;">Henüz maç yok</h3>
+              <p style="margin-bottom: 1.5rem;">İlk maçı sen oluştur!</p>
+              <a href="create-post.html" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; display: inline-block;">
+                Maç Oluştur
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        const filteredMatches = activeMatches.filter(match => filterMatch(match));
         const container = document.getElementById('individual-matches');
         
         // Clear existing content

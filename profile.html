@@ -1041,26 +1041,22 @@
           activitiesContainer.appendChild(activityElement);
         });
 
-        // Sabit aktiviteler (demo)
-        const demoActivities = [
-          {
-            type: 'BAŞARI',
-            title: 'Hat-trick Kralı',
-            description: 'Bir maçta 3 gol atarak yeni rozet kazandın!',
-            date: Date.now() - 604800000 // 1 hafta önce
-          },
-          {
-            type: 'ARKADAŞ',
-            title: 'Yeni Arkadaş',
-            description: 'Mehmet Kaya seni arkadaş olarak ekledi',
-            date: Date.now() - 1209600000 // 2 hafta önce
-          }
-        ];
+        // Gerçek kullanıcı aktivitelerini yükle
+        function loadUserActivities() {
+          const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+          if (!currentUser) return;
 
-        demoActivities.forEach(activity => {
-          const activityElement = createActivityElement(activity);
-          activitiesContainer.appendChild(activityElement);
-        });
+          // Kullanıcının aktivitelerini localStorage'dan al
+          const userActivities = JSON.parse(localStorage.getItem(`activities_${currentUser.id}`)) || [];
+          
+          userActivities.forEach(activity => {
+            const activityElement = createActivityElement(activity);
+            activitiesContainer.appendChild(activityElement);
+          });
+        }
+
+        // Gerçek aktiviteleri yükle
+        loadUserActivities();
 
         if (activitiesContainer.children.length === 0) {
           activitiesContainer.innerHTML = `

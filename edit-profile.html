@@ -294,24 +294,23 @@
         <div class="form-section">
             <div class="form-group">
                 <label class="form-label">Ad Soyad</label>
-                <input type="text" class="form-input" id="fullName" value="Enes Güler" placeholder="Adınızı ve soyadınızı girin">
+                <input type="text" class="form-input" id="fullName" value="" placeholder="Adınızı ve soyadınızı girin">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Kullanıcı Adı</label>
-                <input type="text" class="form-input" id="username" value="enesguler" placeholder="Kullanıcı adınızı girin">
+                <input type="text" class="form-input" id="username" value="" placeholder="Kullanıcı adınızı girin">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Biyografi</label>
-                <textarea class="form-input form-textarea" id="bio" placeholder="Kendinizden bahsedin..." maxlength="150" oninput="updateCharCounter()">⚽ Futsal tutkunu | 🏆 Şampiyon | 📍 İstanbul
-Haftada 4 gün saha, her gün antrenman! 💪</textarea>
+                <textarea class="form-input form-textarea" id="bio" placeholder="Kendinizden bahsedin..." maxlength="150" oninput="updateCharCounter()"></textarea>
                 <div class="char-counter" id="charCounter">86/150</div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Şehir</label>
-                <input type="text" class="form-input" id="city" value="İstanbul" placeholder="Yaşadığınız şehir">
+                <input type="text" class="form-input" id="city" value="" placeholder="Yaşadığınız şehir">
             </div>
 
             <div class="form-group">
@@ -471,13 +470,11 @@ Haftada 4 gün saha, her gün antrenman! 💪</textarea>
             // Avatar için ilk harfleri kullan
             const avatarElement = document.querySelector('.profile-avatar span');
             if (avatarElement) {
-                const nameParts = currentUser.name.split(' ');
+                const nameParts = (currentUser.name || '').split(' ');
                 const initials = nameParts.length > 1 ? 
                   nameParts[0][0] + nameParts[1][0] : 
                   nameParts[0][0] + (nameParts[0][1] || '');
                 avatarElement.textContent = initials.toUpperCase();
-            }
-                avatarElement.textContent = currentUser.avatar;
             }
 
             updateCharCounter();

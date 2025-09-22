@@ -777,33 +777,126 @@
       function loadChatMessages() {
         const messagesArea = document.getElementById('messages');
         
-        // Demo messages based on chat type
-        let demoMessages = [];
-        
-        if (userId === '2' || userId === 'mehmet') {
-          demoMessages = [
-            { type: 'received', text: 'Selamlar! Bugün maça geliyor musun?', time: '14:30', avatar: 'MK' },
-            { type: 'sent', text: 'Evet, kesinlikle gelirim! Saat kaçta?', time: '14:32' },
-            { type: 'received', text: 'Saat 16:00\'da başlıyor. Sahada buluşalım!', time: '14:33', avatar: 'MK' },
-            { type: 'sent', text: 'Tamam, görüşürüz! 🔥', time: '14:35' },
-            { type: 'received', text: 'Yarın maçta görüşürüz! 🔥', time: '16:42', avatar: 'MK' }
-          ];
-        } else if (teamId === 'tigers') {
-          demoMessages = [
-            { type: 'system', text: 'Can Özkan gruba katıldı', time: '10:00' },
-            { type: 'received', text: 'Bu hafta antrenman var mı?', time: '10:15', avatar: 'CÖ', sender: 'Can' },
-            { type: 'received', text: 'Evet, Çarşamba 19:00\'da', time: '10:16', avatar: 'MK', sender: 'Mehmet' },
-            { type: 'received', text: 'Harika! Ben de geleceğim', time: '10:18', avatar: 'ED', sender: 'Emre' },
-            { type: 'sent', text: 'Ben de varım! 💪', time: '10:20' }
-          ];
-        } else {
-          demoMessages = [
-            { type: 'received', text: 'Merhaba! Nasılsın?', time: '10:00', avatar: 'XX' },
-            { type: 'sent', text: 'İyiyim, teşekkürler! Sen nasılsın?', time: '10:05' }
-          ];
+        // Gerçek mesajları yükle
+        function loadMessages() {
+          const currentUser = PasliosData.getCurrentUser();
+          if (!currentUser) {
+            showEmptyState();
+            return;
+          }
+
+          const conversationKey = teamId ? 
+            `team_messages_${teamId}` : 
+            `messages_${Math.min(currentUser.id, parseInt(userId))}_${Math.max(currentUser.id, parseInt(userId))}`;
+          
+          const messages = JSON.parse(localStorage.getItem(conversationKey)) || [];
+          
+          if (messages.length === 0) {
+            showEmptyState();
+            return;
+          }
+
+          displayMessages(messages);
         }
 
-        messagesArea.innerHTML = demoMessages.map(msg => {
+        function displayMessages(messages) {
+          messagesArea.innerHTML = messages.map(msg => {
+            if (msg.type === 'system') {
+              return `
+                <div class="system-message" style="text-align: center; margin: 1rem 0; padding: 0.5rem; background: rgba(107, 114, 128, 0.1); border-radius: 8px; font-size: 0.875rem; color: #6b7280;">
+                  <span class="system-text">${msg.text}</span>
+                </div>
+              `;
+            }
+
+            return `
+              <div class="message ${msg.type}">
+                ${msg.type === 'received' ? `<div class="message-avatar">${msg.avatar || 'XX'}</div>` : ''}
+                <div class="message-content">
+                  ${msg.sender ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                  <div class="message-text">${msg.text}</div>
+                  <div class="message-time">${msg.time}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Scroll to bottom
+          messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        function showEmptyState() {
+          const currentUser = PasliosData.getCurrentUser();
+          const recipientName = teamId ? 'takım' : 'kullanıcı';
+          
+          messagesArea.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+              <h3 style="margin-bottom: 0.5rem; color: #374151;">Henüz mesaj yok</h3>
+              <p>İlk mesajı sen gönder!</p>
+            </div>
+          `;
+        }
+
+        // Mesaj gönder
+        function sendMessage() {
+          const messageInput = document.getElementById('messageInput');
+          const messageText = messageInput.value.trim();
+          
+          if (!messageText) return;
+
+          const currentUser = PasliosData.getCurrentUser();
+          if (!currentUser) return;
+
+          const newMessage = {
+            id: Date.now(),
+            text: messageText,
+            type: 'sent',
+            time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+            senderId: currentUser.id,
+            timestamp: Date.now()
+          };
+
+          // Konuşma anahtarını belirle
+          const conversationKey = teamId ? 
+            `team_messages_${teamId}` : 
+            `messages_${Math.min(currentUser.id, parseInt(userId))}_${Math.max(currentUser.id, parseInt(userId))}`;
+          
+          // Mevcut mesajları al
+          const messages = JSON.parse(localStorage.getItem(conversationKey)) || [];
+          messages.push(newMessage);
+          
+          // Mesajları kaydet
+          localStorage.setItem(conversationKey, JSON.stringify(messages));
+          
+          // Konuşma listesini güncelle
+          updateConversationList(newMessage);
+          
+          // Mesajları yeniden yükle
+          displayMessages(messages);
+          
+          // Input'u temizle
+          messageInput.value = '';
+        }
+
+        function updateConversationList(lastMessage) {
+          const currentUser = PasliosData.getCurrentUser();
+          const conversations = JSON.parse(localStorage.getItem(`conversations_${currentUser.id}`)) || [];
+          
+          const conversationIndex = conversations.findIndex(conv => 
+            teamId ? conv.teamId === teamId : conv.userId === parseInt(userId)
+          );
+          
+          if (conversationIndex !== -1) {
+            conversations[conversationIndex].lastMessage = lastMessage.text;
+            conversations[conversationIndex].time = 'şimdi';
+            conversations[conversationIndex].unread = 0;
+          }
+          
+          localStorage.setItem(`conversations_${currentUser.id}`, JSON.stringify(conversations));
+        }
+
+        loadMessages();
           if (msg.type === 'system') {
             return `
               <div class="system-message" style="text-align: center; margin: 1rem 0; padding: 0.5rem; background: rgba(107, 114, 128, 0.1); border-radius: 8px; font-size: 0.875rem; color: #6b7280;">
