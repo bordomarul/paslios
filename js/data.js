@@ -1047,6 +1047,344 @@ class PasliosData {
       return null;
     }
   }
+
+  // PROFİL YÖNETİMİ
+  
+  // Kullanıcı profili getir
+  getUserProfile(userId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Profil görmek için giriş yapmalısınız!' };
+    }
+    
+    // User ID validation
+    if (!userId || typeof userId !== 'number') {
+      return { success: false, message: 'Geçersiz kullanıcı ID!' };
+    }
+    
+    const users = this.getData('users');
+    const targetUser = users.find(u => u.id === userId);
+    
+    if (!targetUser) {
+      return { success: false, message: 'Kullanıcı bulunamadı!' };
+    }
+    
+    // Kendi profilini mi yoksa başkasının profilini mi görüntülüyor
+    const isOwnProfile = currentUser.id === userId;
+    
+    // Public profile data
+    const publicProfile = {
+      id: targetUser.id,
+      name: this.sanitizeContent(targetUser.name),
+      position: targetUser.position || 'Genel',
+      location: targetUser.location || 'Konum belirtilmemiş',
+      bio: targetUser.bio ? this.sanitizeContent(targetUser.bio) : '',
+      avatar: targetUser.avatar,
+      matchesPlayed: targetUser.matchesPlayed || 0,
+      rating: targetUser.rating || 0,
+      teamId: targetUser.teamId,
+      joinDate: targetUser.joinDate,
+      isOwnProfile: isOwnProfile
+    };
+    
+    // Kendi profiliyse hassas bilgileri de ekle
+    if (isOwnProfile) {
+      publicProfile.email = targetUser.email;
+      publicProfile.phone = targetUser.phone;
+      publicProfile.settings = targetUser.settings;
+    }
+    
+    // Takip durumu kontrolü (başkasının profili için)
+    if (!isOwnProfile) {
+      publicProfile.isFollowing = this.isFollowing(currentUser.id, userId);
+      publicProfile.isFollowedBy = this.isFollowing(userId, currentUser.id);
+    }
+    
+    // Takipçi/takip sayıları
+    publicProfile.followersCount = this.getFollowersCount(userId);
+    publicProfile.followingCount = this.getFollowingCount(userId);
+    
+    return { success: true, profile: publicProfile };
+  }
+  
+  // Profil güncelle
+  updateProfile(updates) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Profil güncellemek için giriş yapmalısınız!' };
+    }
+    
+    // Input validation
+    if (!updates || typeof updates !== 'object') {
+      return { success: false, message: 'Geçersiz güncelleme verisi!' };
+    }
+    
+    const allowedFields = ['name', 'bio', 'position', 'location', 'phone'];
+    const sanitizedUpdates = {};
+    
+    // Sadece izin verilen alanları güncelle
+    for (const [key, value] of Object.entries(updates)) {
+      if (!allowedFields.includes(key)) {
+        continue;
+      }
+      
+      if (typeof value !== 'string') {
+        continue;
+      }
+      
+      // İçerik validation
+      if (key === 'name') {
+        if (value.length < 2 || value.length > 50) {
+          return { success: false, message: 'İsim 2-50 karakter arasında olmalı!' };
+        }
+      }
+      
+      if (key === 'bio' && value.length > 200) {
+        return { success: false, message: 'Bio 200 karakterden uzun olamaz!' };
+      }
+      
+      if (key === 'phone' && value && !/^[0-9+\-\s()]{10,15}$/.test(value)) {
+        return { success: false, message: 'Geçersiz telefon numarası formatı!' };
+      }
+      
+      // Zararlı pattern kontrolü
+      if (this.containsMaliciousPatterns(value)) {
+        return { success: false, message: 'Güvenlik nedeniyle güncelleme reddedildi!' };
+      }
+      
+      // Content sanitization
+      sanitizedUpdates[key] = this.sanitizeContent(value);
+    }
+    
+    if (Object.keys(sanitizedUpdates).length === 0) {
+      return { success: false, message: 'Güncellenecek geçerli alan bulunamadı!' };
+    }
+    
+    // Kullanıcı verilerini güncelle
+    const updated = this.updateData('users', currentUser.id, sanitizedUpdates);
+    
+    if (updated) {
+      // Session'daki kullanıcı bilgilerini de güncelle
+      const updatedUser = { ...currentUser, ...sanitizedUpdates };
+      localStorage.setItem('paslios_currentUser', JSON.stringify(updatedUser));
+      
+      return { success: true, message: 'Profil başarıyla güncellendi!' };
+    }
+    
+    return { success: false, message: 'Profil güncellenirken hata oluştu!' };
+  }
+  
+  // Şifre değiştir
+  changePassword(oldPassword, newPassword) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Şifre değiştirmek için giriş yapmalısınız!' };
+    }
+    
+    // Input validation
+    if (!oldPassword || !newPassword) {
+      return { success: false, message: 'Eski ve yeni şifre gerekli!' };
+    }
+    
+    if (typeof oldPassword !== 'string' || typeof newPassword !== 'string') {
+      return { success: false, message: 'Geçersiz şifre formatı!' };
+    }
+    
+    // Eski şifre doğrulama
+    const users = this.getData('users');
+    const user = users.find(u => u.id === currentUser.id);
+    
+    if (!user || !this.verifyPassword(oldPassword, user.password)) {
+      return { success: false, message: 'Eski şifre hatalı!' };
+    }
+    
+    // Yeni şifre güvenlik kontrolü
+    if (!this.isStrongPassword(newPassword)) {
+      return { success: false, message: 'Yeni şifre güvenlik gereksinimlerini karşılamıyor!' };
+    }
+    
+    // Eski şifre ile aynı olamaz
+    if (oldPassword === newPassword) {
+      return { success: false, message: 'Yeni şifre eski şifre ile aynı olamaz!' };
+    }
+    
+    // Yeni şifreyi hash'le
+    const hashedNewPassword = this.hashPassword(newPassword);
+    
+    // Şifreyi güncelle
+    const updated = this.updateData('users', currentUser.id, { 
+      password: hashedNewPassword,
+      passwordChangedAt: new Date().toISOString()
+    });
+    
+    if (updated) {
+      return { success: true, message: 'Şifre başarıyla değiştirildi!' };
+    }
+    
+    return { success: false, message: 'Şifre değiştirilirken hata oluştu!' };
+  }
+  
+  // Güçlü şifre kontrolü
+  isStrongPassword(password) {
+    if (!password || password.length < 8) return false;
+    
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    return hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+  }
+
+  // TAKİP SİSTEMİ
+  
+  // Kullanıcıyı takip et
+  followUser(targetUserId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Takip etmek için giriş yapmalısınız!' };
+    }
+    
+    // User ID validation
+    if (!targetUserId || typeof targetUserId !== 'number') {
+      return { success: false, message: 'Geçersiz kullanıcı ID!' };
+    }
+    
+    // Kendini takip etmeyi engelle
+    if (currentUser.id === targetUserId) {
+      return { success: false, message: 'Kendinizi takip edemezsiniz!' };
+    }
+    
+    // Hedef kullanıcı var mı kontrol et
+    const users = this.getData('users');
+    const targetUser = users.find(u => u.id === targetUserId);
+    
+    if (!targetUser) {
+      return { success: false, message: 'Kullanıcı bulunamadı!' };
+    }
+    
+    // Zaten takip ediyor mu kontrol et
+    if (this.isFollowing(currentUser.id, targetUserId)) {
+      return { success: false, message: 'Bu kullanıcıyı zaten takip ediyorsunuz!' };
+    }
+    
+    // Takip ilişkisini ekle
+    const follows = this.getData('follows');
+    const newFollow = {
+      id: Date.now(),
+      followerId: currentUser.id,
+      followingId: targetUserId,
+      timestamp: new Date().toISOString()
+    };
+    
+    follows.push(newFollow);
+    this.setData('follows', follows);
+    
+    return { 
+      success: true, 
+      message: `${targetUser.name} takip edildi!`,
+      followersCount: this.getFollowersCount(targetUserId),
+      followingCount: this.getFollowingCount(currentUser.id)
+    };
+  }
+  
+  // Kullanıcıyı takipten çıkar
+  unfollowUser(targetUserId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'İşlem için giriş yapmalısınız!' };
+    }
+    
+    // User ID validation
+    if (!targetUserId || typeof targetUserId !== 'number') {
+      return { success: false, message: 'Geçersiz kullanıcı ID!' };
+    }
+    
+    // Takip ediyor mu kontrol et
+    if (!this.isFollowing(currentUser.id, targetUserId)) {
+      return { success: false, message: 'Bu kullanıcıyı takip etmiyorsunuz!' };
+    }
+    
+    // Takip ilişkisini kaldır
+    const follows = this.getData('follows');
+    const updatedFollows = follows.filter(f => 
+      !(f.followerId === currentUser.id && f.followingId === targetUserId)
+    );
+    
+    this.setData('follows', updatedFollows);
+    
+    const users = this.getData('users');
+    const targetUser = users.find(u => u.id === targetUserId);
+    
+    return { 
+      success: true, 
+      message: `${targetUser ? targetUser.name : 'Kullanıcı'} takipten çıkarıldı!`,
+      followersCount: this.getFollowersCount(targetUserId),
+      followingCount: this.getFollowingCount(currentUser.id)
+    };
+  }
+  
+  // Takip ediyor mu kontrol et
+  isFollowing(followerId, followingId) {
+    const follows = this.getData('follows');
+    return follows.some(f => f.followerId === followerId && f.followingId === followingId);
+  }
+  
+  // Takipçi sayısını getir
+  getFollowersCount(userId) {
+    const follows = this.getData('follows');
+    return follows.filter(f => f.followingId === userId).length;
+  }
+  
+  // Takip edilen sayısını getir
+  getFollowingCount(userId) {
+    const follows = this.getData('follows');
+    return follows.filter(f => f.followerId === userId).length;
+  }
+  
+  // Takipçileri listele
+  getFollowers(userId, limit = null) {
+    const follows = this.getData('follows');
+    const users = this.getData('users');
+    
+    const followerIds = follows
+      .filter(f => f.followingId === userId)
+      .map(f => f.followerId);
+    
+    const followers = followerIds
+      .map(id => users.find(u => u.id === id))
+      .filter(user => user)
+      .map(user => ({
+        id: user.id,
+        name: this.sanitizeContent(user.name),
+        avatar: user.avatar,
+        position: user.position || 'Genel'
+      }));
+    
+    return limit ? followers.slice(0, limit) : followers;
+  }
+  
+  // Takip edilenleri listele
+  getFollowing(userId, limit = null) {
+    const follows = this.getData('follows');
+    const users = this.getData('users');
+    
+    const followingIds = follows
+      .filter(f => f.followerId === userId)
+      .map(f => f.followingId);
+    
+    const following = followingIds
+      .map(id => users.find(u => u.id === id))
+      .filter(user => user)
+      .map(user => ({
+        id: user.id,
+        name: this.sanitizeContent(user.name),
+        avatar: user.avatar,
+        position: user.position || 'Genel'
+      }));
+    
+    return limit ? following.slice(0, limit) : following;
+  }
 }
 
 // Global instance

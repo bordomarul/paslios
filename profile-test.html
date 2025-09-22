@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil ve Takip Güvenlik Testi - Paslios</title>
+    <link href="output.css" rel="stylesheet">
+    <style>
+        .test-result {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .test-button {
+            background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(156, 39, 176, 0.3);
+        }
+        .api-button {
+            background: linear-gradient(45deg, #FF5722, #D84315);
+        }
+        .api-button:hover {
+            box-shadow: 0 4px 8px rgba(255, 87, 34, 0.3);
+        }
+        .test-info {
+            background: #f3e5f5;
+            border-left: 4px solid #9C27B0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .api-example {
+            background: #fff3e0;
+            border-left: 4px solid #FF5722;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .code-block {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .user-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+        }
+        .current-user {
+            border-color: #9C27B0;
+            background: #f3e5f5;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .online { background: #4CAF50; }
+        .offline { background: #F44336; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">👤 Profil ve Takip Güvenlik Testleri</h1>
+                <p class="text-lg text-gray-600">Kullanıcı profili ve takip sistemlerinin güvenlik kontrollerini test edin</p>
+            </div>
+
+            <!-- Test Info -->
+            <div class="test-info">
+                <h3 class="font-bold text-lg mb-2">📋 Test Edilen Güvenlik Kontrolleri:</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <h4 class="font-semibold text-purple-600 mb-2">👤 Profil Sistemi:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+                            <li>Kendi vs başkası profil görüntüleme</li>
+                            <li>Hassas bilgi privacy kontrolü</li>
+                            <li>Profil düzenleme yetki kontrolü</li>
+                            <li>XSS saldırı koruması</li>
+                            <li>Şifre değişikliği güvenliği</li>
+                            <li>Input validation</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-purple-600 mb-2">👥 Takip Sistemi:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+                            <li>Duplicate takip engelleme</li>
+                            <li>Self-follow engelleme</li>
+                            <li>Takipçi/takip sayısı doğruluğu</li>
+                            <li>Unfollow veri güncelleme</li>
+                            <li>Authentication kontrolleri</li>
+                            <li>Geçersiz ID handling</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Examples -->
+            <div class="api-example">
+                <h3 class="font-bold text-lg mb-2">🔌 API Endpoint Örnekleri:</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-semibold text-orange-600">Profil API'leri</h4>
+                        <div class="code-block text-sm">
+GET  /api/users/:id
+PUT  /api/users/:id
+POST /api/users/change-password
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-orange-600">Takip API'leri</h4>
+                        <div class="code-block text-sm">
+POST /api/users/:id/follow
+POST /api/users/:id/unfollow
+GET  /api/users/:id/followers
+GET  /api/users/:id/following
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Buttons -->
+            <div class="text-center mb-6">
+                <button onclick="runTests()" class="test-button">
+                    🚀 Tüm Güvenlik Testlerini Çalıştır
+                </button>
+                <button onclick="testProfileAPI()" class="test-button api-button">
+                    👤 Profil API Testi
+                </button>
+                <button onclick="testFollowAPI()" class="test-button api-button">
+                    👥 Takip API Testi
+                </button>
+            </div>
+
+            <!-- Test Results -->
+            <div id="testResults" class="test-result" style="display: none;">
+                <div id="testOutput"></div>
+            </div>
+
+            <!-- Current User Status -->
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+                <h3 class="text-xl font-bold mb-4">🔐 Mevcut Oturum Durumu</h3>
+                <div id="userStatus" class="p-4 bg-gray-100 rounded-lg">
+                    <div class="flex items-center">
+                        <span class="status-indicator offline"></span>
+                        <span class="font-medium">Oturum kapalı</span>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-600">
+                        Test kullanıcısı ile giriş yaparak testleri gerçekleştirebilirsiniz.
+                    </div>
+                </div>
+                <div class="mt-4 flex space-x-2">
+                    <button onclick="loginTestUser(1)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Test User 1 ile Giriş
+                    </button>
+                    <button onclick="loginTestUser(2)" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Test User 2 ile Giriş
+                    </button>
+                    <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        Çıkış Yap
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manual Test Areas -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Profile Test -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">👤 Manuel Profil Testi</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Profil Bilgileri Güncelle:</label>
+                            <input type="text" id="profileName" class="w-full p-3 border border-gray-300 rounded-lg mb-2" 
+                                   placeholder="İsim">
+                            <textarea id="profileBio" class="w-full p-3 border border-gray-300 rounded-lg" rows="2" 
+                                      placeholder="Bio"></textarea>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="updateProfile()" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 flex-1">
+                                Profil Güncelle
+                            </button>
+                            <button onclick="loadXSSProfile()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                XSS Test
+                            </button>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Şifre Değişikliği:</label>
+                            <input type="password" id="oldPassword" class="w-full p-3 border border-gray-300 rounded-lg mb-2" 
+                                   placeholder="Eski Şifre">
+                            <input type="password" id="newPassword" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="Yeni Şifre">
+                        </div>
+                        
+                        <button onclick="changePassword()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full">
+                            🔒 Şifre Değiştir
+                        </button>
+                        
+                        <div id="profileResult" class="mt-4 p-4 rounded-lg" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Follow Test -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">👥 Manuel Takip Testi</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kullanıcı ID:</label>
+                            <input type="number" id="followUserId" class="w-full p-3 border border-gray-300 rounded-lg" 
+                                   placeholder="Takip edilecek kullanıcı ID" value="2">
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="followUser()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex-1">
+                                ➕ Takip Et
+                            </button>
+                            <button onclick="unfollowUser()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 flex-1">
+                                ➖ Takipten Çıkar
+                            </button>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="getFollowStatus()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex-1">
+                                📊 Durum Kontrol
+                            </button>
+                            <button onclick="getProfile()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 flex-1">
+                                👤 Profil Görüntüle
+                            </button>
+                        </div>
+                        
+                        <div id="followResult" class="mt-4 p-4 rounded-lg" style="display: none;"></div>
+                        
+                        <div id="followStatus" class="mt-4 p-4 bg-gray-100 rounded-lg">
+                            <div class="text-sm space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Takip Durumu:</span>
+                                    <span id="followStatusText" class="text-gray-500">Bilinmiyor</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Takipçi Sayısı:</span>
+                                    <span id="followersCountText" class="text-blue-600 font-bold">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Takip Edilen:</span>
+                                    <span id="followingCountText" class="text-purple-600 font-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edge Case Tests -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-bold mb-4">🧪 Edge Case Testleri</h3>
+                <p class="text-gray-600 mb-4">Özel güvenlik senaryolarını test edin:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button onclick="testSelfFollow()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                        🔄 Self-Follow Test
+                    </button>
+                    <button onclick="testInvalidUserFollow()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                        ❌ Geçersiz User Test
+                    </button>
+                    <button onclick="testDuplicateFollow()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                        🔂 Duplicate Follow Test
+                    </button>
+                    <button onclick="testWeakPassword()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                        🔓 Zayıf Şifre Test
+                    </button>
+                    <button onclick="testLongProfile()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                        📏 Uzun İçerik Test
+                    </button>
+                    <button onclick="testUnauthorizedEdit()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                        🚫 Yetkisiz Edit Test
+                    </button>
+                </div>
+                
+                <div id="edgeResult" class="mt-4 p-4 rounded-lg" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/profile-security-test.js"></script>
+    
+    <script>
+        // Console override
+        const originalLog = console.log;
+        let testOutput = '';
+        
+        function runTests() {
+            const resultsDiv = document.getElementById('testResults');
+            const outputDiv = document.getElementById('testOutput');
+            
+            testOutput = '';
+            
+            console.log = function(...args) {
+                const message = args.join(' ');
+                testOutput += message + '\n';
+                outputDiv.innerHTML = testOutput.replace(/\n/g, '<br>');
+                originalLog.apply(console, args);
+            };
+            
+            resultsDiv.style.display = 'block';
+            outputDiv.innerHTML = 'Testler başlatılıyor...<br>';
+            
+            setTimeout(() => {
+                runProfileSecurityTests();
+                setTimeout(() => {
+                    console.log = originalLog;
+                    updateUserStatus();
+                }, 1000);
+            }, 100);
+        }
+        
+        function createTestUsers() {
+            const pasliosData = new PasliosData();
+            
+            // Test users oluştur
+            const testUsers = [
+                { id: 1, name: 'Test User 1', email: 'test1@test.com', password: 'TestPassword123!' },
+                { id: 2, name: 'Test User 2', email: 'test2@test.com', password: 'TestPassword123!' }
+            ];
+            
+            const users = pasliosData.getData('users');
+            
+            testUsers.forEach(testUser => {
+                const existingIndex = users.findIndex(u => u.id === testUser.id);
+                const hashedUser = {
+                    ...testUser,
+                    password: pasliosData.hashPassword(testUser.password),
+                    position: 'Forvet',
+                    location: 'Test City',
+                    bio: 'Test bio',
+                    avatar: '/images/default-avatar.png',
+                    matchesPlayed: 10,
+                    rating: 4.5,
+                    joinDate: new Date().toISOString()
+                };
+                
+                if (existingIndex !== -1) {
+                    users[existingIndex] = hashedUser;
+                } else {
+                    users.push(hashedUser);
+                }
+            });
+            
+            pasliosData.setData('users', users);
+        }
+        
+        function loginTestUser(userId) {
+            createTestUsers();
+            const pasliosData = new PasliosData();
+            const users = pasliosData.getData('users');
+            const user = users.find(u => u.id === userId);
+            
+            if (user) {
+                localStorage.setItem('paslios_currentUser', JSON.stringify(user));
+                updateUserStatus();
+                showMessage(`Test User ${userId} ile giriş yapıldı!`, 'success');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('paslios_currentUser');
+            updateUserStatus();
+            showMessage('Çıkış yapıldı!', 'info');
+        }
+        
+        function updateUserStatus() {
+            const currentUser = localStorage.getItem('paslios_currentUser');
+            const statusDiv = document.getElementById('userStatus');
+            
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                statusDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="status-indicator online"></span>
+                        <span class="font-medium">${user.name} (ID: ${user.id})</span>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-600">
+                        ${user.email} - Aktif oturum
+                    </div>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="status-indicator offline"></span>
+                        <span class="font-medium">Oturum kapalı</span>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-600">
+                        Test kullanıcısı ile giriş yaparak testleri gerçekleştirebilirsiniz.
+                    </div>
+                `;
+            }
+        }
+        
+        function updateProfile() {
+            const name = document.getElementById('profileName').value;
+            const bio = document.getElementById('profileBio').value;
+            
+            const result = ProfileAPI.updateUser(getCurrentUserId(), { name, bio });
+            showResult('profileResult', result);
+        }
+        
+        function changePassword() {
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            
+            const result = ProfileAPI.changePassword({ oldPassword, newPassword });
+            showResult('profileResult', result);
+        }
+        
+        function followUser() {
+            const userId = parseInt(document.getElementById('followUserId').value);
+            const result = ProfileAPI.followUser(userId);
+            showResult('followResult', result);
+            updateFollowStatus();
+        }
+        
+        function unfollowUser() {
+            const userId = parseInt(document.getElementById('followUserId').value);
+            const result = ProfileAPI.unfollowUser(userId);
+            showResult('followResult', result);
+            updateFollowStatus();
+        }
+        
+        function getFollowStatus() {
+            const userId = parseInt(document.getElementById('followUserId').value);
+            updateFollowStatus();
+            showMessage('Takip durumu güncellendi!', 'info');
+        }
+        
+        function getProfile() {
+            const userId = parseInt(document.getElementById('followUserId').value);
+            const result = ProfileAPI.getUser(userId);
+            
+            if (result.success) {
+                const profile = result.profile;
+                showResult('followResult', {
+                    success: true,
+                    message: `Profil bilgileri: ${profile.name} - ${profile.position} - Takipçi: ${profile.followersCount} - Takip: ${profile.followingCount}`
+                });
+            } else {
+                showResult('followResult', result);
+            }
+        }
+        
+        function updateFollowStatus() {
+            const userId = parseInt(document.getElementById('followUserId').value);
+            const currentUserId = getCurrentUserId();
+            
+            if (!currentUserId) return;
+            
+            const pasliosData = new PasliosData();
+            const isFollowing = pasliosData.isFollowing(currentUserId, userId);
+            const followersCount = pasliosData.getFollowersCount(userId);
+            const followingCount = pasliosData.getFollowingCount(currentUserId);
+            
+            document.getElementById('followStatusText').textContent = isFollowing ? '✅ Takip ediliyor' : '❌ Takip edilmiyor';
+            document.getElementById('followersCountText').textContent = followersCount;
+            document.getElementById('followingCountText').textContent = followingCount;
+        }
+        
+        function getCurrentUserId() {
+            const currentUser = localStorage.getItem('paslios_currentUser');
+            return currentUser ? JSON.parse(currentUser).id : null;
+        }
+        
+        function showResult(elementId, result) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.style.display = 'block';
+            
+            if (result.success) {
+                resultDiv.className = 'mt-4 p-4 rounded-lg bg-green-100 border border-green-400';
+                resultDiv.innerHTML = `<strong>✅ Başarılı!</strong><br>${result.message}`;
+            } else {
+                resultDiv.className = 'mt-4 p-4 rounded-lg bg-red-100 border border-red-400';
+                resultDiv.innerHTML = `<strong>❌ Hata!</strong><br>${result.message}`;
+            }
+        }
+        
+        function showMessage(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
+                type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // XSS Test Functions
+        function loadXSSProfile() {
+            document.getElementById('profileName').value = `<script>alert("XSS")</script>`;
+            document.getElementById('profileBio').value = `<img src="x" onerror="alert(1)">`;
+        }
+        
+        // Edge Case Test Functions
+        function testSelfFollow() {
+            const currentUserId = getCurrentUserId();
+            if (!currentUserId) {
+                showEdgeResult('Önce giriş yapın!', false);
+                return;
+            }
+            
+            const result = ProfileAPI.followUser(currentUserId);
+            showEdgeResult(`Self-follow test: ${result.message}`, !result.success);
+        }
+        
+        function testInvalidUserFollow() {
+            const result = ProfileAPI.followUser(999999);
+            showEdgeResult(`Geçersiz user test: ${result.message}`, !result.success);
+        }
+        
+        function testDuplicateFollow() {
+            const userId = parseInt(document.getElementById('followUserId').value);
+            ProfileAPI.followUser(userId); // İlk takip
+            const result = ProfileAPI.followUser(userId); // Duplicate takip
+            showEdgeResult(`Duplicate follow test: ${result.message}`, !result.success);
+        }
+        
+        function testWeakPassword() {
+            const result = ProfileAPI.changePassword({ oldPassword: 'TestPassword123!', newPassword: '123456' });
+            showEdgeResult(`Zayıf şifre test: ${result.message}`, !result.success);
+        }
+        
+        function testLongProfile() {
+            const longName = 'A'.repeat(51);
+            const result = ProfileAPI.updateUser(getCurrentUserId(), { name: longName });
+            showEdgeResult(`Uzun isim test: ${result.message}`, !result.success);
+        }
+        
+        function testUnauthorizedEdit() {
+            const otherUserId = getCurrentUserId() === 1 ? 2 : 1;
+            const result = ProfileAPI.updateUser(otherUserId, { name: 'Hacked Name' });
+            showEdgeResult(`Yetkisiz edit test: ${result.message}`, !result.success);
+        }
+        
+        function showEdgeResult(message, passed) {
+            const resultDiv = document.getElementById('edgeResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = `mt-4 p-4 rounded-lg ${passed ? 'bg-green-100 border border-green-400' : 'bg-red-100 border border-red-400'}`;
+            resultDiv.innerHTML = `<strong>${passed ? '✅' : '❌'} ${message}</strong>`;
+        }
+        
+        // API Test Functions
+        function testProfileAPI() {
+            createTestUsers();
+            loginTestUser(1);
+            
+            console.log('🔌 Profile API Test Başlatılıyor...');
+            
+            setTimeout(() => {
+                // Test cases
+                const tests = [
+                    () => ProfileAPI.getUser(1),
+                    () => ProfileAPI.getUser(2), 
+                    () => ProfileAPI.updateUser(1, { name: 'Updated Name' }),
+                    () => ProfileAPI.changePassword({ oldPassword: 'TestPassword123!', newPassword: 'NewPassword456!' })
+                ];
+                
+                tests.forEach((test, index) => {
+                    setTimeout(() => {
+                        const result = test();
+                        console.log(`API Test ${index + 1}: ${result.success ? '✅ BAŞARILI' : '❌ BAŞARISIZ'} - ${result.message || 'OK'}`);
+                    }, index * 100);
+                });
+            }, 100);
+        }
+        
+        function testFollowAPI() {
+            createTestUsers();
+            loginTestUser(1);
+            
+            console.log('🔌 Follow API Test Başlatılıyor...');
+            
+            setTimeout(() => {
+                const tests = [
+                    () => ProfileAPI.followUser(2),
+                    () => ProfileAPI.getFollowers(2),
+                    () => ProfileAPI.getFollowing(1),
+                    () => ProfileAPI.unfollowUser(2)
+                ];
+                
+                tests.forEach((test, index) => {
+                    setTimeout(() => {
+                        const result = test();
+                        console.log(`Follow API Test ${index + 1}: ${result.success ? '✅ BAŞARILI' : '❌ BAŞARISIZ'} - ${result.message || 'OK'}`);
+                    }, index * 200);
+                });
+            }, 100);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔒 Profil ve takip sistemi güvenlik test sistemi hazır!');
+            createTestUsers();
+            updateUserStatus();
+            updateFollowStatus();
+        });
+    </script>
+</body>
+</html>
