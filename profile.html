@@ -627,6 +627,7 @@
           </div>
           <div id="profile-position" class="profile-title">Orta Saha Oyuncusu</div>
           <div id="profile-location" class="profile-location">📍 Ankara, Türkiye</div>
+          <div id="profile-bio" class="profile-bio" style="margin: 0.5rem 0; font-size: 0.875rem; opacity: 0.9; text-align: center; font-style: italic;"></div>
         </div>
       </div>
     </div>
@@ -942,8 +943,17 @@
         // Profil bilgilerini güncelle
         document.getElementById('profile-avatar').textContent = initials.toUpperCase();
         document.getElementById('profile-name').textContent = currentUser.name;
-        document.getElementById('profile-position').textContent = currentUser.position + ' Oyuncusu';
-        document.getElementById('profile-location').textContent = '📍 ' + currentUser.location;
+        document.getElementById('profile-position').textContent = (currentUser.position || 'Genel') + ' Oyuncusu';
+        document.getElementById('profile-location').textContent = '📍 ' + (currentUser.location || 'Konum belirtilmemiş');
+        
+        // Bio alanını güncelle
+        const bioElement = document.getElementById('profile-bio');
+        if (currentUser.bio && currentUser.bio.trim()) {
+          bioElement.textContent = `"${currentUser.bio}"`;
+          bioElement.style.display = 'block';
+        } else {
+          bioElement.style.display = 'none';
+        }
 
         // İstatistikleri güncelle
         document.getElementById('matches-played').textContent = currentUser.matchesPlayed || 0;

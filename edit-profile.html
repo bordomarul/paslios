@@ -314,13 +314,26 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Mevki</label>
+                <select class="form-input" id="position">
+                    <option value="">Mevkinizi seçin</option>
+                    <option value="Kaleci">Kaleci</option>
+                    <option value="Defans">Defans</option>
+                    <option value="Orta Saha">Orta Saha</option>
+                    <option value="Forvet">Forvet</option>
+                    <option value="Kanat">Kanat</option>
+                    <option value="Genel">Genel Oyuncu</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Telefon</label>
-                <input type="tel" class="form-input" id="phone" value="+90 555 123 4567" placeholder="Telefon numaranız">
+                <input type="tel" class="form-input" id="phone" value="" placeholder="Telefon numaranız">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Doğum Tarihi</label>
-                <input type="date" class="form-input" id="birthDate" value="1995-06-15">
+                <input type="date" class="form-input" id="birthDate" value="">
             </div>
         </div>
     </div>
@@ -415,6 +428,7 @@
                 username: document.getElementById('username').value,
                 bio: document.getElementById('bio').value,
                 location: document.getElementById('city').value,
+                position: document.getElementById('position').value,
                 phone: document.getElementById('phone').value,
                 birthDate: document.getElementById('birthDate').value
             };
@@ -431,9 +445,9 @@
             }
 
             // Save profile using data management system
-            const success = PasliosData.updateCurrentUser(profileData);
+            const updatedUser = PasliosData.updateCurrentUser(profileData);
             
-            if (success) {
+            if (updatedUser) {
                 showToast('Profil bilgileriniz başarıyla güncellendi! ✅', 'success');
                 setTimeout(() => {
                     window.location.href = 'profile.html';
@@ -445,7 +459,7 @@
 
         // Sayfa yüklendiğinde kullanıcı verilerini form'a yükle
         function loadUserData() {
-            if (!PasliosData.isLoggedIn()) {
+            if (!PasliosData.isAuthenticated()) {
                 window.location.href = 'index.html';
                 return;
             }
@@ -464,6 +478,7 @@
             document.getElementById('username').value = currentUser.username || currentUser.name.toLowerCase().replace(' ', '') || '';
             document.getElementById('bio').value = currentUser.bio || '';
             document.getElementById('city').value = currentUser.location || '';
+            document.getElementById('position').value = currentUser.position || '';
             document.getElementById('phone').value = currentUser.phone || '';
             document.getElementById('birthDate').value = currentUser.birthDate || '';
             
