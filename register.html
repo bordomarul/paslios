@@ -414,13 +414,20 @@
             return;
           }
           
+          // Email format kontrolü
+          if (!window.SecurityUtils.isValidEmail(email)) {
+            toastManager.show('Geçerli bir email adresi girin!', 'error', 'Hata');
+            return;
+          }
+          
           if (password !== confirmPassword) {
             toastManager.show('Şifreler eşleşmiyor!', 'error', 'Hata');
             return;
           }
           
-          if (password.length < 6) {
-            toastManager.show('Şifre en az 6 karakter olmalıdır!', 'warning', 'Uyarı');
+          // Güçlü şifre kontrolü (backend ile tutarlı)
+          if (!window.SecurityUtils.isStrongPassword(password)) {
+            toastManager.show('Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir!', 'warning', 'Zayıf Şifre');
             return;
           }
           
@@ -454,5 +461,10 @@
         });
       });
     </script>
+    
+    <!-- Security Utils -->
+    <script src="js/security.js"></script>
+    <!-- Data Management -->
+    <script src="js/data.js"></script>
   </body>
 </html>

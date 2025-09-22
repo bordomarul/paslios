@@ -119,21 +119,82 @@ class PasliosData {
 
   // GÜVENLIK FONKSİYONLARI
   
-  // Basit password hashing (production'da bcrypt kullanılmalı)
-  hashPassword(password) {
-    // Bu sadece demo amaçlı basit hash - gerçek projede bcrypt kullanın
-    let hash = 0;
-    for (let i = 0; i < password.length; i++) {
-      const char = password.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // 32bit integer'a çevir
+  // Browser fingerprint oluştur (session hijacking koruması)
+  generateFingerprint() {
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('Browser fingerprint', 2, 2);
+      
+      return btoa(
+        navigator.userAgent + 
+        navigator.language + 
+        screen.width + 'x' + screen.height + 
+        new Date().getTimezoneOffset() +
+        canvas.toDataURL()
+      ).slice(0, 32);
+    } catch {
+      // Fallback fingerprint
+      return btoa(navigator.userAgent + navigator.language + screen.width).slice(0, 32);
     }
-    return 'hash_' + Math.abs(hash).toString(36) + '_' + password.length;
+  }
+  
+  // Improved password hashing with salt (production'da bcrypt kullanılmalı)
+  hashPassword(password) {
+    // Salt oluştur (her kullanıcı için farklı)
+    const salt = this.generateSalt();
+    
+    // PBKDF2 benzeri iterative hashing
+    let hash = password + salt;
+    for (let i = 0; i < 1000; i++) {
+      let newHash = 0;
+      for (let j = 0; j < hash.length; j++) {
+        const char = hash.charCodeAt(j);
+        newHash = ((newHash << 5) - newHash) + char;
+        newHash = newHash & newHash;
+      }
+      hash = newHash.toString(36) + salt.charAt(i % salt.length);
+    }
+    
+    return `hash_${Math.abs(parseInt(hash.slice(0, 10), 36)).toString(36)}_${salt}_${password.length}`;
+  }
+  
+  // Salt generator
+  generateSalt() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let salt = '';
+    for (let i = 0; i < 16; i++) {
+      salt += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return salt;
   }
   
   // Password doğrulama
   verifyPassword(password, hash) {
-    return this.hashPassword(password) === hash;
+    if (!hash || !hash.includes('_')) return false;
+    
+    const parts = hash.split('_');
+    if (parts.length < 4) return false;
+    
+    const salt = parts[2];
+    const originalLength = parseInt(parts[3]);
+    
+    // Aynı salt ile hash'i yeniden oluştur
+    let testHash = password + salt;
+    for (let i = 0; i < 1000; i++) {
+      let newHash = 0;
+      for (let j = 0; j < testHash.length; j++) {
+        const char = testHash.charCodeAt(j);
+        newHash = ((newHash << 5) - newHash) + char;
+        newHash = newHash & newHash;
+      }
+      testHash = newHash.toString(36) + salt.charAt(i % salt.length);
+    }
+    
+    const expectedHash = `hash_${Math.abs(parseInt(testHash.slice(0, 10), 36)).toString(36)}_${salt}_${originalLength}`;
+    return expectedHash === hash;
   }
 
   // KULLANICI YÖNETİMİ
@@ -257,11 +318,11 @@ class PasliosData {
           rating: user.rating
         },
         loginTime: new Date().getTime(),
-        expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 saat
+        expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000), // 24 saat
+        fingerprint: this.generateFingerprint() // Session hijacking koruması
       };
       
-      // Session'ı güvenli storage'a kaydet
-      window.SecurityUtils.secureStorage.set('paslios_session', sessionData);
+      // Session'ı storage'a kaydet
       localStorage.setItem('paslios_session', JSON.stringify(sessionData));
       localStorage.setItem('currentUserId', user.id);
       

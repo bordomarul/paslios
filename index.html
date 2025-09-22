@@ -409,6 +409,12 @@
             return;
           }
           
+          // Email format kontrolü
+          if (!window.SecurityUtils.isValidEmail(email)) {
+            toastManager.show('Geçerli bir email adresi girin!', 'error', 'Hata');
+            return;
+          }
+          
           // Yeni giriş sistemi ile kullanıcı doğrula
           const result = pasliosData.loginUser(email, password);
           

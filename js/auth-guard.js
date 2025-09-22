@@ -6,6 +6,23 @@
 (function() {
     'use strict';
     
+    // Browser fingerprint oluştur (session hijacking koruması)
+    function generateFingerprint() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillText('Browser fingerprint', 2, 2);
+        
+        return btoa(
+            navigator.userAgent + 
+            navigator.language + 
+            screen.width + 'x' + screen.height + 
+            new Date().getTimezoneOffset() +
+            canvas.toDataURL()
+        ).slice(0, 32);
+    }
+    
     // Production authentication kontrolü
     function checkAuthentication() {
         try {
@@ -22,6 +39,14 @@
                 const now = new Date().getTime();
                 if (sessionData.expiresAt && now > sessionData.expiresAt) {
                     // Session süresi dolmuş
+                    clearAuthData();
+                    isLoggedIn = false;
+                }
+                
+                // Browser fingerprint kontrolü (session hijacking koruması)
+                const currentFingerprint = generateFingerprint();
+                if (sessionData.fingerprint && sessionData.fingerprint !== currentFingerprint) {
+                    console.warn('Session hijacking attempt detected');
                     clearAuthData();
                     isLoggedIn = false;
                 }
