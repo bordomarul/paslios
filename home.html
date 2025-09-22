@@ -797,7 +797,7 @@
         
         if (!pasliosData.isAuthenticated()) {
           console.log('Kullanıcı giriş yapmamış, index.html\'e yönlendiriliyor');
-          window.location.href = 'index.html';
+          window.location.href = '/';
           return;
         }
         
@@ -836,7 +836,7 @@
           updateUserStats(currentUser);
         } else {
           // Giriş yapılmamışsa login sayfasına yönlendir
-          window.location.href = 'index.html';
+          window.location.href = '/';
         }
       }
 
