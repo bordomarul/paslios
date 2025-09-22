@@ -757,43 +757,68 @@
         
         // Gerçek mesajları yükle
         function loadMessages() {
-          const currentUser = PasliosData.getCurrentUser();
+          const currentUser = pasliosData.getCurrentUser();
           if (!currentUser) {
             showEmptyState();
             return;
           }
 
-          const conversationKey = teamId ? 
-            `team_messages_${teamId}` : 
-            `messages_${Math.min(currentUser.id, parseInt(userId))}_${Math.max(currentUser.id, parseInt(userId))}`;
+          // URL parametrelerinden conversation ID'yi al
+          const urlParams = new URLSearchParams(window.location.search);
+          const conversationId = urlParams.get('conversation');
           
-          const messages = JSON.parse(localStorage.getItem(conversationKey)) || [];
-          
-          if (messages.length === 0) {
+          if (!conversationId) {
             showEmptyState();
             return;
           }
 
-          displayMessages(messages);
+          // Paslios data API'si ile mesajları yükle
+          const result = pasliosData.getConversationMessages(conversationId);
+          
+          if (!result.success) {
+            console.error('Mesajlar yüklenemedi:', result.message);
+            showEmptyState();
+            return;
+          }
+          
+          if (result.messages.length === 0) {
+            showEmptyState();
+            return;
+          }
+
+          displayMessages(result.messages);
+          
+          // Konuşmayı okundu olarak işaretle
+          pasliosData.markConversationAsRead(conversationId);
         }
 
         function displayMessages(messages) {
+          const currentUser = pasliosData.getCurrentUser();
+          
           messagesArea.innerHTML = messages.map(msg => {
-            if (msg.type === 'system') {
-              return `
-                <div class="system-message" style="text-align: center; margin: 1rem 0; padding: 0.5rem; background: rgba(107, 114, 128, 0.1); border-radius: 8px; font-size: 0.875rem; color: #6b7280;">
-                  <span class="system-text">${msg.text}</span>
-                </div>
-              `;
-            }
+            // Mesajın gönderen mi alıcı mı olduğunu belirle
+            const isSent = msg.senderId === currentUser.id;
+            const messageType = isSent ? 'sent' : 'received';
+            
+            // Zaman formatı
+            const messageTime = pasliosData.formatTimeAgo ? 
+              pasliosData.formatTimeAgo(msg.timestamp) : 
+              new Date(msg.timestamp).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'});
+            
+            // Avatar ve gönderen ismi (sadece alınan mesajlar için)
+            const avatar = !isSent ? (msg.senderAvatar || msg.senderName?.charAt(0) || '👤') : '';
+            const senderName = !isSent ? msg.senderName : '';
 
             return `
-              <div class="message ${msg.type}">
-                ${msg.type === 'received' ? `<div class="message-avatar">${msg.avatar || 'XX'}</div>` : ''}
+              <div class="message ${messageType}">
+                ${!isSent ? `<div class="message-avatar">${avatar}</div>` : ''}
                 <div class="message-content">
-                  ${msg.sender ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                  ${!isSent && senderName ? `<div class="message-sender">${senderName}</div>` : ''}
                   <div class="message-text">${msg.text}</div>
-                  <div class="message-time">${msg.time}</div>
+                  <div class="message-time">
+                    ${messageTime}
+                    ${isSent && msg.isRead ? ' ✓✓' : isSent && msg.isDelivered ? ' ✓' : ''}
+                  </div>
                 </div>
               </div>
             `;
@@ -823,29 +848,36 @@
           
           if (!messageText) return;
 
-          const currentUser = PasliosData.getCurrentUser();
-          if (!currentUser) return;
-
-          const newMessage = {
-            id: Date.now(),
-            text: messageText,
-            type: 'sent',
-            time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-            senderId: currentUser.id,
-            timestamp: Date.now()
-          };
-
-          // Konuşma anahtarını belirle
-          const conversationKey = teamId ? 
-            `team_messages_${teamId}` : 
-            `messages_${Math.min(currentUser.id, parseInt(userId))}_${Math.max(currentUser.id, parseInt(userId))}`;
+          // URL parametrelerinden partner ID'yi al
+          const urlParams = new URLSearchParams(window.location.search);
+          const partnerId = parseInt(urlParams.get('partner'));
+          const conversationId = urlParams.get('conversation');
           
-          // Mevcut mesajları al
-          const messages = JSON.parse(localStorage.getItem(conversationKey)) || [];
-          messages.push(newMessage);
+          if (!partnerId) {
+            alert('Geçersiz partner ID!');
+            return;
+          }
+
+          // Paslios data API'si ile mesaj gönder
+          const result = pasliosData.sendMessage(partnerId, messageText);
           
-          // Mesajları kaydet
-          localStorage.setItem(conversationKey, JSON.stringify(messages));
+          if (result.success) {
+            // Mesaj başarıyla gönderildi, UI'yi güncelle
+            messageInput.value = '';
+            loadMessages(); // Mesajları yeniden yükle
+            
+            // Toast bildirimi göster
+            if (window.ToastManager) {
+              ToastManager.show('Mesaj gönderildi!', 'success');
+            }
+          } else {
+            // Hata durumu
+            alert('Mesaj gönderilemedi: ' + result.message);
+            
+            if (window.ToastManager) {
+              ToastManager.show('Mesaj gönderilemedi: ' + result.message, 'error');
+            }
+          }
           
           // Konuşma listesini güncelle
           updateConversationList(newMessage);

@@ -33,6 +33,16 @@ class PasliosData {
       localStorage.setItem('paslios_bookings', JSON.stringify([]));
     }
     
+    // Mesajlar - başlangıçta boş
+    if (!localStorage.getItem('paslios_messages')) {
+      localStorage.setItem('paslios_messages', JSON.stringify([]));
+    }
+    
+    // Konuşmalar - başlangıçta boş
+    if (!localStorage.getItem('paslios_conversations')) {
+      localStorage.setItem('paslios_conversations', JSON.stringify([]));
+    }
+    
     // Sahalar - demo sahalar
     if (!localStorage.getItem('paslios_venues')) {
       const venues = [
@@ -954,7 +964,7 @@ class PasliosData {
   
   // Tüm verileri temizle (geliştirme amaçlı)
   clearAllData() {
-    const keys = ['users', 'posts', 'teams', 'matches', 'bookings'];
+    const keys = ['users', 'posts', 'teams', 'matches', 'bookings', 'messages', 'conversations'];
     keys.forEach(key => localStorage.removeItem(`paslios_${key}`));
     localStorage.removeItem('currentUser');
     this.initializeDatabase();
@@ -1384,6 +1394,410 @@ class PasliosData {
       }));
     
     return limit ? following.slice(0, limit) : following;
+  }
+
+  // MESAJLAŞMA SİSTEMİ
+  
+  // Mesaj gönder
+  sendMessage(receiverId, text) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Mesaj göndermek için giriş yapmalısınız!' };
+    }
+    
+    // Input validation
+    if (!receiverId || typeof receiverId !== 'number') {
+      return { success: false, message: 'Geçersiz alıcı ID!' };
+    }
+    
+    if (!text || typeof text !== 'string') {
+      return { success: false, message: 'Geçersiz mesaj içeriği!' };
+    }
+    
+    // Kendine mesaj gönderme engelleme
+    if (currentUser.id === receiverId) {
+      return { success: false, message: 'Kendinize mesaj gönderemezsiniz!' };
+    }
+    
+    // Alıcı kullanıcı var mı kontrol et
+    const users = this.getData('users');
+    const receiver = users.find(u => u.id === receiverId);
+    
+    if (!receiver) {
+      return { success: false, message: 'Alıcı kullanıcı bulunamadı!' };
+    }
+    
+    // Zararlı pattern kontrolü
+    if (this.containsMaliciousPatterns(text)) {
+      return { success: false, message: 'Güvenlik nedeniyle mesaj reddedildi!' };
+    }
+    
+    // Content sanitization
+    const sanitizedText = this.sanitizeContent(text);
+    if (sanitizedText.trim().length === 0) {
+      return { success: false, message: 'Mesaj boş olamaz!' };
+    }
+    
+    // Minimum uzunluk kontrolü
+    if (sanitizedText.trim().length < 1) {
+      return { success: false, message: 'Mesaj çok kısa!' };
+    }
+    
+    // Maximum uzunluk kontrolü
+    if (sanitizedText.length > 1000) {
+      return { success: false, message: 'Mesaj çok uzun! (Maksimum 1000 karakter)' };
+    }
+    
+    // Spam/flood kontrolü
+    const spamCheck = this.checkMessageSpam(currentUser.id, sanitizedText);
+    if (!spamCheck.allowed) {
+      return { success: false, message: spamCheck.message };
+    }
+    
+    // Conversation ID oluştur (küçük ID + büyük ID)
+    const conversationId = currentUser.id < receiverId ? 
+      `${currentUser.id}_${receiverId}` : `${receiverId}_${currentUser.id}`;
+    
+    // Yeni mesaj oluştur
+    const newMessage = {
+      id: Date.now(),
+      conversationId: conversationId,
+      senderId: currentUser.id,
+      receiverId: receiverId,
+      senderName: this.sanitizeContent(currentUser.name),
+      receiverName: this.sanitizeContent(receiver.name),
+      text: sanitizedText,
+      timestamp: new Date().toISOString(),
+      isRead: false,
+      isDelivered: true,
+      messageType: 'text'
+    };
+    
+    // Mesajı kaydet
+    const messages = this.getData('messages');
+    messages.push(newMessage);
+    this.setData('messages', messages);
+    
+    // Conversation güncelle
+    this.updateConversation(conversationId, currentUser.id, receiverId, sanitizedText);
+    
+    // Real-time event trigger
+    this.triggerMessageEvent('newMessage', {
+      message: newMessage,
+      senderId: currentUser.id,
+      receiverId: receiverId,
+      conversationId: conversationId
+    });
+    
+    return { 
+      success: true, 
+      message: 'Mesaj gönderildi!',
+      messageId: newMessage.id,
+      conversationId: conversationId
+    };
+  }
+  
+  // Real-time mesajlaşma için event trigger
+  triggerMessageEvent(eventType, data) {
+    // Custom event oluştur
+    const event = new CustomEvent('pasliosMessage', {
+      detail: { type: eventType, data: data }
+    });
+    
+    // LocalStorage event ile diğer tab/pencereler bilgilendir
+    localStorage.setItem('paslios_message_event', JSON.stringify({
+      type: eventType,
+      data: data,
+      timestamp: Date.now()
+    }));
+    
+    // Event'i trigger et
+    window.dispatchEvent(event);
+  }
+  
+  // Mesaj spam/flood kontrolü
+  checkMessageSpam(userId, messageText) {
+    const messages = this.getData('messages');
+    const userMessages = messages.filter(m => m.senderId === userId);
+    
+    // Son 5 dakikadaki mesajları kontrol et
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentMessages = userMessages.filter(m => new Date(m.timestamp) > fiveMinutesAgo);
+    
+    // Rate limiting: 5 dakikada maksimum 50 mesaj
+    if (recentMessages.length >= 50) {
+      return {
+        allowed: false,
+        message: 'Çok hızlı mesaj gönderiyorsunuz! Lütfen 5 dakika bekleyin.'
+      };
+    }
+    
+    // Son 1 dakikadaki mesajları kontrol et
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const lastMinuteMessages = userMessages.filter(m => new Date(m.timestamp) > oneMinuteAgo);
+    
+    // Flood kontrolü: 1 dakikada maksimum 15 mesaj
+    if (lastMinuteMessages.length >= 15) {
+      return {
+        allowed: false,
+        message: 'Çok hızlı mesaj gönderiyorsunuz! Lütfen biraz bekleyin.'
+      };
+    }
+    
+    // Aynı içerik kontrolü (son 10 mesaj)
+    const lastTenMessages = userMessages.slice(-10);
+    const duplicateMessage = lastTenMessages.find(m => 
+      m.text.toLowerCase() === messageText.toLowerCase()
+    );
+    
+    if (duplicateMessage) {
+      // Son 5 dakika içinde aynı mesaj var mı
+      const duplicateTime = new Date(duplicateMessage.timestamp);
+      if (duplicateTime > fiveMinutesAgo) {
+        return {
+          allowed: false,
+          message: 'Bu mesajı yakın zamanda gönderdiniz!'
+        };
+      }
+    }
+    
+    // Çok kısa aralıklarla mesaj kontrolü (son 10 saniye)
+    const tenSecondsAgo = new Date(Date.now() - 10 * 1000);
+    const veryRecentMessages = userMessages.filter(m => new Date(m.timestamp) > tenSecondsAgo);
+    
+    if (veryRecentMessages.length >= 3) {
+      return {
+        allowed: false,
+        message: 'Lütfen mesajlar arasında en az 3 saniye bekleyin.'
+      };
+    }
+    
+    return { allowed: true };
+  }
+  
+  // Conversation güncelle
+  updateConversation(conversationId, senderId, receiverId, lastMessage) {
+    const conversations = this.getData('conversations');
+    const existingIndex = conversations.findIndex(c => c.id === conversationId);
+    
+    const conversationData = {
+      id: conversationId,
+      participants: [senderId, receiverId],
+      lastMessage: lastMessage,
+      lastMessageTime: new Date().toISOString(),
+      lastSenderId: senderId,
+      unreadCount: existingIndex !== -1 ? conversations[existingIndex].unreadCount + 1 : 1,
+      updatedAt: new Date().toISOString()
+    };
+    
+    if (existingIndex !== -1) {
+      conversations[existingIndex] = conversationData;
+    } else {
+      conversations.push(conversationData);
+    }
+    
+    this.setData('conversations', conversations);
+  }
+  
+  // Conversation mesajlarını getir
+  getConversationMessages(conversationId, limit = null) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Mesajları görüntülemek için giriş yapmalısınız!' };
+    }
+    
+    if (!conversationId || typeof conversationId !== 'string') {
+      return { success: false, message: 'Geçersiz conversation ID!' };
+    }
+    
+    // Conversation'a erişim var mı kontrol et
+    const [userId1, userId2] = conversationId.split('_').map(Number);
+    if (!userId1 || !userId2 || (currentUser.id !== userId1 && currentUser.id !== userId2)) {
+      return { success: false, message: 'Bu konuşmaya erişim yetkiniz yok!' };
+    }
+    
+    const messages = this.getData('messages');
+    const conversationMessages = messages
+      .filter(m => m.conversationId === conversationId)
+      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    
+    const result = limit ? conversationMessages.slice(-limit) : conversationMessages;
+    
+    return { 
+      success: true, 
+      messages: result,
+      count: conversationMessages.length
+    };
+  }
+  
+  // Kullanıcının tüm konuşmalarını getir
+  getUserConversations(userId = null) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Konuşmaları görüntülemek için giriş yapmalısınız!' };
+    }
+    
+    const targetUserId = userId || currentUser.id;
+    
+    // Sadece kendi konuşmalarını görebilir
+    if (currentUser.id !== targetUserId) {
+      return { success: false, message: 'Başkasının konuşmalarını görüntüleyemezsiniz!' };
+    }
+    
+    const conversations = this.getData('conversations');
+    const userConversations = conversations
+      .filter(c => c.participants.includes(targetUserId))
+      .sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
+    
+    // Partner bilgilerini ekle
+    const users = this.getData('users');
+    const enrichedConversations = userConversations.map(conv => {
+      const partnerId = conv.participants.find(p => p !== targetUserId);
+      const partner = users.find(u => u.id === partnerId);
+      
+      return {
+        ...conv,
+        partner: partner ? {
+          id: partner.id,
+          name: this.sanitizeContent(partner.name),
+          avatar: partner.avatar
+        } : null
+      };
+    });
+    
+    return { 
+      success: true, 
+      conversations: enrichedConversations,
+      count: enrichedConversations.length
+    };
+  }
+  
+  // Mesajı okundu olarak işaretle
+  markMessageAsRead(messageId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'İşlem için giriş yapmalısınız!' };
+    }
+    
+    if (!messageId || typeof messageId !== 'number') {
+      return { success: false, message: 'Geçersiz mesaj ID!' };
+    }
+    
+    const messages = this.getData('messages');
+    const messageIndex = messages.findIndex(m => m.id === messageId);
+    
+    if (messageIndex === -1) {
+      return { success: false, message: 'Mesaj bulunamadı!' };
+    }
+    
+    const message = messages[messageIndex];
+    
+    // Sadece alıcı mesajı okundu olarak işaretleyebilir
+    if (message.receiverId !== currentUser.id) {
+      return { success: false, message: 'Bu mesajı okundu olarak işaretleme yetkiniz yok!' };
+    }
+    
+    if (message.isRead) {
+      return { success: false, message: 'Mesaj zaten okundu!' };
+    }
+    
+    messages[messageIndex].isRead = true;
+    messages[messageIndex].readAt = new Date().toISOString();
+    this.setData('messages', messages);
+    
+    return { success: true, message: 'Mesaj okundu olarak işaretlendi!' };
+  }
+  
+  // Conversation'ı okundu olarak işaretle
+  markConversationAsRead(conversationId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'İşlem için giriş yapmalısınız!' };
+    }
+    
+    // Conversation'daki tüm okunmamış mesajları okundu yap
+    const messages = this.getData('messages');
+    const conversationMessages = messages.filter(m => 
+      m.conversationId === conversationId && 
+      m.receiverId === currentUser.id && 
+      !m.isRead
+    );
+    
+    conversationMessages.forEach(message => {
+      const messageIndex = messages.findIndex(m => m.id === message.id);
+      if (messageIndex !== -1) {
+        messages[messageIndex].isRead = true;
+        messages[messageIndex].readAt = new Date().toISOString();
+      }
+    });
+    
+    this.setData('messages', messages);
+    
+    // Conversation unread count sıfırla
+    const conversations = this.getData('conversations');
+    const conversationIndex = conversations.findIndex(c => c.id === conversationId);
+    
+    if (conversationIndex !== -1) {
+      conversations[conversationIndex].unreadCount = 0;
+      this.setData('conversations', conversations);
+    }
+    
+    return { 
+      success: true, 
+      message: 'Konuşma okundu olarak işaretlendi!',
+      markedCount: conversationMessages.length
+    };
+  }
+  
+  // Okunmamış mesaj sayısını getir
+  getUnreadMessageCount(userId = null) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return 0;
+    
+    const targetUserId = userId || currentUser.id;
+    
+    const messages = this.getData('messages');
+    return messages.filter(m => 
+      m.receiverId === targetUserId && !m.isRead
+    ).length;
+  }
+  
+  // Mesaj ara
+  searchMessages(query, conversationId = null) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Arama için giriş yapmalısınız!' };
+    }
+    
+    if (!query || typeof query !== 'string' || query.trim().length < 2) {
+      return { success: false, message: 'Arama terimi en az 2 karakter olmalı!' };
+    }
+    
+    const messages = this.getData('messages');
+    let searchMessages = messages;
+    
+    // Sadece kullanıcının erişebileceği mesajları ara
+    searchMessages = searchMessages.filter(m => 
+      m.senderId === currentUser.id || m.receiverId === currentUser.id
+    );
+    
+    // Belirli bir conversation'da ara
+    if (conversationId) {
+      searchMessages = searchMessages.filter(m => m.conversationId === conversationId);
+    }
+    
+    // Arama yap
+    const sanitizedQuery = this.sanitizeContent(query.toLowerCase());
+    const results = searchMessages.filter(m => 
+      m.text.toLowerCase().includes(sanitizedQuery)
+    ).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    return { 
+      success: true, 
+      results: results,
+      count: results.length,
+      query: sanitizedQuery
+    };
   }
 }
 

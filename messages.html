@@ -658,6 +658,13 @@
             loadScript('js/toast.js')
           ]);
           console.log('Scripts loaded successfully');
+          
+          // Authentication check
+          if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+            return;
+          }
+          
           loadConversations();
         } catch (error) {
           console.error('Error loading scripts:', error);
@@ -1178,40 +1185,96 @@
             return;
           }
 
-          // Gerçek kullanıcı konuşmalarını yükle
-          const userConversations = JSON.parse(localStorage.getItem(`conversations_${currentUser.id}`)) || [];
+          // Paslios data API'sini kullanarak konuşmaları yükle
+          const conversationsResult = pasliosData.getUserConversations();
           
           const conversationList = document.querySelector('.conversation-list');
           
-          if (userConversations.length === 0) {
+          if (!conversationsResult.success || conversationsResult.conversations.length === 0) {
             showEmptyState();
             return;
           }
 
-          conversationList.innerHTML = userConversations.map(conv => `
-            <a href="chat.html?user=${conv.userId}" class="conversation-item ${conv.unread > 0 ? 'unread' : ''}">
-              <div class="user-avatar">
-                ${conv.avatar}
-                ${conv.online ? '<div class="online-status"></div>' : ''}
-              </div>
-              <div class="conversation-info">
-                <div class="conversation-header">
-                  <div class="user-name">${conv.name}</div>
-                  <div class="message-time">${conv.time}</div>
+          // Konuşmaları render et
+          conversationList.innerHTML = conversationsResult.conversations.map(conv => {
+            const partnerId = conv.partner ? conv.partner.id : 'Unknown';
+            const partnerName = conv.partner ? conv.partner.name : 'Bilinmeyen Kullanıcı';
+            const partnerAvatar = conv.partner && conv.partner.avatar ? conv.partner.avatar : '👤';
+            const unreadCount = conv.unreadCount || 0;
+            const timeFormatted = pasliosData.formatTimeAgo ? 
+              pasliosData.formatTimeAgo(conv.lastMessageTime) : 
+              new Date(conv.lastMessageTime).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'});
+            
+            return `
+              <a href="chat.html?conversation=${conv.id}" class="conversation-item ${unreadCount > 0 ? 'unread' : ''}" 
+                 data-conversation-id="${conv.id}" data-partner-id="${partnerId}">
+                <div class="user-avatar">
+                  ${partnerAvatar}
+                  <div class="online-status" style="display: none;"></div>
                 </div>
-                <div class="last-message">${conv.lastMessage}</div>
-              </div>
-              ${conv.unread > 0 ? `<div class="unread-count">${conv.unread}</div>` : ''}
-            </a>
-          `).join('');
+                <div class="conversation-info">
+                  <div class="conversation-header">
+                    <div class="user-name">${partnerName}</div>
+                    <div class="message-time">${timeFormatted}</div>
+                  </div>
+                  <div class="last-message">${conv.lastMessage || 'Henüz mesaj yok'}</div>
+                </div>
+                ${unreadCount > 0 ? `<div class="unread-count">${unreadCount}</div>` : ''}
+              </a>
+            `;
+          }).join('');
+
+          // Konuşmalara tıklama event'i ekle
+          document.querySelectorAll('.conversation-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+              e.preventDefault();
+              const conversationId = this.dataset.conversationId;
+              const partnerId = this.dataset.partnerId;
+              
+              // Chat sayfasına yönlendir
+              window.location.href = `chat.html?conversation=${conversationId}&partner=${partnerId}`;
+            });
+          });
 
           // Re-initialize conversations after loading
           initializeConversations();
+          
+          // Okunmamış mesaj sayısını güncelle
+          updateUnreadCount();
+          
         } catch (error) {
           console.error('Error loading conversations:', error);
           if (window.ToastManager) {
             ToastManager.show('Konuşmalar yüklenirken hata oluştu.', 'error');
           }
+        }
+      }
+
+      function updateUnreadCount() {
+        try {
+          const unreadCount = pasliosData.getUnreadMessageCount();
+          
+          // Navigation badge güncelle
+          const navBadge = document.querySelector('.nav-item[href="messages.html"] .badge');
+          if (navBadge) {
+            if (unreadCount > 0) {
+              navBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+              navBadge.style.display = 'block';
+            } else {
+              navBadge.style.display = 'none';
+            }
+          }
+          
+          // Page title güncelle
+          const originalTitle = 'Paslios - Mesajlar';
+          if (unreadCount > 0) {
+            document.title = `(${unreadCount}) ${originalTitle}`;
+          } else {
+            document.title = originalTitle;
+          }
+          
+        } catch (error) {
+          console.error('Error updating unread count:', error);
         }
       }
 
