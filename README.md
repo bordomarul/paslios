@@ -4,7 +4,7 @@ Futbol tutkunları için sosyal medya platformu.
 
 **"Sahada buluşalım, Paslios'ta tanışalım!"**
 
-*Son güncelleme: 21 Eylül 2025, 23:01*
+*Son güncelleme: 22 Eylül 2025*
 
 ## Özellikler
 
