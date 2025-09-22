@@ -4,11 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yeni Gönderi - Paslios</title>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/security.js"></script>
+    <script src="js/data.js"></script>
     <script>
-        // Authentication check - redirect if not logged in
-        if (!localStorage.getItem('currentUser')) {
-            window.location.href = 'index.html';
-        }
+        // Enhanced authentication check with session validation
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.isAuthenticated || !window.isAuthenticated()) {
+                console.warn('Authentication required for post creation');
+                window.location.href = 'index.html?redirect=' + encodeURIComponent(window.location.href);
+                return;
+            }
+            
+            // Additional user validation
+            const currentUser = window.getCurrentUser();
+            if (!currentUser || !currentUser.id) {
+                console.error('Invalid user session');
+                localStorage.clear();
+                window.location.href = 'index.html';
+                return;
+            }
+        });
     </script>
     <style>
         * {
@@ -574,26 +590,75 @@
         
         function previewMedia(event, type) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if (type === 'photo') {
-                        document.getElementById('previewImg').src = e.target.result;
-                        document.getElementById('previewImg').style.display = 'block';
-                        document.getElementById('previewVideo').style.display = 'none';
-                    } else {
-                        document.getElementById('videoSource').src = e.target.result;
-                        document.getElementById('previewVideo').style.display = 'block';
-                        document.getElementById('previewImg').style.display = 'none';
-                        document.getElementById('previewVideo').load();
-                    }
-                    
-                    document.querySelector('.media-upload-section').style.display = 'none';
-                    document.getElementById('mediaPreview').style.display = 'block';
-                    validateForm();
-                };
-                reader.readAsDataURL(file);
+            if (!file) return;
+            
+            // File size validation (max 10MB for images, 50MB for videos)
+            const maxSizeImage = 10 * 1024 * 1024; // 10MB
+            const maxSizeVideo = 50 * 1024 * 1024; // 50MB
+            const maxSize = type === 'photo' ? maxSizeImage : maxSizeVideo;
+            
+            if (file.size > maxSize) {
+                const maxSizeText = type === 'photo' ? '10MB' : '50MB';
+                if (window.ToastManager) {
+                    ToastManager.show(`Dosya boyutu çok büyük! Maksimum ${maxSizeText} olmalıdır.`, 'error');
+                }
+                event.target.value = ''; // Clear the input
+                return;
             }
+            
+            // File type validation
+            const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+            const validTypes = type === 'photo' ? validImageTypes : validVideoTypes;
+            
+            if (!validTypes.includes(file.type)) {
+                const allowedFormats = type === 'photo' ? 'JPEG, PNG, GIF, WebP' : 'MP4, WebM, OGG';
+                if (window.ToastManager) {
+                    ToastManager.show(`Geçersiz dosya formatı! İzin verilen formatlar: ${allowedFormats}`, 'error');
+                }
+                event.target.value = ''; // Clear the input
+                return;
+            }
+            
+            // Security: Check file name for malicious patterns
+            const fileName = file.name.toLowerCase();
+            const maliciousPatterns = ['.php', '.js', '.html', '.exe', '.bat', '.sh'];
+            const hasMaliciousPattern = maliciousPatterns.some(pattern => fileName.includes(pattern));
+            
+            if (hasMaliciousPattern) {
+                if (window.ToastManager) {
+                    ToastManager.show('Güvenlik nedeniyle bu dosya tipi yüklenemez!', 'error');
+                }
+                event.target.value = ''; // Clear the input
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (type === 'photo') {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('previewImg').style.display = 'block';
+                    document.getElementById('previewVideo').style.display = 'none';
+                } else {
+                    document.getElementById('videoSource').src = e.target.result;
+                    document.getElementById('previewVideo').style.display = 'block';
+                    document.getElementById('previewImg').style.display = 'none';
+                    document.getElementById('previewVideo').load();
+                }
+                
+                document.querySelector('.media-upload-section').style.display = 'none';
+                document.getElementById('mediaPreview').style.display = 'block';
+                validateForm();
+            };
+            
+            reader.onerror = function() {
+                if (window.ToastManager) {
+                    ToastManager.show('Dosya okuma hatası! Lütfen başka bir dosya seçin.', 'error');
+                }
+                event.target.value = ''; // Clear the input
+            };
+            
+            reader.readAsDataURL(file);
         }
         
         function removeMedia() {
@@ -656,26 +721,74 @@
             const hasMedia = document.getElementById('mediaPreview').style.display === 'block';
             const postBtn = document.getElementById('postBtn');
             
-            if (text.length > 0 || hasMedia) {
+            // Enhanced validation
+            const isValidText = text.length > 0 && text.length <= 500;
+            const hasContent = isValidText || hasMedia;
+            
+            // Additional content quality check
+            const isOnlyWhitespace = text && /^\s*$/.test(text);
+            const isOnlySpecialChars = text && /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]*$/.test(text);
+            
+            if (hasContent && !isOnlyWhitespace && !isOnlySpecialChars) {
                 postBtn.disabled = false;
+                postBtn.textContent = 'Paylaş';
             } else {
                 postBtn.disabled = true;
+                postBtn.textContent = hasContent ? 'Geçerli içerik girin' : 'Paylaş';
             }
         }
         
         function createPost() {
+            // Authentication check
+            if (!window.isAuthenticated || !window.isAuthenticated()) {
+                if (window.ToastManager) {
+                    ToastManager.show('Gönderi paylaşmak için giriş yapmalısınız!', 'error');
+                }
+                setTimeout(() => window.location.href = 'index.html', 1500);
+                return;
+            }
+            
             const text = document.getElementById('postText').value.trim();
             const personTags = document.getElementById('personTags').value.trim();
             const tags = document.getElementById('tagsInput').value.trim();
             const hasMedia = document.getElementById('mediaPreview').style.display === 'block';
             const postBtn = document.getElementById('postBtn');
             
+            // Enhanced content validation
             if (text.length === 0 && !hasMedia) {
                 if (window.ToastManager) {
                     ToastManager.show('Lütfen bir metin yazın veya medya ekleyin.', 'error');
                 }
                 return;
             }
+            
+            // Text length validation
+            if (text.length > 500) {
+                if (window.ToastManager) {
+                    ToastManager.show('Metin çok uzun! Maksimum 500 karakter olmalıdır.', 'error');
+                }
+                return;
+            }
+            
+            // Content quality validation
+            if (text && /^\s*$/.test(text)) {
+                if (window.ToastManager) {
+                    ToastManager.show('Sadece boşluk karakteri içeren gönderiler paylaşılamaz.', 'error');
+                }
+                return;
+            }
+            
+            if (text && /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]*$/.test(text)) {
+                if (window.ToastManager) {
+                    ToastManager.show('Lütfen anlamlı bir içerik yazın.', 'error');
+                }
+                return;
+            }
+            
+            // Input sanitization
+            const sanitizedText = window.SecurityUtils ? window.SecurityUtils.sanitizeInput(text) : text;
+            const sanitizedPersonTags = window.SecurityUtils ? window.SecurityUtils.sanitizeInput(personTags) : personTags;
+            const sanitizedTags = window.SecurityUtils ? window.SecurityUtils.sanitizeInput(tags) : tags;
             
             // Show loading state
             postBtn.disabled = true;
@@ -689,10 +802,10 @@
                     userId: currentUser.id,
                     username: currentUser.username,
                     userAvatar: currentUser.avatar || '👤',
-                    text: text,
-                    personTags: personTags,
+                    text: sanitizedText,
+                    personTags: sanitizedPersonTags,
                     location: selectedLocation,
-                    tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                    tags: sanitizedTags.split(',').map(tag => tag.trim()).filter(tag => tag),
                     privacy: selectedPrivacy,
                     hasMedia: hasMedia,
                     mediaType: hasMedia ? (document.getElementById('previewImg').style.display === 'block' ? 'image' : 'video') : null,
@@ -704,7 +817,7 @@
                 };
                 
                 // Yeni gönderi oluşturma sistemi
-                const result = pasliosData.createPost(text, 'text');
+                const result = pasliosData.createPost(sanitizedText, 'text');
                 
                 if (result.success) {
                     if (window.ToastManager) {

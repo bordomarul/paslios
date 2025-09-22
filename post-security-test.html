@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Güvenlik Testi - Paslios</title>
+    <link href="output.css" rel="stylesheet">
+    <style>
+        .test-result {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .test-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+        .test-info {
+            background: #f0f8ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">🔒 Post Güvenlik Test Sistemi</h1>
+                <p class="text-lg text-gray-600">Paslios post paylaşma sisteminin güvenlik kontrollerini test edin</p>
+            </div>
+
+            <!-- Test Info -->
+            <div class="test-info">
+                <h3 class="font-bold text-lg mb-2">📋 Test Edilen Güvenlik Kontrolleri:</h3>
+                <ul class="list-disc list-inside space-y-1 text-gray-700">
+                    <li><strong>Kimlik Doğrulama:</strong> Giriş yapmadan post atılabiliyor mu?</li>
+                    <li><strong>Boş İçerik:</strong> Yazı alanı boşken post atılabiliyor mu?</li>
+                    <li><strong>XSS Koruması:</strong> Zararlı JavaScript kodları engelleniyor mu?</li>
+                    <li><strong>İçerik Uzunluğu:</strong> Maksimum karakter limiti kontrol ediliyor mu?</li>
+                    <li><strong>Post Türü:</strong> Geçersiz dosya türleri engelleniyor mu?</li>
+                    <li><strong>Veri Yapısı:</strong> Post veritabanında doğru alanlarla kaydediliyor mu?</li>
+                </ul>
+            </div>
+
+            <!-- Test Button -->
+            <div class="text-center mb-6">
+                <button onclick="runTests()" class="test-button">
+                    🚀 Güvenlik Testlerini Başlat
+                </button>
+            </div>
+
+            <!-- Test Results -->
+            <div id="testResults" class="test-result" style="display: none;">
+                <div id="testOutput"></div>
+            </div>
+
+            <!-- Manual Test Area -->
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-bold mb-4">🔧 Manuel Test Alanı</h3>
+                <p class="text-gray-600 mb-4">Aşağıdaki alandan manuel olarak güvenlik testleri yapabilirsiniz:</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Test İçeriği:</label>
+                        <textarea id="testContent" class="w-full p-3 border border-gray-300 rounded-lg" rows="4" 
+                                  placeholder="Buraya test etmek istediğiniz içeriği yazın..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Post Türü:</label>
+                        <select id="testType" class="w-full p-3 border border-gray-300 rounded-lg">
+                            <option value="text">Text</option>
+                            <option value="image">Image</option>
+                            <option value="video">Video</option>
+                            <option value="invalid">Invalid (Test için)</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="testManualPost()" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                        Manuel Test Et
+                    </button>
+                    
+                    <div id="manualResult" class="mt-4 p-4 rounded-lg" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Quick XSS Tests -->
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-bold mb-4">⚡ Hızlı XSS Testleri</h3>
+                <p class="text-gray-600 mb-4">Yaygın XSS saldırı vektörlerini test edin:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="testXSS('&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;')" 
+                            class="bg-red-500 text-white p-3 rounded hover:bg-red-600">
+                        Script Tag Test
+                    </button>
+                    <button onclick="testXSS('&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;')" 
+                            class="bg-red-500 text-white p-3 rounded hover:bg-red-600">
+                        IMG Onerror Test
+                    </button>
+                    <button onclick="testXSS('javascript:alert(&quot;XSS&quot;)')" 
+                            class="bg-red-500 text-white p-3 rounded hover:bg-red-600">
+                        Javascript URL Test
+                    </button>
+                    <button onclick="testXSS('&lt;svg onload=&quot;alert(1)&quot;&gt;')" 
+                            class="bg-red-500 text-white p-3 rounded hover:bg-red-600">
+                        SVG Onload Test
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/post-security-test.js"></script>
+    
+    <script>
+        // Console'u override et
+        const originalLog = console.log;
+        let testOutput = '';
+        
+        function runTests() {
+            const resultsDiv = document.getElementById('testResults');
+            const outputDiv = document.getElementById('testOutput');
+            
+            // Clear previous results
+            testOutput = '';
+            
+            // Override console.log
+            console.log = function(...args) {
+                const message = args.join(' ');
+                testOutput += message + '\n';
+                outputDiv.innerHTML = testOutput.replace(/\n/g, '<br>');
+                originalLog.apply(console, args);
+            };
+            
+            // Show results area
+            resultsDiv.style.display = 'block';
+            outputDiv.innerHTML = 'Testler başlatılıyor...<br>';
+            
+            // Run tests
+            setTimeout(() => {
+                runPostSecurityTests();
+                
+                // Restore console.log
+                setTimeout(() => {
+                    console.log = originalLog;
+                }, 1000);
+            }, 100);
+        }
+        
+        function testManualPost() {
+            const content = document.getElementById('testContent').value;
+            const type = document.getElementById('testType').value;
+            const resultDiv = document.getElementById('manualResult');
+            
+            // Create test user if not exists
+            if (!localStorage.getItem('paslios_currentUser')) {
+                const testUser = {
+                    id: 999999,
+                    name: 'Test User',
+                    email: 'test@test.com',
+                    avatar: '/images/default-avatar.png'
+                };
+                localStorage.setItem('paslios_currentUser', JSON.stringify(testUser));
+            }
+            
+            const pasliosData = new PasliosData();
+            const result = pasliosData.createPost(content, type);
+            
+            resultDiv.style.display = 'block';
+            if (result.success) {
+                resultDiv.className = 'mt-4 p-4 rounded-lg bg-green-100 border border-green-400';
+                resultDiv.innerHTML = `
+                    <strong>✅ Post Başarıyla Oluşturuldu!</strong><br>
+                    <strong>ID:</strong> ${result.post.id}<br>
+                    <strong>İçerik:</strong> ${result.post.content}<br>
+                    <strong>Tür:</strong> ${result.post.type}<br>
+                    <strong>Zaman:</strong> ${result.post.timestamp}
+                `;
+            } else {
+                resultDiv.className = 'mt-4 p-4 rounded-lg bg-red-100 border border-red-400';
+                resultDiv.innerHTML = `
+                    <strong>❌ Post Oluşturulamadı!</strong><br>
+                    <strong>Hata:</strong> ${result.message}
+                `;
+            }
+        }
+        
+        function testXSS(payload) {
+            document.getElementById('testContent').value = payload;
+            document.getElementById('testType').value = 'text';
+            testManualPost();
+        }
+        
+        // Sayfa yüklendiğinde test hazırlığı
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔒 Post güvenlik test sistemi hazır!');
+        });
+    </script>
+</body>
+</html>

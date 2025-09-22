@@ -199,6 +199,93 @@ class PasliosData {
 
   // KULLANICI YÖNETİMİ
   
+  // İçerik temizleme ve güvenlik
+  sanitizeContent(input) {
+    if (!input || typeof input !== 'string') return '';
+    
+    // HTML karakterlerini encode et
+    return input
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;')
+      .trim();
+  }
+  
+  // Zararlı pattern kontrolü
+  containsMaliciousPatterns(content) {
+    const maliciousPatterns = [
+      /<script/i,
+      /javascript:/i,
+      /on\w+\s*=/i,
+      /data:text\/html/i,
+      /<iframe/i,
+      /<object/i,
+      /<embed/i,
+      /vbscript:/i
+    ];
+    
+    return maliciousPatterns.some(pattern => pattern.test(content));
+  }
+  
+  // Yorum spam/flood kontrolü
+  checkCommentSpam(userId, commentText) {
+    const allComments = this.getAllComments();
+    const userComments = allComments.filter(c => c.authorId === userId);
+    
+    // Son 5 dakikadaki yorumları kontrol et
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentComments = userComments.filter(c => new Date(c.timestamp) > fiveMinutesAgo);
+    
+    // Rate limiting: 5 dakikada maksimum 10 yorum
+    if (recentComments.length >= 10) {
+      return {
+        allowed: false,
+        message: 'Çok hızlı yorum yapıyorsunuz! Lütfen 5 dakika bekleyin.'
+      };
+    }
+    
+    // Son 1 dakikadaki yorumları kontrol et
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const lastMinuteComments = userComments.filter(c => new Date(c.timestamp) > oneMinuteAgo);
+    
+    // Flood kontrolü: 1 dakikada maksimum 3 yorum
+    if (lastMinuteComments.length >= 3) {
+      return {
+        allowed: false,
+        message: 'Çok hızlı yorum yapıyorsunuz! Lütfen biraz bekleyin.'
+      };
+    }
+    
+    // Aynı içerik kontrolü (son 10 yorum)
+    const lastTenComments = userComments.slice(-10);
+    const duplicateComment = lastTenComments.find(c => 
+      c.content.toLowerCase() === commentText.toLowerCase()
+    );
+    
+    if (duplicateComment) {
+      return {
+        allowed: false,
+        message: 'Bu yorumu zaten yaptınız!'
+      };
+    }
+    
+    // Çok kısa aralıklarla yorum kontrolü (son 30 saniye)
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
+    const veryRecentComments = userComments.filter(c => new Date(c.timestamp) > thirtySecondsAgo);
+    
+    if (veryRecentComments.length >= 2) {
+      return {
+        allowed: false,
+        message: 'Lütfen yorumlar arasında en az 30 saniye bekleyin.'
+      };
+    }
+    
+    return { allowed: true };
+  }
+  
   // Yeni kullanıcı kaydı
   registerUser(userData) {
     // Input validation ve sanitization
@@ -373,18 +460,47 @@ class PasliosData {
       return { success: false, message: 'Gönderi oluşturmak için giriş yapmalısınız!' };
     }
     
+    // Input validation ve sanitization
+    if (!content || typeof content !== 'string') {
+      return { success: false, message: 'Geçersiz gönderi içeriği!' };
+    }
+    
+    // Zararlı pattern kontrolü
+    if (this.containsMaliciousPatterns(content)) {
+      return { success: false, message: 'Güvenlik nedeniyle gönderi reddedildi!' };
+    }
+    
+    // Content length kontrolü (max 2000 karakter)
+    if (content.length > 2000) {
+      return { success: false, message: 'Gönderi çok uzun! (Maksimum 2000 karakter)' };
+    }
+    
+    // Type validation
+    const validTypes = ['text', 'image', 'video'];
+    if (!validTypes.includes(type)) {
+      return { success: false, message: 'Geçersiz gönderi türü!' };
+    }
+    
+    // Content sanitization - XSS koruması
+    const sanitizedContent = this.sanitizeContent(content);
+    if (sanitizedContent.trim().length === 0) {
+      return { success: false, message: 'Gönderi içeriği boş olamaz!' };
+    }
+    
     const posts = this.getData('posts');
     const newPost = {
       id: Date.now(),
       authorId: currentUser.id,
-      authorName: currentUser.name,
+      authorName: this.sanitizeContent(currentUser.name),
       authorAvatar: currentUser.avatar,
-      content: content,
+      content: sanitizedContent,
       type: type,
       timestamp: new Date().toISOString(),
       likedBy: [],
       comments: [],
-      visibility: 'public'
+      visibility: 'public',
+      reported: false,
+      reportCount: 0
     };
     
     // Gönderiyi ekle (en üste)
@@ -414,25 +530,68 @@ class PasliosData {
   // Gönderiyi beğen/beğenme
   togglePostLike(postId) {
     const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: 'Beğenmek için giriş yapmalısınız!' };
+    }
+    
+    // Post ID validation
+    if (!postId || typeof postId !== 'number') {
+      return { success: false, message: 'Geçersiz gönderi ID!' };
+    }
+    
+    const posts = this.getData('posts');
+    const post = posts.find(p => p.id === postId);
+    
+    if (!post) {
+      return { success: false, message: 'Gönderi bulunamadı!' };
+    }
+    
+    // Kullanıcının kendi gönderisini beğenmesini engelle
+    if (post.authorId === currentUser.id) {
+      return { success: false, message: 'Kendi gönderinizi beğenemezsiniz!' };
+    }
+    
+    let isLiked = false;
+    let likeCount = 0;
+    
+    if (post.likedBy.includes(currentUser.id)) {
+      // Beğeniyi kaldır
+      post.likedBy = post.likedBy.filter(id => id !== currentUser.id);
+      isLiked = false;
+    } else {
+      // Beğeni ekle
+      post.likedBy.push(currentUser.id);
+      isLiked = true;
+    }
+    
+    likeCount = post.likedBy.length;
+    this.setData('posts', posts);
+    
+    return { 
+      success: true, 
+      isLiked: isLiked, 
+      likeCount: likeCount,
+      message: isLiked ? 'Gönderi beğenildi!' : 'Beğeni kaldırıldı!'
+    };
+  }
+  
+  // Kullanıcının gönderiyi beğenip beğenmediğini kontrol et
+  isPostLikedByUser(postId, userId = null) {
+    const currentUser = userId || (this.getCurrentUser() && this.getCurrentUser().id);
     if (!currentUser) return false;
     
     const posts = this.getData('posts');
     const post = posts.find(p => p.id === postId);
     
-    if (post) {
-      if (post.likedBy.includes(currentUser.id)) {
-        // Beğeniyi kaldır
-        post.likedBy = post.likedBy.filter(id => id !== currentUser.id);
-      } else {
-        // Beğeni ekle
-        post.likedBy.push(currentUser.id);
-      }
-      
-      this.setData('posts', posts);
-      return true;
-    }
+    return post ? post.likedBy.includes(currentUser) : false;
+  }
+  
+  // Gönderinin beğeni sayısını getir
+  getPostLikeCount(postId) {
+    const posts = this.getData('posts');
+    const post = posts.find(p => p.id === postId);
     
-    return false;
+    return post ? post.likedBy.length : 0;
   }
   
   // Gönderi sil
@@ -461,8 +620,35 @@ class PasliosData {
       return { success: false, message: 'Yorum yapmak için giriş yapmalısınız!' };
     }
     
-    if (!commentText || commentText.trim().length === 0) {
+    // Input validation
+    if (!commentText || typeof commentText !== 'string') {
+      return { success: false, message: 'Geçersiz yorum içeriği!' };
+    }
+    
+    // Zararlı pattern kontrolü
+    if (this.containsMaliciousPatterns(commentText)) {
+      return { success: false, message: 'Güvenlik nedeniyle yorum reddedildi!' };
+    }
+    
+    // Content sanitization
+    const sanitizedComment = this.sanitizeContent(commentText);
+    if (sanitizedComment.trim().length === 0) {
       return { success: false, message: 'Yorum boş olamaz!' };
+    }
+    
+    // Minimum uzunluk kontrolü
+    if (sanitizedComment.trim().length < 2) {
+      return { success: false, message: 'Yorum çok kısa! (Minimum 2 karakter)' };
+    }
+    
+    // Maximum uzunluk kontrolü
+    if (sanitizedComment.length > 500) {
+      return { success: false, message: 'Yorum çok uzun! (Maksimum 500 karakter)' };
+    }
+    
+    // Post ID validation
+    if (!postId || typeof postId !== 'number') {
+      return { success: false, message: 'Geçersiz gönderi ID!' };
     }
     
     const posts = this.getData('posts');
@@ -472,15 +658,23 @@ class PasliosData {
       return { success: false, message: 'Gönderi bulunamadı!' };
     }
     
+    // Spam/flood kontrolü
+    const spamCheck = this.checkCommentSpam(currentUser.id, sanitizedComment);
+    if (!spamCheck.allowed) {
+      return { success: false, message: spamCheck.message };
+    }
+    
     const newComment = {
       id: Date.now(),
       postId: postId,
       authorId: currentUser.id,
-      authorName: currentUser.name,
+      authorName: this.sanitizeContent(currentUser.name),
       authorAvatar: currentUser.avatar,
-      content: commentText.trim(),
+      content: sanitizedComment,
       timestamp: new Date().toISOString(),
-      likedBy: []
+      likedBy: [],
+      reported: false,
+      reportCount: 0
     };
     
     // Yorumu gönderinin comments dizisine ekle
