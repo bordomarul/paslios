@@ -30,12 +30,12 @@
     <title>Paslios - Türkiye'nin Futbol Sosyal Platformu</title>
     
     <!-- Security Utils -->
-    <script src="js/security.js"></script>
-    <script src="js/enhanced-security.js"></script>
+    <script src="js/security.js?v=1.2"></script>
+    <script src="js/enhanced-security.js?v=1.2"></script>
     <!-- Data Management -->
-    <script src="js/data.js"></script>
+    <script src="js/data.js?v=1.2"></script>
     <!-- Toast Manager -->
-    <script src="js/toast.js"></script>
+    <script src="js/toast.js?v=1.2"></script>
     
     <style>
       * {
@@ -388,8 +388,8 @@
     </div>
 
     <!-- Additional UX Scripts -->
-    <script src="js/mobile-ux.js"></script>
-    <script src="js/ux-enhancer.js"></script>
+    <script src="js/mobile-ux.js?v=1.2"></script>
+    <script src="js/ux-enhancer.js?v=1.2"></script>
     <script>
       // Toast manager başlat
       let toastManager;
@@ -398,9 +398,16 @@
         // ToastManager'ı başlat
         toastManager = new ToastManager();
         
+        console.log('=== INDEX.HTML BAŞLADI ===');
+        console.log('Current URL:', window.location.href);
+        console.log('Current Pathname:', window.location.pathname);
+        
         // Basit authentication check - döngü önleme ile
         const currentUser = localStorage.getItem('currentUser');
         const sessionData = localStorage.getItem('paslios_session');
+        
+        console.log('currentUser:', currentUser ? 'EXISTS' : 'NULL');
+        console.log('sessionData:', sessionData ? 'EXISTS' : 'NULL');
         
         // Giriş yapmış kullanıcıyı kontrol et
         if (currentUser || sessionData) {
@@ -411,19 +418,24 @@
             // Session geçerliliği kontrolü
             if (session && session.expiresAt && now <= session.expiresAt) {
               // Geçerli session var, home'a yönlendir
+              console.log('Geçerli session bulundu, home\'a yönlendiriliyor...');
               window.location.href = '/home';
               return;
             } else if (session && session.expiresAt && now > session.expiresAt) {
               // Session süresi dolmuş, temizle
+              console.log('Session süresi dolmuş, temizleniyor...');
               localStorage.removeItem('currentUser');
               localStorage.removeItem('paslios_session');
             }
           } catch (e) {
             // Hatalı session verisi, temizle
+            console.log('Hatalı session verisi, temizleniyor...', e);
             localStorage.removeItem('currentUser');
             localStorage.removeItem('paslios_session');
           }
         }
+        
+        console.log('=== AUTH CHECK TAMAMLANDI, LOGIN FORM HAZIR ===');
         
         document.getElementById('loginForm').addEventListener('submit', function(e) {
           e.preventDefault();
