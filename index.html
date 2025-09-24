@@ -398,11 +398,18 @@
         // ToastManager'ı başlat
         toastManager = new ToastManager();
         
-        // Zaten giriş yapılmış mı kontrol et
+        // Zaten giriş yapılmış mı kontrol et - sadece redirect parametresi yoksa yönlendir
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectParam = urlParams.get('redirect');
+        
         const currentUser = localStorage.getItem('currentUser');
         const sessionData = localStorage.getItem('paslios_session');
-        if (currentUser || sessionData) {
-          window.location.href = '/home';
+        
+        if ((currentUser || sessionData) && !redirectParam) {
+          // Döngüyü önlemek için kısa gecikme ekle
+          setTimeout(() => {
+            window.location.href = '/home';
+          }, 100);
           return;
         }
         
