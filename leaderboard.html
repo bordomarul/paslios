@@ -10,7 +10,7 @@
     <script>
       // Check authentication immediately
       if (!localStorage.getItem('currentUser')) {
-        window.location.href = 'index.html';
+        window.location.href = '/';
       }
     </script>
     <style>
@@ -545,7 +545,7 @@
           // Get current user from localStorage
           const userData = localStorage.getItem('currentUser');
           if (!userData) {
-            window.location.href = 'index.html';
+            window.location.href = '/';
             return;
           }
           

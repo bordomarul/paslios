@@ -21,7 +21,7 @@
             if (!currentUser || !currentUser.id) {
                 console.error('Invalid user session');
                 localStorage.clear();
-                window.location.href = 'index.html';
+                window.location.href = '/';
                 return;
             }
         });
@@ -744,7 +744,7 @@
                 if (window.ToastManager) {
                     ToastManager.show('Gönderi paylaşmak için giriş yapmalısınız!', 'error');
                 }
-                setTimeout(() => window.location.href = 'index.html', 1500);
+                setTimeout(() => window.location.href = '/', 1500);
                 return;
             }
             

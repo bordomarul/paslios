@@ -12,7 +12,7 @@
       // Check authentication immediately
       const authUser = JSON.parse(localStorage.getItem('currentUser'));
       if (!authUser) {
-        window.location.href = 'index.html';
+        window.location.href = '/';
       }
     </script>
     <style>
@@ -507,7 +507,7 @@
           // Get current user from localStorage
           const userData = localStorage.getItem('currentUser');
           if (!userData) {
-            window.location.href = 'index.html';
+            window.location.href = '/';
             return;
           }
           

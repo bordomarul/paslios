@@ -460,14 +460,14 @@
         // Sayfa yüklendiğinde kullanıcı verilerini form'a yükle
         function loadUserData() {
             if (!PasliosData.isAuthenticated()) {
-                window.location.href = 'index.html';
+                window.location.href = '/';
                 return;
             }
 
             // localStorage'dan gerçek kullanıcı verilerini oku
             const currentUserData = localStorage.getItem('currentUser');
             if (!currentUserData) {
-                window.location.href = 'index.html';
+                window.location.href = '/';
                 return;
             }
             

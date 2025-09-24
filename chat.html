@@ -9,7 +9,7 @@
     <script>
         // Authentication check - redirect if not logged in
         if (!localStorage.getItem('currentUser')) {
-            window.location.href = 'index.html';
+            window.location.href = '/';
         }
     </script>
     <style>
@@ -947,7 +947,7 @@
       document.addEventListener('DOMContentLoaded', function() {
         // Authentication check
         if (!localStorage.getItem('currentUser')) {
-          window.location.href = 'index.html';
+          window.location.href = '/';
           return;
         }
         

@@ -657,9 +657,9 @@
             localStorage.removeItem('currentUser');
             
             alert('Hesabınız başarıyla silindi. Güle güle! 👋');
-            window.location.href = 'index.html';
+            window.location.href = '/';
             alert('Hesabınız silme işlemi başlatıldı.\n\n24 saat içinde tüm verileriniz kalıcı olarak silinecek.\n\nGoodbye... 👋');
-            window.location.href = 'index.html';
+            window.location.href = '/';
           }
         } else if (confirmation !== null) {
           alert('Yanlış metin girdiniz. Hesap silme işlemi iptal edildi.');
@@ -669,7 +669,7 @@
       // Sayfa yüklendiğinde ayarları yükle
       document.addEventListener('DOMContentLoaded', function() {
         if (!PasliosData.isLoggedIn()) {
-          window.location.href = 'index.html';
+          window.location.href = '/';
           return;
         }
         

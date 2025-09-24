@@ -75,7 +75,7 @@
             console.error('Authentication check failed:', error);
             // Hata durumunda güvenli taraf - giriş sayfasına yönlendir
             clearAuthData();
-            window.location.href = 'index.html';
+            window.location.href = '/';
             return false;
         }
     }
@@ -107,7 +107,7 @@
     // Logout fonksiyonu
     window.logout = function() {
         clearAuthData();
-        window.location.href = 'index.html';
+        window.location.href = '/';
     };
     
     // Session durumunu kontrol et

@@ -14,13 +14,19 @@
       (function() {
         try {
           const currentUser = localStorage.getItem('currentUser');
+          const sessionData = localStorage.getItem('paslios_session');
           
-          if (!currentUser) {
-            window.location.href = 'index.html';
+          if (!currentUser && !sessionData) {
+            // Döngüyü önlemek için kısa gecikme
+            setTimeout(() => {
+              window.location.href = '/?redirect=' + encodeURIComponent(window.location.pathname);
+            }, 100);
             return;
           }
         } catch (e) {
-          window.location.href = 'index.html';
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 100);
           return;
         }
       })();
@@ -914,7 +920,7 @@
         // Oturum kontrolü
         if (!pasliosData.isAuthenticated()) {
           console.log('Kullanıcı giriş yapmamış, index.html\'e yönlendiriliyor');
-          window.location.href = 'index.html';
+          window.location.href = '/';
           return;
         }
 
@@ -929,7 +935,7 @@
         // localStorage'dan gerçek kullanıcı verilerini oku
         const currentUserData = localStorage.getItem('currentUser');
         if (!currentUserData) {
-          window.location.href = 'index.html';
+          window.location.href = '/';
           return;
         }
         

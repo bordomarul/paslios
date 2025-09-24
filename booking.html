@@ -1402,7 +1402,7 @@
         if (!PasliosData.isLoggedIn()) {
           ToastManager.show('⚠️ Rezervasyon yapmak için giriş yapmalısınız!', 'warning');
           setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = '/';
           }, 2000);
           return;
         }
@@ -1647,7 +1647,7 @@
         
         if (!isLoggedIn) {
           console.log('User not logged in, redirecting...');
-          window.location.href = 'index.html';
+          window.location.href = '/';
           return;
         }
         
