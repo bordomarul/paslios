@@ -401,18 +401,22 @@
         // ToastManager'ı başlat
         toastManager = new ToastManager();
         
-        // Zaten giriş yapılmış mı kontrol et - döngüyü önle
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectParam = urlParams.get('redirect');
-        
+        // Zaten giriş yapılmış kullanıcıyı kontrol et
         const currentUser = localStorage.getItem('currentUser');
         const sessionData = localStorage.getItem('paslios_session');
         
-        if ((currentUser || sessionData) && !redirectParam) {
-          setTimeout(() => {
-            window.location.href = '/home';
-          }, 100);
-          return;
+        if (currentUser || sessionData) {
+          try {
+            const session = sessionData ? JSON.parse(sessionData) : null;
+            const now = new Date().getTime();
+            
+            if (session && session.expiresAt && now <= session.expiresAt) {
+              window.location.href = '/home';
+              return;
+            }
+          } catch (e) {
+            // Hatalı session verisi, devam et
+          }
         }
         
         document.getElementById('registerForm').addEventListener('submit', function(e) {

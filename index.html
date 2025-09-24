@@ -398,27 +398,31 @@
         // ToastManager'ı başlat
         toastManager = new ToastManager();
         
-        // URL parametrelerini kontrol et
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectParam = urlParams.get('redirect');
-        
-        // Eğer redirect parametresi varsa, authentication check yapma
-        // Çünkü bu zaten auth-guard.js'den gelen bir yönlendirme
-        if (redirectParam) {
-          console.log('Redirect parametresi tespit edildi, auth check atlanıyor:', redirectParam);
-          return;
-        }
-        
-        // Normal authentication check - sadece redirect parametresi yokken
+        // Basit authentication check - döngü önleme ile
         const currentUser = localStorage.getItem('currentUser');
         const sessionData = localStorage.getItem('paslios_session');
         
+        // Giriş yapmış kullanıcıyı kontrol et
         if (currentUser || sessionData) {
-          console.log('Kullanıcı zaten giriş yapmış, home\'a yönlendiriliyor');
-          setTimeout(() => {
-            window.location.href = '/home';
-          }, 100);
-          return;
+          try {
+            const session = sessionData ? JSON.parse(sessionData) : null;
+            const now = new Date().getTime();
+            
+            // Session geçerliliği kontrolü
+            if (session && session.expiresAt && now <= session.expiresAt) {
+              // Geçerli session var, home'a yönlendir
+              window.location.href = '/home';
+              return;
+            } else if (session && session.expiresAt && now > session.expiresAt) {
+              // Session süresi dolmuş, temizle
+              localStorage.removeItem('currentUser');
+              localStorage.removeItem('paslios_session');
+            }
+          } catch (e) {
+            // Hatalı session verisi, temizle
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('paslios_session');
+          }
         }
         
         document.getElementById('loginForm').addEventListener('submit', function(e) {

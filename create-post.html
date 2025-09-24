@@ -12,7 +12,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             if (!window.isAuthenticated || !window.isAuthenticated()) {
                 console.warn('Authentication required for post creation');
-                window.location.href = 'index.html?redirect=' + encodeURIComponent(window.location.href);
+                window.location.href = '/'?redirect=' + encodeURIComponent(window.location.href);
                 return;
             }
             

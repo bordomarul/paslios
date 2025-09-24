@@ -1,99 +1,100 @@
 /**
- * Authentication Guard - Production Ready
- * Kullanıcı giriş kontrolü ve session yönetimi
+ * Authentication Guard - Simplified Version
+ * Basit ve güvenilir kullanıcı giriş kontrolü
  */
 
 (function() {
     'use strict';
     
-    // Browser fingerprint oluştur (session hijacking koruması)
-    function generateFingerprint() {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.textBaseline = 'top';
-        ctx.font = '14px Arial';
-        ctx.fillText('Browser fingerprint', 2, 2);
-        
-        return btoa(
-            navigator.userAgent + 
-            navigator.language + 
-            screen.width + 'x' + screen.height + 
-            new Date().getTimezoneOffset() +
-            canvas.toDataURL()
-        ).slice(0, 32);
-    }
-    
-    // Production authentication kontrolü
+    // Basit authentication kontrolü
     function checkAuthentication() {
         try {
+            const currentUser = localStorage.getItem('currentUser');
             const session = localStorage.getItem('paslios_session');
-            let isLoggedIn = false;
-            let userId = null;
             
-            if (session) {
-                const sessionData = JSON.parse(session);
-                isLoggedIn = sessionData && sessionData.isLoggedIn && sessionData.userId;
-                userId = sessionData.userId;
-                
-                // Session süresini kontrol et (24 saat)
-                const now = new Date().getTime();
-                if (sessionData.expiresAt && now > sessionData.expiresAt) {
-                    // Session süresi dolmuş
-                    clearAuthData();
-                    isLoggedIn = false;
-                }
-                
-                // Browser fingerprint kontrolü (session hijacking koruması)
-                const currentFingerprint = generateFingerprint();
-                if (sessionData.fingerprint && sessionData.fingerprint !== currentFingerprint) {
-                    console.warn('Session hijacking attempt detected');
-                    clearAuthData();
-                    isLoggedIn = false;
-                }
-                
-                // Session'ı yenile (her sayfa yüklemesinde)
-                if (isLoggedIn) {
-                    renewSession(sessionData);
-                }
-            }
-            
-            if (!isLoggedIn) {
-                // Giriş gerekli - redirect (clean URL kullan)
-                const currentUrl = window.location.pathname + window.location.search;
-                // Eğer zaten index sayfasındaysak döngüyü önle
-                if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-                    return false;
-                }
-                const redirectUrl = '/?redirect=' + encodeURIComponent(currentUrl);
-                window.location.href = redirectUrl;
+            // Hiç auth data yoksa giriş sayfasına yönlendir
+            if (!currentUser && !session) {
+                console.log('No authentication data found, redirecting to login');
+                redirectToLogin();
                 return false;
             }
             
-            // Global olarak kullanıcı ID'sini ayarla
-            window.currentUserId = userId;
-            localStorage.setItem('currentUserId', userId);
+            // Session kontrolü
+            if (session) {
+                try {
+                    const sessionData = JSON.parse(session);
+                    const now = new Date().getTime();
+                    
+                    // Session süresi kontrolü
+                    if (sessionData.expiresAt && now > sessionData.expiresAt) {
+                        console.log('Session expired, clearing auth data');
+                        clearAuthData();
+                        redirectToLogin();
+                        return false;
+                    }
+                    
+                    // Session geçerli, user ID'yi ayarla
+                    if (sessionData.userId) {
+                        window.currentUserId = sessionData.userId;
+                        localStorage.setItem('currentUserId', sessionData.userId);
+                    }
+                    
+                    return true;
+                    
+                } catch (e) {
+                    console.error('Invalid session data:', e);
+                    clearAuthData();
+                    redirectToLogin();
+                    return false;
+                }
+            }
             
-            return true;
+            // Sadece currentUser varsa (eski sistem uyumluluğu)
+            if (currentUser) {
+                try {
+                    const userData = JSON.parse(currentUser);
+                    if (userData && userData.id) {
+                        window.currentUserId = userData.id;
+                        localStorage.setItem('currentUserId', userData.id);
+                        return true;
+                    }
+                } catch (e) {
+                    console.error('Invalid user data:', e);
+                    clearAuthData();
+                    redirectToLogin();
+                    return false;
+                }
+            }
+            
+            redirectToLogin();
+            return false;
             
         } catch (error) {
             console.error('Authentication check failed:', error);
-            // Hata durumunda güvenli taraf - giriş sayfasına yönlendir
             clearAuthData();
-            window.location.href = '/';
+            redirectToLogin();
             return false;
         }
     }
     
-    // Session'ı yenile
-    function renewSession(sessionData) {
-        const newExpiry = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 saat
-        sessionData.expiresAt = newExpiry;
-        localStorage.setItem('paslios_session', JSON.stringify(sessionData));
+    // Giriş sayfasına yönlendir (döngü önleme ile)
+    function redirectToLogin() {
+        const currentPath = window.location.pathname;
+        
+        // Zaten giriş sayfasındaysak döngüyü önle
+        if (currentPath === '/' || currentPath === '/index.html') {
+            console.log('Already on login page, preventing redirect loop');
+            return;
+        }
+        
+        console.log('Redirecting to login page from:', currentPath);
+        window.location.href = '/';
     }
     
     // Auth verilerini temizle
     function clearAuthData() {
         localStorage.removeItem('paslios_session');
+        localStorage.removeItem('currentUser');
         localStorage.removeItem('currentUserId');
         
         // Diğer kullanıcı verilerini de temizle
