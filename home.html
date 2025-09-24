@@ -646,10 +646,10 @@
             <div class="user-avatar">AY</div>
           </div>
           <div class="nav-right">
-            <a href="search.html" class="nav-btn">
+            <a href="/search" class="nav-btn">
               <span style="color: white; font-size: 1rem;">🔍</span>
             </a>
-            <a href="notifications.html" class="nav-btn">
+            <a href="/notifications" class="nav-btn">
               <span style="color: white; font-size: 1rem;">🔔</span>
             </a>
           </div>
@@ -663,12 +663,12 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-          <a href="matches.html" class="action-btn">
+          <a href="/matches" class="action-btn">
             <span class="action-icon">⚽</span>
             <div class="action-title">Maç Bul</div>
             <div class="action-desc">Yakındaki maçları keşfet</div>
           </a>
-          <a href="booking.html" class="action-btn">
+          <a href="/booking" class="action-btn">
             <span class="action-icon">🏟️</span>
             <div class="action-title">Saha Reserve Et</div>
             <div class="action-desc">Saha bul ve rezerve et</div>
@@ -683,7 +683,7 @@
       <div class="section">
         <div class="section-header">
           <div class="section-title">Yaklaşan Maçlar</div>
-          <a href="matches.html" class="section-link">Tümünü Gör</a>
+          <a href="/matches" class="section-link">Tümünü Gör</a>
         </div>
 
         <div id="upcomingMatches">
@@ -695,7 +695,7 @@
       <div class="section">
         <div class="section-header">
           <div class="section-title">Son Aktiviteler</div>
-          <a href="profile.html" class="section-link">Profili Gör</a>
+          <a href="/profile" class="section-link">Profili Gör</a>
         </div>
 
         <div id="socialFeed">
@@ -705,7 +705,7 @@
     </div>
 
     <!-- Floating Action Button -->
-    <a href="create-post.html" class="floating-btn">
+    <a href="/create-post" class="floating-btn">
       <span style="color: white; font-size: 1.5rem;">+</span>
     </a>
 
@@ -716,15 +716,15 @@
           <span>🏠</span>
           <span>Ana Sayfa</span>
         </a>
-        <a href="matches.html" class="nav-item">
+        <a href="/matches" class="nav-item">
           <span>⚽</span>
           <span>Maçlar</span>
         </a>
-        <a href="messages.html" class="nav-item">
+        <a href="/messages" class="nav-item">
           <span>💌</span>
           <span>Mesajlar</span>
         </a>
-        <a href="profile.html" class="nav-item">
+        <a href="/profile" class="nav-item">
           <span>👤</span>
           <span>Profil</span>
         </a>
@@ -882,7 +882,7 @@
           matchesContainer.innerHTML = `
             <div class="match-card" style="text-align: center; color: #6b7280;">
               <p>Henüz yaklaşan maç yok</p>
-              <a href="create-post.html" style="color: #10b981; text-decoration: underline;">Maç oluştur</a>
+              <a href="/create-post" style="color: #10b981; text-decoration: underline;">Maç oluştur</a>
             </div>
           `;
           return;
@@ -968,7 +968,7 @@
           feedContainer.innerHTML = `
             <div class="post-card" style="text-align: center; color: #6b7280;">
               <p>Henüz gönderi yok</p>
-              <a href="create-post.html" style="color: #10b981; text-decoration: underline;">İlk gönderiyi sen oluştur!</a>
+              <a href="/create-post" style="color: #10b981; text-decoration: underline;">İlk gönderiyi sen oluştur!</a>
             </div>
           `;
           return;

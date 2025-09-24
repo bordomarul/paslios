@@ -511,7 +511,7 @@
           <div class="nav-center">
             <h1>Mesajlar</h1>
           </div>
-          <a href="search.html" class="new-message-btn">
+          <a href="/search" class="new-message-btn">
             <span style="color: white; font-size: 1.125rem;">✏️</span>
           </a>
         </div>
@@ -621,15 +621,15 @@
           <span>🏠</span>
           <span>Ana Sayfa</span>
         </a>
-        <a href="matches.html" class="nav-item">
+        <a href="/matches" class="nav-item">
           <span>⚽</span>
           <span>Maçlar</span>
         </a>
-        <a href="messages.html" class="nav-item active">
+        <a href="/messages" class="nav-item active">
           <span>💌</span>
           <span>Mesajlar</span>
         </a>
-        <a href="profile.html" class="nav-item">
+        <a href="/profile" class="nav-item">
           <span>👤</span>
           <span>Profil</span>
         </a>
@@ -1255,7 +1255,7 @@
           const unreadCount = pasliosData.getUnreadMessageCount();
           
           // Navigation badge güncelle
-          const navBadge = document.querySelector('.nav-item[href="messages.html"] .badge');
+          const navBadge = document.querySelector('.nav-item[href="/messages"] .badge');
           if (navBadge) {
             if (unreadCount > 0) {
               navBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
@@ -1285,7 +1285,7 @@
             <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
             <h3 style="margin-bottom: 0.5rem; color: #374151;">Henüz mesajın yok</h3>
             <p style="margin-bottom: 1.5rem;">Diğer oyuncularla tanış ve konuşmaya başla!</p>
-            <a href="search.html" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; display: inline-block;">
+            <a href="/search" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; display: inline-block;">
               Oyuncu Ara
             </a>
           </div>
