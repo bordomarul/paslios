@@ -1,4 +1,7 @@
 {
+  "redirects": [
+    { "source": "/index", "destination": "/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/home", "destination": "/home.html" },
@@ -8,6 +11,8 @@
     { "source": "/register", "destination": "/register.html" },
     { "source": "/messages", "destination": "/messages.html" },
     { "source": "/chat", "destination": "/chat.html" },
-    { "source": "/settings", "destination": "/settings.html" }
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/forgot-password", "destination": "/forgot-password.html" },
+    { "source": "/reset-password", "destination": "/reset-password.html" }
   ]
 }
