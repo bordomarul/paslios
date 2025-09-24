@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paslios - Hesap oluştur ve sahada buluş!">
-    <link href="output.css" rel="stylesheet">`n    <link href="css/responsive.css" rel="stylesheet">
+  <link href="output.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
     <link href="css/toast.css" rel="stylesheet">
     <title>Paslios - Kayıt Ol</title>
     <style>
@@ -451,7 +452,18 @@
           if (result.success) {
             // Başarı mesajı - Güzel toast bildirimi
             toastManager.show('Hesabınız başarıyla oluşturuldu! Hoş geldiniz ' + fullName + '!', 'success', '🎉 Tebrikler');
-            
+
+            // Oturum bilgisini kaydet (login ile aynı şekilde)
+            localStorage.setItem('currentUser', JSON.stringify(result.user));
+            const sessionData = {
+              isLoggedIn: true,
+              userId: result.user.id,
+              user: result.user,
+              loginTime: new Date().getTime(),
+              expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 saat
+            };
+            localStorage.setItem('paslios_session', JSON.stringify(sessionData));
+
             // Ana sayfaya yönlendir
             setTimeout(function() {
               window.location.href = '/home';
