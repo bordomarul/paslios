@@ -796,8 +796,8 @@
         console.log('currentUser:', pasliosData.getCurrentUser());
         
         if (!pasliosData.isAuthenticated()) {
-          console.log('Kullanıcı giriş yapmamış, index.html\'e yönlendiriliyor');
-          window.location.href = '/';
+          console.log('Kullanıcı giriş yapmamış, ana sayfa gösterilmiyor.');
+          document.body.innerHTML = '<div style="padding:2rem;text-align:center;color:#b91c1c;font-weight:bold;">Giriş yapmadan ana sayfaya erişemezsiniz.<br><a href="/" style="color:#10b981;">Giriş yap</a></div>';
           return;
         }
         
@@ -835,8 +835,8 @@
           // Kullanıcı istatistiklerini güncelle
           updateUserStats(currentUser);
         } else {
-          // Giriş yapılmamışsa login sayfasına yönlendir
-          window.location.href = '/';
+          // Giriş yapılmamışsa uyarı göster
+          document.body.innerHTML = '<div style="padding:2rem;text-align:center;color:#b91c1c;font-weight:bold;">Giriş yapmadan ana sayfaya erişemezsiniz.<br><a href="/" style="color:#10b981;">Giriş yap</a></div>';
         }
       }
 
