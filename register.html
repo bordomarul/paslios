@@ -7,6 +7,14 @@
   <link href="output.css" rel="stylesheet">
   <link href="css/responsive.css" rel="stylesheet">
     <link href="css/toast.css" rel="stylesheet">
+    
+    <!-- Security Utils -->
+    <script src="js/security.js"></script>
+    <!-- Data Management -->
+    <script src="js/data.js"></script>
+    <!-- Toast Manager -->
+    <script src="js/toast.js"></script>
+    
     <title>Paslios - Kayıt Ol</title>
     <style>
       * {
@@ -447,6 +455,7 @@
           }
           
           // Yeni kayıt sistemi ile kullanıcı oluştur
+          console.log('Kayıt denemesi yapılıyor:', email);
           const result = pasliosData.registerUser({
             name: fullName,
             email: email,
@@ -456,6 +465,7 @@
             location: 'Ankara, Türkiye'
           });
           
+          console.log('Kayıt sonucu:', result);
           if (result.success) {
             // Başarı mesajı - Güzel toast bildirimi
             toastManager.show('Hesabınız başarıyla oluşturuldu! Hoş geldiniz ' + fullName + '!', 'success', '🎉 Tebrikler');
@@ -482,10 +492,5 @@
         });
       });
     </script>
-    
-    <!-- Security Utils -->
-    <script src="js/security.js"></script>
-    <!-- Data Management -->
-    <script src="js/data.js"></script>
   </body>
 </html>

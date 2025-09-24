@@ -32,6 +32,10 @@
     <!-- Security Utils -->
     <script src="js/security.js"></script>
     <script src="js/enhanced-security.js"></script>
+    <!-- Data Management -->
+    <script src="js/data.js"></script>
+    <!-- Toast Manager -->
+    <script src="js/toast.js"></script>
     
     <style>
       * {
@@ -383,11 +387,7 @@
       </div>
     </div>
 
-    <!-- Data Management Script -->
-    <script src="js/toast.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/toast.js"></script>
-    <script src="js/data.js"></script>
+    <!-- Additional UX Scripts -->
     <script src="js/mobile-ux.js"></script>
     <script src="js/ux-enhancer.js"></script>
     <script>
@@ -449,7 +449,9 @@
           }
           
           // Yeni giriş sistemi ile kullanıcı doğrula
+          console.log('Giriş denemesi yapılıyor:', email);
           const result = pasliosData.loginUser(email, password);
+          console.log('Giriş sonucu:', result);
           
           if (result.success) {
             // Session oluştur - production ready

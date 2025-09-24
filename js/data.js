@@ -8,9 +8,84 @@ class PasliosData {
 
   // Temiz veritabanı başlatma
   initializeDatabase() {
-    // Kullanıcılar - başlangıçta boş
+    // Kullanıcılar - demo hesaplarla başlat
     if (!localStorage.getItem('paslios_users')) {
-      localStorage.setItem('paslios_users', JSON.stringify([]));
+      const demoUsers = [
+        {
+          id: 'demo_001',
+          email: 'demo@paslios.com',
+          password: '123456',
+          name: 'Demo Kullanıcı',
+          username: 'demo_user',
+          position: 'Orta Saha',
+          level: 'Orta',
+          phone: '0555 123 4567',
+          location: 'Ankara',
+          bio: 'Paslios demo hesabı - Test için kullanabilirsiniz!',
+          profileImage: 'https://via.placeholder.com/150/10b981/white?text=Demo',
+          joinDate: new Date().toISOString(),
+          stats: {
+            matchesPlayed: 25,
+            goals: 12,
+            assists: 8,
+            rating: 4.2
+          },
+          badges: ['welcome', 'first_post'],
+          followers: [],
+          following: [],
+          isVerified: true
+        },
+        {
+          id: 'test_002', 
+          email: 'test@paslios.com',
+          password: 'test123',
+          name: 'Test Oyuncu',
+          username: 'test_player',
+          position: 'Forvet',
+          level: 'İleri',
+          phone: '0555 987 6543',
+          location: 'İstanbul',
+          bio: 'Test hesabı - Futbol tutkunu!',
+          profileImage: 'https://via.placeholder.com/150/059669/white?text=Test',
+          joinDate: new Date().toISOString(),
+          stats: {
+            matchesPlayed: 45,
+            goals: 28,
+            assists: 15,
+            rating: 4.5
+          },
+          badges: ['welcome', 'first_post', 'goal_scorer'],
+          followers: [],
+          following: [],
+          isVerified: false
+        },
+        {
+          id: 'admin_003',
+          email: 'admin@paslios.com', 
+          password: 'admin123',
+          name: 'Admin Kullanıcı',
+          username: 'admin',
+          position: 'Kaleci',
+          level: 'Profesyonel',
+          phone: '0555 000 0000',
+          location: 'Ankara',
+          bio: 'Paslios yönetici hesabı',
+          profileImage: 'https://via.placeholder.com/150/047857/white?text=Admin',
+          joinDate: new Date().toISOString(),
+          stats: {
+            matchesPlayed: 100,
+            goals: 2,
+            assists: 45,
+            rating: 4.8
+          },
+          badges: ['welcome', 'first_post', 'team_captain', 'veteran'],
+          followers: [],
+          following: [],
+          isVerified: true,
+          isAdmin: true
+        }
+      ];
+      localStorage.setItem('paslios_users', JSON.stringify(demoUsers));
     }
     
     // Gönderiler - başlangıçta boş
