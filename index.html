@@ -400,7 +400,8 @@
         
         // Zaten giriş yapılmış mı kontrol et
         const currentUser = localStorage.getItem('currentUser');
-        if (currentUser) {
+        const sessionData = localStorage.getItem('paslios_session');
+        if (currentUser || sessionData) {
           window.location.href = '/home';
           return;
         }
@@ -446,6 +447,7 @@
             };
             
             localStorage.setItem('paslios_session', JSON.stringify(sessionData));
+            localStorage.setItem('currentUser', JSON.stringify(result.user));
             localStorage.setItem('currentUserId', result.user.id);
             
             // Güzel toast bildirimi
