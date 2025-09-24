@@ -398,15 +398,23 @@
         // ToastManager'ı başlat
         toastManager = new ToastManager();
         
-        // Zaten giriş yapılmış mı kontrol et - sadece redirect parametresi yoksa yönlendir
+        // URL parametrelerini kontrol et
         const urlParams = new URLSearchParams(window.location.search);
         const redirectParam = urlParams.get('redirect');
         
+        // Eğer redirect parametresi varsa, authentication check yapma
+        // Çünkü bu zaten auth-guard.js'den gelen bir yönlendirme
+        if (redirectParam) {
+          console.log('Redirect parametresi tespit edildi, auth check atlanıyor:', redirectParam);
+          return;
+        }
+        
+        // Normal authentication check - sadece redirect parametresi yokken
         const currentUser = localStorage.getItem('currentUser');
         const sessionData = localStorage.getItem('paslios_session');
         
-        if ((currentUser || sessionData) && !redirectParam) {
-          // Döngüyü önlemek için kısa gecikme ekle
+        if (currentUser || sessionData) {
+          console.log('Kullanıcı zaten giriş yapmış, home\'a yönlendiriliyor');
           setTimeout(() => {
             window.location.href = '/home';
           }, 100);

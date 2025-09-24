@@ -58,9 +58,13 @@
             }
             
             if (!isLoggedIn) {
-                // Giriş gerekli - redirect
+                // Giriş gerekli - redirect (clean URL kullan)
                 const currentUrl = window.location.pathname + window.location.search;
-                const redirectUrl = 'index.html?redirect=' + encodeURIComponent(currentUrl);
+                // Eğer zaten index sayfasındaysak döngüyü önle
+                if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+                    return false;
+                }
+                const redirectUrl = '/?redirect=' + encodeURIComponent(currentUrl);
                 window.location.href = redirectUrl;
                 return false;
             }
